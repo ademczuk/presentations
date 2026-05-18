@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Claws Across the Internet - AWA: Agents with Agents</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--card:rgba(17,24,39,0.7);--border:rgba(148,163,184,0.12);
+  --border-hover:rgba(148,163,184,0.25);--text:#f1f5f9;--dim:#94a3b8;--muted:#64748b;
+  --blue:#3b82f6;--cyan:#06b6d4;--purple:#a855f7;--green:#10b981;
+  --orange:#f59e0b;--red:#ef4444;--pink:#ec4899;--electric:#818cf8;
+  --mono:'JetBrains Mono',monospace;--glow:0 0 30px rgba(168,85,247,0.3);--blur:blur(12px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(168,85,247,0.08),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(6,182,212,0.06),transparent 50%)}
+
+/* Video BG */
+#bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0.2;filter:saturate(0.6) brightness(0.7);pointer-events:none}
+#bg-grid{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background-image:linear-gradient(rgba(148,163,184,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.03) 1px,transparent 1px);
+  background-size:60px 60px}
+
+/* Particles */
+.particles{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:var(--purple);border-radius:50%;opacity:0.4;animation:float-up linear infinite}
+@keyframes float-up{0%{transform:translateY(100vh) scale(1);opacity:0}10%{opacity:0.4}90%{opacity:0.4}100%{transform:translateY(-10vh) scale(0);opacity:0}}
+
+/* Gource overlay */
+#gource-overlay{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:rgba(10,14,26,0.85);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
+#gource-overlay .g-stat{display:flex;align-items:center;gap:6px}
+#gource-overlay .g-num{color:var(--cyan);font-weight:700}
+#gource-overlay .g-label{color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-size:0.6rem}
+
+/* Deck & Slides */
+.deck{position:fixed;inset:0;z-index:10}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;
+  opacity:0;transform:scale(0.97);transition:opacity 0.4s ease,transform 0.4s ease;pointer-events:none;overflow-y:auto;z-index:20}
+.slide.active{opacity:1;transform:scale(1);pointer-events:auto}
+
+/* Typography */
+.mega{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.05;text-align:center;letter-spacing:-0.02em}
+.big{font-size:clamp(1.5rem,4vw,2.8rem);font-weight:700;line-height:1.15;text-align:center}
+.mid{font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:600;line-height:1.3;text-align:center}
+.body{font-size:clamp(0.85rem,1.5vw,1.15rem);line-height:1.6;color:var(--dim);text-align:center;max-width:700px}
+.small{font-size:clamp(0.7rem,1vw,0.85rem);color:var(--muted);text-align:center}
+.mono{font-family:var(--mono)}
+
+/* Text gradients */
+.text-gradient{background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-purple{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-green{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-red{background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-claw{background:linear-gradient(135deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-electric{background:linear-gradient(135deg,var(--electric),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Badges */
+.badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-purple{background:rgba(168,85,247,0.15);color:var(--purple);border:1px solid rgba(168,85,247,0.3)}
+.badge-cyan{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.3)}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+.badge-orange{background:rgba(245,158,11,0.15);color:var(--orange);border:1px solid rgba(245,158,11,0.3)}
+
+/* Divider */
+.divider{width:80px;height:3px;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px;margin:0 auto}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);transition:border-color 0.3s}
+.card:hover{border-color:var(--border-hover)}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.card p,.card li{font-size:0.85rem;color:var(--dim);line-height:1.5}
+.card ul{list-style:none;padding:0}
+.card li{padding:6px 0 6px 16px;position:relative}
+.card li::before{content:'';position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:var(--cyan);transform:translateY(-50%)}
+.card-grid{display:grid;gap:16px;width:100%;max-width:1000px}
+.card-grid-2{grid-template-columns:repeat(2,1fr)}
+.card-grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:768px){.card-grid-2,.card-grid-3{grid-template-columns:1fr}}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:800px;width:100%}
+.stat-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;backdrop-filter:var(--blur)}
+.stat-num{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;font-family:var(--mono)}
+.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+@media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Architecture boxes */
+.arch-container{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;max-width:1000px}
+.arch-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-family:var(--mono);font-size:0.8rem;text-align:center;white-space:pre-line;line-height:1.6;backdrop-filter:var(--blur)}
+.arch-box .hl{color:var(--cyan);font-weight:700}
+.arch-box .hl2{color:var(--purple);font-weight:700}
+.arch-box .hl3{color:var(--green);font-weight:700}
+.arch-arrow{font-size:1.5rem;color:var(--purple);font-weight:700}
+
+/* Flow diagram */
+.flow-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;max-width:1100px}
+.flow-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:0.85rem;font-weight:600;text-align:center;backdrop-filter:var(--blur);min-width:120px}
+.flow-arrow{color:var(--purple);font-size:1.2rem;font-weight:700}
+
+/* Pipeline */
+.pipeline{display:flex;flex-direction:column;gap:12px;max-width:600px;width:100%}
+.pipe-step{display:flex;align-items:flex-start;gap:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;backdrop-filter:var(--blur)}
+.pipe-num{font-family:var(--mono);font-size:1.2rem;font-weight:900;color:var(--purple);min-width:30px}
+.pipe-label{font-weight:700;font-size:0.9rem}
+.pipe-desc{font-size:0.8rem;color:var(--dim);margin-top:2px}
+
+/* Quote blocks */
+.quote-block{background:var(--card);border-left:3px solid var(--purple);border-radius:0 10px 10px 0;padding:16px 20px;max-width:600px;width:100%;backdrop-filter:var(--blur)}
+.quote-block.green{border-left-color:var(--green)}
+.quote-block.red{border-left-color:var(--red)}
+.quote-block.cyan{border-left-color:var(--cyan)}
+
+/* VS boxes */
+.vs-container{display:flex;align-items:stretch;gap:20px;max-width:900px;width:100%}
+.vs-box{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;backdrop-filter:var(--blur)}
+.vs-box h3{font-size:1rem;font-weight:700;margin-bottom:12px}
+.vs-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+
+/* Pulse dot */
+.pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse-glow 2s ease-in-out infinite;vertical-align:middle;margin-right:6px}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 4px var(--green)}50%{box-shadow:0 0 12px var(--green),0 0 24px rgba(16,185,129,0.3)}}
+
+/* Image styling */
+.slide-img{width:100%;border-radius:12px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.img-caption{font-size:0.7rem;color:var(--muted);text-align:center;margin-top:8px;font-style:italic}
+
+/* Utility */
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}.mt-4{margin-top:32px}
+.text-center{text-align:center}
+.text-left{text-align:left}
+.text-purple{color:var(--purple)}.text-cyan{color:var(--cyan)}.text-green{color:var(--green)}
+.text-red{color:var(--red)}.text-orange{color:var(--orange)}.text-blue{color:var(--blue)}
+
+/* Nav dots */
+#nav-dots{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(148,163,184,0.25);cursor:pointer;transition:all 0.3s}
+.nav-dot.active{background:var(--purple);box-shadow:0 0 8px rgba(168,85,247,0.5);transform:scale(1.3)}
+.nav-dot:hover{background:rgba(168,85,247,0.5)}
+
+/* Slide counter */
+#slide-counter{position:fixed;bottom:20px;right:24px;z-index:50;font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
+
+/* Timer */
+#timer{position:fixed;top:14px;right:24px;z-index:50;font-family:var(--mono);font-size:0.85rem;padding:6px 14px;border-radius:20px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;user-select:none;backdrop-filter:var(--blur);transition:all 0.3s}
+#timer.running{color:var(--green);border-color:rgba(16,185,129,0.3)}
+#timer.warn{color:var(--orange);border-color:rgba(245,158,11,0.3)}
+#timer.danger{color:var(--red);border-color:rgba(239,68,68,0.3);animation:pulse-border 1s ease-in-out infinite}
+@keyframes pulse-border{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(239,68,68,0.3)}}
+
+/* Reorder panel */
+#reorder-btn{position:fixed;top:14px;left:24px;z-index:50;width:36px;height:36px;border-radius:8px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:var(--blur);transition:all 0.3s}
+#reorder-btn:hover{border-color:var(--purple);color:var(--purple)}
+#reorder-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;z-index:60;background:rgba(10,14,26,0.95);border-left:1px solid var(--border);padding:60px 16px 20px;overflow-y:auto;transition:right 0.3s ease;backdrop-filter:blur(20px)}
+#reorder-panel.open{right:0}
+#reorder-panel h3{font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.reorder-item{padding:10px 12px;margin-bottom:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;cursor:grab;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s}
+.reorder-item:active{cursor:grabbing}
+.reorder-item.dragging{opacity:0.5;border-color:var(--purple)}
+.reorder-item .ri-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reorder-item .ri-toggle{width:16px;height:16px;border-radius:4px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:var(--green);margin-left:8px;flex-shrink:0}
+.reorder-item .ri-toggle.hidden{color:var(--red)}
+
+/* Claw animation */
+@keyframes claw-scratch{0%{transform:translateX(-10px) rotate(-5deg);opacity:0}30%{opacity:1}60%{transform:translateX(10px) rotate(2deg);opacity:1}100%{transform:translateX(0) rotate(0);opacity:1}}
+.claw-in{animation:claw-scratch 0.6s ease-out forwards}
+
+/* Network pulse */
+@keyframes net-pulse{0%{box-shadow:0 0 0 0 rgba(168,85,247,0.4)}70%{box-shadow:0 0 0 15px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+.net-pulse{animation:net-pulse 2s ease-in-out infinite}
+
+/* Glow card variants */
+.card-glow-purple{border-color:rgba(168,85,247,0.3);box-shadow:0 0 20px rgba(168,85,247,0.1)}
+.card-glow-cyan{border-color:rgba(6,182,212,0.3);box-shadow:0 0 20px rgba(6,182,212,0.1)}
+.card-glow-green{border-color:rgba(16,185,129,0.3);box-shadow:0 0 20px rgba(16,185,129,0.1)}
+.card-glow-red{border-color:rgba(239,68,68,0.3);box-shadow:0 0 20px rgba(239,68,68,0.1)}
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="openclaw-gource.mp4" type="video/mp4">
+</video>
+<div id="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<!-- Gource overlay -->
+<div id="gource-overlay">
+  <div class="g-stat"><span class="g-label">OpenClaw</span></div>
+  <div style="display:flex;gap:20px">
+    <div class="g-stat"><span class="g-num" id="g-prs">5,241</span><span class="g-label">PRs</span></div>
+    <div class="g-stat"><span class="g-num" id="g-issues">3,012</span><span class="g-label">Issues</span></div>
+    <div class="g-stat"><span class="g-num" id="g-contribs">891</span><span class="g-label">Contributors</span></div>
+  </div>
+  <div class="g-stat"><span class="g-label">AWA Talk</span> <span style="color:var(--purple)">May 19, 2026 &middot; Vienna</span></div>
+</div>
+
+<!-- Slide counter -->
+<div id="slide-counter">1 / 17</div>
+
+<!-- Timer -->
+<div id="timer" onclick="toggleTimer()">10:00</div>
+
+<!-- Reorder button -->
+<div id="reorder-btn" onclick="togglePanel()">&#9776;</div>
+<div id="reorder-panel"><h3>Slide Order</h3><div id="reorder-list"></div></div>
+
+<!-- Nav dots -->
+<div id="nav-dots"></div>
+
+<!-- ========== SLIDES ========== -->
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" data-title="Title">
+  <span class="badge badge-purple">OpenClaw Presents</span>
+  <div class="mega mt-3">
+    Claws Across<br><span class="text-gradient-claw">the Internet</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="mid mt-2" style="font-weight:500;color:var(--dim)">
+    AWA: <span class="text-gradient-purple">Agents with Agents</span>
+  </div>
+  <div class="body mt-3" style="max-width:600px">
+    A claw is one bounded agent. Connect claws across the internet and you get a team, an arena, an economy.
+  </div>
+  <div class="small mt-4">Andrew Demczuk, MSc &middot; OpenClaw Contributor &middot; AI Battle Arena Builder</div>
+  <div class="small mt-1" style="font-family:var(--mono);color:var(--purple)">github.com/ademczuk &middot; openclaw.net</div>
+</div>
+
+<!-- SLIDE 2: The Question -->
+<div class="slide" data-title="The Force Multiplier">
+  <span class="badge badge-cyan">The Premise</span>
+  <div class="big mt-2">
+    One agent is useful.<br><span class="text-gradient-claw">An agent that spawns agents?</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">
+    When one agent can securely spawn and coordinate subagents across the internet, the force multiplier changes the game entirely. I've stress-tested this in some of the most demanding environments imaginable.
+  </div>
+  <div class="stat-grid mt-3">
+    <div class="stat-block">
+      <div class="stat-num text-purple">4</div>
+      <div class="stat-label">AI Models</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num text-cyan">16</div>
+      <div class="stat-label">Arena Bots</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num text-green">3</div>
+      <div class="stat-label">Battle Arenas</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num text-orange">24/7</div>
+      <div class="stat-label">Uptime</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: About Andrew -->
+<div class="slide" data-title="About Andrew">
+  <span class="badge badge-purple">Background</span>
+  <div class="big mt-2">
+    Who builds <span class="text-gradient-purple">battle arenas</span><br>for AI agents?
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:900px">
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">OpenClaw Contributor</span></h3>
+      <ul>
+        <li>Active contributor to the OpenClaw open-source project</li>
+        <li>Focus on agent-to-agent coordination protocols</li>
+        <li>Security-first approach to multi-agent systems</li>
+      </ul>
+    </div>
+    <div class="card card-glow-cyan">
+      <h3><span class="text-cyan">Arena Builder</span></h3>
+      <ul>
+        <li>Runs Battle Arena and Agent League competitive AI arenas</li>
+        <li>16+ concurrent bot management with Elo ranking</li>
+        <li>Real-time exploit detection and stat validation</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-block mt-3" style="max-width:700px">
+    <div style="font-size:0.9rem;font-weight:600">The arena isn't just entertainment. It's a stress test for the exact problems production multi-agent systems face: trust, coordination, and security at scale.</div>
+  </div>
+</div>
+
+<!-- SLIDE 4: The Arena -->
+<div class="slide" data-title="The Arena">
+  <span class="badge badge-red">Live Demo</span>
+  <div class="big mt-2">
+    The <span class="text-gradient-red">Battle Arena</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">CLI-driven AI battlebots. Agents don't just assist here - they compete.</div>
+  <div class="flow-row mt-3">
+    <div class="flow-box" style="border-color:rgba(168,85,247,0.3)"><span class="text-purple">Agent Spawns</span><br><span style="font-size:0.75rem;color:var(--dim)">Bot connects via API</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(6,182,212,0.3)"><span class="text-cyan">Arena Matches</span><br><span style="font-size:0.75rem;color:var(--dim)">Weapon + stat builds</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(16,185,129,0.3)"><span class="text-green">Elo Ranking</span><br><span style="font-size:0.75rem;color:var(--dim)">Competitive scoring</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(239,68,68,0.3)"><span class="text-red">Security Scan</span><br><span style="font-size:0.75rem;color:var(--dim)">Exploit detection</span></div>
+  </div>
+  <div class="card mt-3" style="max-width:700px;border-color:rgba(239,68,68,0.3)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span class="pulse-dot"></span>
+      <span style="font-size:0.85rem;font-weight:700">arena.angel-serv.com</span>
+      <span class="badge badge-red" style="margin-left:auto;font-size:0.6rem">LIVE</span>
+    </div>
+    <p style="font-size:0.8rem;color:var(--dim)">16 bots active &middot; Spear, Staff, Grapple weapon classes &middot; Real-time Elo from 100 to 12,879 &middot; Automated stat validation every 5 seconds</p>
+  </div>
+</div>
+
+<!-- SLIDE 5: Arena Admin -->
+<div class="slide" data-title="Arena Admin">
+  <span class="badge badge-orange">Security Dashboard</span>
+  <div class="big mt-2">
+    <span class="text-gradient-red">Arena Admin:</span> The War Room
+  </div>
+  <div class="divider mt-3"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
+    <div style="flex:1.6;max-width:640px">
+      <img src="arena-admin.png" class="slide-img" alt="Arena Admin Dashboard">
+      <div class="img-caption">Arena Admin - Security scan results with risk scoring per bot</div>
+    </div>
+    <div style="flex:1;max-width:360px;display:flex;flex-direction:column;gap:12px">
+      <div class="card card-glow-red">
+        <h3><span class="text-red">Real-Time Scanning</span></h3>
+        <ul>
+          <li>16 bots scanned per cycle</li>
+          <li>Stat anomaly flagging</li>
+          <li>IP clustering detection</li>
+          <li>Risk score 0-100 per bot</li>
+        </ul>
+      </div>
+      <div class="card card-glow-orange">
+        <h3><span class="text-orange">What Gets Flagged</span></h3>
+        <p>Defense reduction exceeds stat-derived value. Got: 0.10 | Expected: &le; 0.06. Each anomaly raises the risk score.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: Security Management -->
+<div class="slide" data-title="Security Per Round">
+  <span class="badge badge-red">Security</span>
+  <div class="big mt-2">
+    Patching Exploits <span class="text-gradient-red">Every Round</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Each arena round is a live security exercise. Bots try to game the system. We catch them, patch, and harden.</div>
+  <div class="pipeline mt-3">
+    <div class="pipe-step">
+      <div class="pipe-num">01</div>
+      <div><div class="pipe-label"><span class="text-red">Detect</span></div><div class="pipe-desc">Auto-scan flags stat anomalies, IP clusters, timing exploits</div></div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">02</div>
+      <div><div class="pipe-label"><span class="text-orange">Triage</span></div><div class="pipe-desc">Risk scoring classifies severity. High risk = immediate review</div></div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">03</div>
+      <div><div class="pipe-label"><span class="text-purple">Patch</span></div><div class="pipe-desc">Fix deployed mid-round. Validation rules tightened for next cycle</div></div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">04</div>
+      <div><div class="pipe-label"><span class="text-green">Harden</span></div><div class="pipe-desc">Boardroom review nightly. Permanent security rules merged into core</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: The Boardroom -->
+<div class="slide" data-title="The Boardroom">
+  <span class="badge badge-purple">OpenClaw</span>
+  <div class="big mt-2">
+    The Nightly <span class="text-gradient-purple">Boardroom</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Every night, the OpenClaw boardroom convenes to address real hacks. Not a standup. A security incident response session, run by agents.</div>
+  <div class="vs-container mt-3">
+    <div class="vs-box" style="border-color:rgba(239,68,68,0.3)">
+      <div class="vs-label text-red">What Comes In</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Flagged exploits from arena rounds</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Security scan anomalies</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Community vulnerability reports</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Automated CVE triage alerts</li>
+      </ul>
+    </div>
+    <div class="vs-box" style="border-color:rgba(16,185,129,0.3)">
+      <div class="vs-label text-green">What Comes Out</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Patches merged to main</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Updated validation rules</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Hardened API boundaries</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Security advisories published</li>
+      </ul>
+    </div>
+  </div>
+  <div class="small mt-3" style="color:var(--purple);font-family:var(--mono)">Real hacks. Real patches. Every night.</div>
+</div>
+
+<!-- SLIDE 8: AWA Architecture -->
+<div class="slide" data-title="AWA: Architecture">
+  <span class="badge badge-cyan">Core Concept</span>
+  <div class="big mt-2">
+    AWA: <span class="text-gradient-claw">Agents with Agents</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">One orchestrator. Multiple specialized subagents. Secure spawning across network boundaries.</div>
+  <div class="arch-container mt-3">
+    <div class="arch-box" style="border-color:rgba(168,85,247,0.4);min-width:140px">
+      <span class="hl2">Orchestrator</span>
+      <br>intent routing
+      <br>task decomposition
+      <br>result synthesis
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="arch-box" style="border-color:rgba(6,182,212,0.3)"><span class="hl">Builder</span> &middot; code gen</div>
+      <div class="arch-box" style="border-color:rgba(16,185,129,0.3)"><span class="hl3">Scout</span> &middot; research</div>
+      <div class="arch-box" style="border-color:rgba(239,68,68,0.3)"><span style="color:var(--red);font-weight:700">Reviewer</span> &middot; validation</div>
+      <div class="arch-box" style="border-color:rgba(245,158,11,0.3)"><span style="color:var(--orange);font-weight:700">Guard</span> &middot; security</div>
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box" style="border-color:rgba(168,85,247,0.4);min-width:140px">
+      <span class="hl2">Merge</span>
+      <br>conflict resolution
+      <br>quality gate
+      <br>deploy
+    </div>
+  </div>
+  <div class="card mt-3" style="max-width:700px;border-color:rgba(168,85,247,0.3)">
+    <p style="font-size:0.85rem;color:var(--dim)">Each subagent runs in an isolated git worktree with scoped file permissions. The orchestrator coordinates via a mail system, not shared memory. Trust is established per-task, not globally. <span style="color:var(--purple)">The same architecture that runs the arena runs the nightly boardroom.</span></p>
+  </div>
+</div>
+
+<!-- SLIDE 9: Secure Spawning -->
+<div class="slide" data-title="Secure Spawning">
+  <span class="badge badge-green">Requirements</span>
+  <div class="big mt-2">
+    Secure Subagent <span class="text-gradient-green">Spawning</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">You can't just fork() an agent and hope for the best. Secure spawning requires guardrails at every layer.</div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:900px">
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">Isolation</span></h3>
+      <ul>
+        <li>Git worktree per agent (no shared state)</li>
+        <li>Scoped file permissions (only touch your files)</li>
+        <li>Separate process, separate context window</li>
+      </ul>
+    </div>
+    <div class="card card-glow-cyan">
+      <h3><span class="text-cyan">Authentication</span></h3>
+      <ul>
+        <li>Per-task capability tokens</li>
+        <li>No ambient authority (least privilege)</li>
+        <li>Audit trail on every tool call</li>
+      </ul>
+    </div>
+    <div class="card card-glow-green">
+      <h3><span class="text-green">Coordination</span></h3>
+      <ul>
+        <li>Mail-based messaging (async, auditable)</li>
+        <li>Task dependency graphs (DAG, not queue)</li>
+        <li>Merge gating with dry-run conflict check</li>
+      </ul>
+    </div>
+    <div class="card card-glow-red">
+      <h3><span class="text-red">Kill Switches</span></h3>
+      <ul>
+        <li>Resource limits and timeouts per agent</li>
+        <li>Circuit breakers on external calls</li>
+        <li>Orchestrator can terminate any subagent</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: Coordination Patterns -->
+<div class="slide" data-title="Coordination Patterns">
+  <span class="badge badge-blue">Patterns</span>
+  <div class="big mt-2">
+    Coordination <span class="text-gradient">in the Wild</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Patterns battle-tested in competitive AI arenas, now running in production workflows.</div>
+  <div class="card-grid card-grid-3 mt-3" style="max-width:1000px">
+    <div class="card">
+      <h3><span class="text-purple">Fan-Out / Fan-In</span></h3>
+      <p>Decompose task into N subtasks. Spawn N agents in parallel. Collect and synthesize results. The arena does this every round with 16 bots.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-cyan">Multi-Model Consensus</span></h3>
+      <p>Same question to 4 different AI models. Compare answers. If they disagree, that's where the risk lives. Used for security-critical decisions.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-green">Fallback Chains</span></h3>
+      <p>Primary model fails? Auto-route to next in chain. Circuit breakers prevent cascading failures. No single point of failure.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-orange">Capability Routing</span></h3>
+      <p>Match task signals to agent strengths. Code gen to the code model. Research to the context-window model. Math to the reasoning model.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-red">Adversarial Review</span></h3>
+      <p>One agent writes. Another red-teams. The arena equivalent: bots exploit each other's weaknesses. Apply the same pattern to your CI/CD.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-blue">Iterative Refinement</span></h3>
+      <p>Agent loops: plan, execute, observe, adjust. Each iteration sharpens the output. Set a completion promise. Exit when done.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11: Competitive AI -->
+<div class="slide" data-title="Arenas as Stress Test">
+  <span class="badge badge-red">Stress Test</span>
+  <div class="big mt-2">
+    Why the <span class="text-gradient-red">Arena</span> Beats <span class="text-gradient-claw">Unit Tests</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Competitive AI battle arenas where agents don't just assist - they fight. The most adversarial testing ground for multi-agent coordination.</div>
+  <div class="vs-container mt-3">
+    <div class="vs-box card-glow-red">
+      <div class="vs-label text-red">What the Arena Teaches</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Agents WILL exploit any unvalidated input</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Stat manipulation is the first thing they try</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; IP clustering reveals coordination attacks</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Elo systems need tamper-proof backends</li>
+      </ul>
+    </div>
+    <div class="vs-box card-glow-green">
+      <div class="vs-label text-green">What Builders Should Steal</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Treat every agent output as untrusted input</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Validate at the boundary, not in the agent</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Log everything - you'll need the audit trail</li>
+        <li style="padding:8px 0;font-size:0.85rem;color:var(--dim)">&bull; Assume adversarial conditions in production</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12: From Arena to Production -->
+<div class="slide" data-title="Arena to Production">
+  <span class="badge badge-green">Takeaways</span>
+  <div class="big mt-2">
+    From Arena to <span class="text-gradient-green">Your Workflow</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">The arena is just a more demanding version of your production environment. These patterns transfer directly.</div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:900px">
+    <div class="card">
+      <h3><span class="text-purple">1. Don't Trust Single Agents</span></h3>
+      <p>Multi-model consensus for critical decisions. One agent can hallucinate. Four agreeing is a signal. Four disagreeing is a bigger signal.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-cyan">2. Isolate Everything</span></h3>
+      <p>Separate worktrees. Scoped permissions. No ambient authority. The blast radius of a misbehaving agent should be zero.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-green">3. Coordination &gt; Intelligence</span></h3>
+      <p>Four mediocre agents well-coordinated beat one brilliant agent working alone. The orchestration layer is the product.</p>
+    </div>
+    <div class="card">
+      <h3><span class="text-orange">4. Security Is a Loop</span></h3>
+      <p>Detect, triage, patch, harden, repeat. Not a checklist. A continuous cycle. The arena taught us this the hard way.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13: The Stack -->
+<div class="slide" data-title="The Stack">
+  <span class="badge badge-cyan">Under the Hood</span>
+  <div class="big mt-2">
+    The <span class="text-gradient-claw">AWA Stack</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="arch-container mt-3">
+    <div class="arch-box" style="min-width:180px;border-color:rgba(168,85,247,0.4)">
+      <span class="hl2">Orchestration</span>
+      <br>Claude Code CLI
+      <br>Overstory agents
+      <br>Trident multi-model
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box" style="min-width:180px;border-color:rgba(6,182,212,0.4)">
+      <span class="hl">Coordination</span>
+      <br>MCP protocol
+      <br>Mail-based messaging
+      <br>Task dependency DAGs
+    </div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box" style="min-width:180px;border-color:rgba(16,185,129,0.4)">
+      <span class="hl3">Execution</span>
+      <br>Git worktrees
+      <br>Sandboxed processes
+      <br>Merge + deploy gates
+    </div>
+  </div>
+  <div class="card mt-3" style="max-width:700px;border-color:rgba(6,182,212,0.3)">
+    <h3><span class="text-cyan">Models in the Fleet</span></h3>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px">
+      <div style="font-size:0.8rem;color:var(--dim)"><span class="text-purple">Claude Opus 4.6</span> - orchestration</div>
+      <div style="font-size:0.8rem;color:var(--dim)"><span class="text-cyan">Codex (GPT-5.4)</span> - code gen</div>
+      <div style="font-size:0.8rem;color:var(--dim)"><span class="text-green">Gemini 3.1 Pro</span> - research</div>
+      <div style="font-size:0.8rem;color:var(--dim)"><span class="text-orange">Grok 4.20</span> - reasoning</div>
+    </div>
+  </div>
+  <div class="small mt-3">4 models &middot; 0 API credits for 3 of them &middot; subscription-based multi-model at zero marginal cost</div>
+</div>
+
+<!-- SLIDE 14: The Ecosystem -->
+<div class="slide" data-title="OpenClaw Arenas">
+  <span class="badge badge-cyan">OpenClaw</span>
+  <div class="big mt-2">
+    Six Arenas. <span class="text-gradient-claw">One Stack.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Each arena stresses a different coordination shape. Same primitives. Different rules of the game.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1000px;width:100%;margin-top:20px">
+    <div class="card card-glow-red" style="padding:16px">
+      <h3 style="font-size:0.9rem"><span class="text-red">ClawFC</span></h3>
+      <p style="font-size:0.78rem">AI Football League. OpenClaw agents playing football autonomously in the browser. Not a simulation - full LLM-backed decision making on the pitch.</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">clawfc.ai</div>
+    </div>
+    <div class="card card-glow-purple" style="padding:16px">
+      <h3 style="font-size:0.9rem"><span class="text-purple">CodeClash</span></h3>
+      <p style="font-size:0.78rem">OpenClaw bots compete in this Stanford/Princeton benchmark. 6 sub-arenas: BattleSnake, Poker, CoreWar, Robocode. Agents iterate code across 15 rounds.</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">codeclash.ai</div>
+    </div>
+    <div class="card card-glow-cyan" style="padding:16px">
+      <h3 style="font-size:0.9rem"><span class="text-cyan">Agent League</span></h3>
+      <p style="font-size:0.78rem">OpenClaw's competition hub. Tron, Poker, Chess. 150ms decision deadline per tick. ELO matchmaking. Python SDK. Free to compete.</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">openclawagentleague.com</div>
+    </div>
+    <div class="card" style="padding:16px;border-color:rgba(245,158,11,0.3)">
+      <h3 style="font-size:0.9rem"><span class="text-orange">ClawGames</span></h3>
+      <p style="font-size:0.78rem">Agents BUILD the games, humans play them. AI bots generate complete HTML5 canvas games. Human ratings rank the agents.</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">clawgames.io</div>
+    </div>
+    <div class="card" style="padding:16px;border-color:rgba(16,185,129,0.3)">
+      <h3 style="font-size:0.9rem"><span class="text-green">Claw Clash</span></h3>
+      <p style="font-size:0.78rem">Prediction market for AI agents. $10K virtual money. Agents make autonomous sports predictions. "Built for agents, by agents."</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">clawclash.xyz</div>
+    </div>
+    <div class="card" style="padding:16px;border-color:rgba(59,130,246,0.3)">
+      <h3 style="font-size:0.9rem"><span class="text-blue">Battle Arena</span></h3>
+      <p style="font-size:0.78rem">Our arena. 100x100 grid battle royale. WebSocket API. 7 weapon classes. 16 bots per round. Auto stat validation. No signup required.</p>
+      <div class="small mt-1" style="text-align:left;font-family:var(--mono)">arena.angel-serv.com</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15: The Field Right Now (Games + Payments) -->
+<div class="slide" data-title="The Field Right Now">
+  <span class="badge badge-orange">May 2026</span>
+  <div class="big mt-2">
+    Where Agents <span class="text-gradient-claw">Play and Pay</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Two industries are forming at the same time. Both need the same primitives: identity, isolation, verification, audit.</div>
+  <div class="vs-container mt-3">
+    <div class="vs-box card-glow-purple">
+      <div class="vs-label text-purple">Agents Play</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">Claude Opus 4.7 beats Pokemon Red</span> &middot; vision finally cracked Victory Road (this month)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">Project Sid</span> &middot; 1,000 Claude agents amend constitutions and spread religion via bribery in Minecraft</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">DeepMind Game Arena</span> &middot; Werewolf, Poker, chess on Kaggle (Feb 26)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">SIMA 2</span> &middot; Gemini playing 3D games, 62% on novel tasks (up from 31%)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">SpaceMolt</span> &middot; space MMO, humans banned, 291 agents, all-Claude codebase</li>
+      </ul>
+    </div>
+    <div class="vs-box card-glow-green">
+      <div class="vs-label text-green">Agents Pay</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">AWS AgentCore Payments</span> &middot; agents transacting in USDC, 200ms (May 7)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">Coinbase x402</span> + <span style="color:var(--text);font-weight:600">Google AP2</span> &middot; HTTP 402 agent payments protocol</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">Anthropic + FIS</span> &middot; 12% of global payments, AML agents (May 4)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">Anthropic + Blackstone + H&amp;F + Goldman</span> &middot; $1.5B JV</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; <span style="color:var(--text);font-weight:600">OpenAI + Plaid</span> &middot; 12,000 institutions in ChatGPT (May 15)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-block cyan mt-3" style="max-width:800px">
+    <div style="font-size:0.9rem;font-weight:600">Games are where agents learn to compete. Payment rails are where they learn to cooperate. Same primitives: identity, isolation, audit. Different cargo.</div>
+  </div>
+</div>
+
+<!-- SLIDE 16: Deep Dive - ClawFC & CodeClash -->
+<div class="slide" data-title="ClawFC & CodeClash">
+  <span class="badge badge-red">Deep Dive</span>
+  <div class="big mt-2">
+    <span class="text-gradient-red">ClawFC</span> meets <span class="text-gradient-purple">CodeClash</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="vs-container mt-3">
+    <div class="vs-box card-glow-red">
+      <div class="vs-label text-red">ClawFC - Community-Built</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Created by <span style="color:var(--text)">@peterpiep</span> on top of OpenClaw</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Full LLM agents making real-time football decisions</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Went viral: <span style="color:var(--text)">"You're about to watch AI agents play football. Not a simulation."</span></li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Any LLM backend: Claude, GPT, Gemini, Ollama</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; The spectacle IS the product - humans watch, agents play</li>
+      </ul>
+    </div>
+    <div class="vs-box card-glow-purple">
+      <div class="vs-label text-purple">CodeClash - Academic Rigor</div>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Stanford/Princeton/Cornell research (<span style="color:var(--text)">arXiv 2511.00839</span>)</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; 1,680 tournaments, 25,200 rounds, 50K trajectories</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Key finding: codebases get messier each iteration</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; No model dominates all arenas - specialists emerge</li>
+        <li style="padding:6px 0;font-size:0.83rem;color:var(--dim)">&bull; Top AI still loses every round vs expert humans</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-block cyan mt-3" style="max-width:800px">
+    <div style="font-size:0.9rem;font-weight:600">The pattern is the same everywhere: when you put agents in adversarial environments with real stakes, you learn things about coordination, security, and reliability that no unit test will ever reveal.</div>
+  </div>
+</div>
+
+<!-- SLIDE 17: Get Connected -->
+<div class="slide" data-title="Get Connected">
+  <div class="big" style="margin-bottom:8px">
+    Join the <span class="text-gradient-claw">Game</span>
+  </div>
+  <div class="small" style="color:var(--dim);margin-bottom:14px;font-size:0.95rem">Single agents are demos. Networked agents become real when they spawn, compete, and harden in arenas with stakes.</div>
+  <div style="display:flex;align-items:flex-start;justify-content:center;gap:5vw;width:95vw">
+    <div class="card card-glow-purple" style="text-align:center;padding:16px 20px;flex:1;max-width:420px">
+      <h3 style="font-size:1.1rem"><span class="text-purple">OpenClaw</span></h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=https://openclaw.net&bgcolor=111827&color=a855f7" style="margin:10px auto;display:block;border-radius:8px;width:100%;aspect-ratio:1" alt="OpenClaw QR">
+      <p style="font-family:var(--mono);font-size:0.85rem">openclaw.net</p>
+    </div>
+    <div class="card card-glow-red" style="text-align:center;padding:16px 20px;flex:1;max-width:420px">
+      <h3 style="font-size:1.1rem"><span class="text-red">The Arena</span></h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=https://arena.angel-serv.com&bgcolor=111827&color=ef4444" style="margin:10px auto;display:block;border-radius:8px;width:100%;aspect-ratio:1" alt="Arena QR">
+      <p style="font-family:var(--mono);font-size:0.85rem">arena.angel-serv.com</p>
+    </div>
+    <div class="card card-glow-cyan" style="text-align:center;padding:16px 20px;flex:1;max-width:420px">
+      <h3 style="font-size:1.1rem"><span class="text-cyan">This Talk</span></h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=https://ademczuk.github.io/presentations/claws-across-the-internet/slides.html&bgcolor=111827&color=06b6d4" style="margin:10px auto;display:block;border-radius:8px;width:100%;aspect-ratio:1" alt="Slides QR">
+      <p style="font-family:var(--mono);font-size:0.85rem">Slides on GitHub Pages</p>
+    </div>
+  </div>
+  <div class="small mt-3" style="font-family:var(--mono);color:var(--purple);font-size:0.8rem">Thanks Vienna &middot; <span style="color:var(--cyan)">#vibecodingvienna</span> &middot; @ademczuk</div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+// Particles
+(function(){
+  var c=document.getElementById('particles');
+  for(var i=0;i<25;i++){
+    var p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(10+Math.random()*15)+'s';
+    p.style.animationDelay=Math.random()*10+'s';
+    if(Math.random()>0.5) p.style.background='var(--cyan)';
+    c.appendChild(p);
+  }
+})();
+
+// Slide engine
+var currentSlide=0;
+var slideOrder=[];
+var hiddenSlides=new Set();
+var transitioning=false;
+
+function getAllSlides(){return document.querySelectorAll('.slide')}
+function getVisibleSlides(){
+  var all=getAllSlides();
+  var visible=[];
+  slideOrder.forEach(function(i){if(!hiddenSlides.has(i)&&i<all.length) visible.push(i)});
+  return visible;
+}
+
+function showSlide(visIdx){
+  var visible=getVisibleSlides();
+  if(visIdx<0||visIdx>=visible.length) return;
+  if(transitioning) return;
+  transitioning=true;
+  currentSlide=visIdx;
+  var slides=getAllSlides();
+  slides.forEach(function(s){s.classList.remove('active')});
+  slides[visible[visIdx]].classList.add('active');
+  updateDots();
+  updateCounter();
+  setTimeout(function(){transitioning=false},450);
+}
+
+function next(){var v=getVisibleSlides();if(currentSlide<v.length-1) showSlide(currentSlide+1)}
+function prev(){if(currentSlide>0) showSlide(currentSlide-1)}
+
+// Nav dots
+function buildDots(){
+  var container=document.getElementById('nav-dots');
+  container.innerHTML='';
+  var visible=getVisibleSlides();
+  visible.forEach(function(_,i){
+    var d=document.createElement('div');
+    d.className='nav-dot'+(i===currentSlide?' active':'');
+    d.onclick=function(){showSlide(i)};
+    container.appendChild(d);
+  });
+}
+function updateDots(){
+  var dots=document.querySelectorAll('.nav-dot');
+  dots.forEach(function(d,i){d.classList.toggle('active',i===currentSlide)});
+}
+function updateCounter(){
+  var v=getVisibleSlides();
+  document.getElementById('slide-counter').textContent=(currentSlide+1)+' / '+v.length;
+}
+
+// Keyboard
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+  else if(e.key==='Home'){e.preventDefault();showSlide(0)}
+  else if(e.key==='End'){e.preventDefault();showSlide(getVisibleSlides().length-1)}
+  else if(e.key==='r'||e.key==='R') togglePanel();
+  else if(e.key==='f'||e.key==='F'){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+    else document.exitFullscreen();
+  }
+  else if(e.key==='Escape'){var p=document.getElementById('reorder-panel');if(p.classList.contains('open')) p.classList.remove('open')}
+});
+
+// Click navigation
+document.addEventListener('click',function(e){
+  if(e.target.closest('#reorder-panel,#reorder-btn,#timer,.card a,a,.badge')) return;
+  if(e.clientX>window.innerWidth*0.5) next(); else prev();
+});
+
+// Touch
+var touchX=0;
+document.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-touchX;
+  if(Math.abs(dx)>60){if(dx<0) next(); else prev()}
+},{passive:true});
+
+// Timer
+var timerEl=document.getElementById('timer');
+var timerRunning=false,timerInterval=null,timerSeconds=600;
+function toggleTimer(){
+  if(!timerRunning){
+    timerRunning=true;timerSeconds=600;
+    timerEl.classList.add('running');
+    timerInterval=setInterval(function(){
+      timerSeconds--;
+      if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;timerEl.textContent='0:00';timerEl.className='';timerEl.id='timer';return}
+      var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+      timerEl.textContent=m+':'+(s<10?'0':'')+s;
+      timerEl.classList.remove('running','warn','danger');
+      if(timerSeconds<=60) timerEl.classList.add('danger');
+      else if(timerSeconds<=120) timerEl.classList.add('warn');
+      else timerEl.classList.add('running');
+    },1000);
+  } else {
+    clearInterval(timerInterval);timerRunning=false;timerSeconds=600;
+    timerEl.textContent='10:00';timerEl.classList.remove('running','warn','danger');
+  }
+}
+
+// Reorder panel
+function togglePanel(){document.getElementById('reorder-panel').classList.toggle('open')}
+function buildReorderList(){
+  var list=document.getElementById('reorder-list');list.innerHTML='';
+  var slides=getAllSlides();
+  slideOrder.forEach(function(idx){
+    var item=document.createElement('div');
+    item.className='reorder-item';
+    item.draggable=true;
+    item.dataset.idx=idx;
+    var label=document.createElement('span');
+    label.className='ri-label';
+    label.textContent=(idx+1)+'. '+(slides[idx].dataset.title||'Slide '+(idx+1));
+    var toggle=document.createElement('span');
+    toggle.className='ri-toggle'+(hiddenSlides.has(idx)?' hidden':'');
+    toggle.textContent=hiddenSlides.has(idx)?'X':'V';
+    toggle.onclick=function(e){
+      e.stopPropagation();
+      if(hiddenSlides.has(idx)) hiddenSlides.delete(idx); else hiddenSlides.add(idx);
+      buildReorderList();buildDots();updateCounter();
+      if(currentSlide>=getVisibleSlides().length) showSlide(getVisibleSlides().length-1);
+    };
+    item.appendChild(label);item.appendChild(toggle);
+    // Drag handlers
+    item.addEventListener('dragstart',function(e){item.classList.add('dragging');e.dataTransfer.setData('text/plain',idx)});
+    item.addEventListener('dragend',function(){item.classList.remove('dragging')});
+    item.addEventListener('dragover',function(e){e.preventDefault()});
+    item.addEventListener('drop',function(e){
+      e.preventDefault();
+      var fromIdx=parseInt(e.dataTransfer.getData('text/plain'));
+      var fromPos=slideOrder.indexOf(fromIdx);
+      var toPos=slideOrder.indexOf(idx);
+      slideOrder.splice(fromPos,1);
+      slideOrder.splice(toPos,0,fromIdx);
+      buildReorderList();buildDots();
+    });
+    list.appendChild(item);
+  });
+}
+
+// Init
+(function(){
+  var slides=getAllSlides();
+  for(var i=0;i<slides.length;i++) slideOrder.push(i);
+  buildDots();buildReorderList();updateCounter();
+})();
+
+// GitHub live-edit (configure for your repo)
+var REPO_OWNER='ademczuk';
+var REPO_NAME='claws-across-the-internet';
+var FILE_PATH='slides.html';
+</script>
+</body>
+</html>
