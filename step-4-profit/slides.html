@@ -358,29 +358,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     I stopped giving one agent a <span class="text-gradient-claw">goal</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="body mt-2">A build this big is too much for one session grinding on one prompt. So I changed how I drive the agents.</div>
-  <div class="vs-container mt-3">
-    <div class="vs-box" style="border-color:rgba(148,163,184,0.25)">
-      <div class="vs-label" style="color:var(--muted)">The usual way</div>
-      <h3 style="margin-bottom:8px">Claude Code, one Goal</h3>
-      <ul style="list-style:none;padding:0">
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; One session, one outcome</li>
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Runs until it thinks it is done</li>
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; You wait, and you can't see inside</li>
-      </ul>
-    </div>
-    <div class="vs-box card-glow-purple">
-      <div class="vs-label text-purple">What worked for me</div>
-      <h3 style="margin-bottom:8px"><span class="text-purple">nimbalyst</span>: a board of agents</h3>
-      <ul style="list-style:none;padding:0">
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Meta-agents plan and delegate the work</li>
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Parallel sessions, each in its own git worktree</li>
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; A kanban: backlog, planning, building, done</li>
-        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; I drive the board, not the prompt</li>
-      </ul>
-    </div>
-  </div>
-  <div class="small mt-3" style="color:var(--purple);font-family:var(--mono)">For a build this big, the board beat the single goal.</div>
+  <div class="body mt-2">One Claude Code goal is one session grinding alone. A nimbalyst meta-agent runs a whole board. Here are two of them from this build.</div>
+  <img src="nimbalyst-meta.png" class="slide-img mt-3" style="max-width:1140px" alt="Two nimbalyst windows, each a meta-agent delegating dozens of child sessions on a kanban">
+  <div class="img-caption">Left builds the swipe deck and the site sections. Right runs hero image generation. Each meta-agent delegates dozens of child sessions and tracks them on its own kanban.</div>
 </div>
 
 <!-- SLIDE 8: Close / CTA - nimbalyst -->
