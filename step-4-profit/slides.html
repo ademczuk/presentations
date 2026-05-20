@@ -206,7 +206,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
 </div>
 
 <!-- Slide counter -->
-<div id="slide-counter">1 / 8</div>
+<div id="slide-counter">1 / 7</div>
 
 <!-- Timer (5 min lightning slot) -->
 <div id="timer" onclick="toggleTimer()">5:00</div>
@@ -232,7 +232,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     Can an agent <span class="text-gradient-purple">actually make money?</span>
   </div>
   <div class="body mt-3" style="max-width:600px">
-    The agent economy has a Step 2 problem. Here is one honest attempt to fill it in. The wins, and the spectacular fails.
+    The agent economy has a Step 2 problem. Here is my honest attempt to fill it in, live on stage, fails and all.
   </div>
   <div class="small mt-4">Andrew Demczuk, MSc &middot; OpenClaw Contributor &middot; 5-minute lightning talk</div>
   <div class="small mt-1" style="font-family:var(--mono);color:var(--purple)">github.com/ademczuk &middot; ViennaUP 2026</div>
@@ -265,53 +265,32 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   </div>
 </div>
 
-<!-- SLIDE 3: My four steps (the pipeline) -->
-<div class="slide" data-title="The Pipeline">
-  <span class="badge badge-purple">How did you do that</span>
-  <div class="big mt-2">
-    My version has <span class="text-gradient-gold">four steps</span>
-  </div>
-  <div class="divider mt-3"></div>
-  <div class="body mt-2">A $500 website service for tradies. Plumbers, electricians, the people who never built a decent site. The whole thing runs on agents.</div>
-  <div class="flow-row mt-3">
-    <div class="flow-box" style="border-color:rgba(168,85,247,0.3)"><span class="text-purple">1. Scrape</span><br><span style="font-size:0.75rem;color:var(--dim)">Pull a real lead from the CRM</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(6,182,212,0.3)"><span class="text-cyan">2. Build</span><br><span style="font-size:0.75rem;color:var(--dim)">Agents make 6 designs</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(16,185,129,0.3)"><span class="text-green">3. Swipe</span><br><span style="font-size:0.75rem;color:var(--dim)">Customer picks one, Tinder-style</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(245,158,11,0.4)"><span class="text-orange">4. Profit?</span><br><span style="font-size:0.75rem;color:var(--dim)">Invoice $500</span></div>
-  </div>
-  <div class="card mt-3" style="max-width:760px;border-color:rgba(168,85,247,0.3)">
-    <p style="font-size:0.85rem;color:var(--dim)">Under the hood: scrape the business, generate six distinct designs, paint the photos with Nano Banana, run a <span class="text-orange">19-check audit gate</span> with a local vision model, deploy to Cloudflare, then hand the customer a swipe deck of their own business. <span class="text-purple">No human touches the build.</span></p>
-  </div>
-</div>
-
-<!-- SLIDE 4: Tinder for Websites -->
-<div class="slide" data-title="Tinder for Websites">
-  <span class="badge badge-green">The Demo</span>
+<!-- SLIDE 3: LIVE demo - Tinder for websites -->
+<div class="slide" data-title="LIVE: Tinder for Websites">
+  <span class="badge badge-red"><span class="pulse-dot"></span>Live demo</span>
   <div class="big mt-2">
     Tinder, but for <span class="text-gradient-green">your own website</span>
   </div>
   <div class="divider mt-3"></div>
-  <div style="display:flex;align-items:flex-start;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
-    <div style="flex:1.6;max-width:680px">
+  <div class="flow-row mt-3">
+    <div class="flow-box" style="border-color:rgba(168,85,247,0.3)"><span class="text-purple">1. Scrape</span><br><span style="font-size:0.72rem;color:var(--dim)">a real tradie lead</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(6,182,212,0.3)"><span class="text-cyan">2. Build</span><br><span style="font-size:0.72rem;color:var(--dim)">6 designs, no human</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(16,185,129,0.3)"><span class="text-green">3. Swipe</span><br><span style="font-size:0.72rem;color:var(--dim)">customer picks one</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box" style="border-color:rgba(245,158,11,0.4)"><span class="text-orange">4. Profit?</span><br><span style="font-size:0.72rem;color:var(--dim)">invoice $500</span></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
+    <div style="flex:1.5;max-width:600px">
       <img src="tinder-swipe.png" class="slide-img" alt="Swipe deck card showing an AI-built plumbing site with pass and winner controls">
-      <div class="img-caption">One of six AI-built designs for a plumber. Swipe controls: pass, refine, pin, winner.</div>
+      <div class="img-caption">Six AI-built designs of one real business. Swipe: pass, refine, pin, winner.</div>
     </div>
-    <div style="flex:1;max-width:340px;display:flex;flex-direction:column;gap:12px">
-      <div class="card card-glow-green">
-        <h3><span class="text-green">No proposal</span></h3>
-        <ul>
-          <li>Customer never reads a pitch</li>
-          <li>Sees six versions of their own business</li>
-          <li>Swipes left or right</li>
-          <li>The favorite becomes the sale</li>
-        </ul>
-      </div>
-      <div class="card card-glow-cyan">
-        <h3><span class="text-cyan">Built from a name</span></h3>
-        <p>Input is a business name and a phone number off a directory. Output is six finished sites. Cost in AI: about a dollar.</p>
+    <div style="flex:1;max-width:320px;display:flex;flex-direction:column;gap:12px">
+      <div class="card card-glow-red">
+        <h3><span class="text-red">Switching live now</span></h3>
+        <p style="font-family:var(--mono);font-size:0.92rem;color:var(--text)">aliasweb-tinder.pages.dev</p>
+        <p>Swiping a real plumber. Scrape to deploy: six designs, a <span class="text-orange">19-check audit</span>, a local vision model. No human touches the build.</p>
       </div>
     </div>
   </div>
