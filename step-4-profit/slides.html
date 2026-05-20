@@ -232,7 +232,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     Can an agent <span class="text-gradient-purple">actually make money?</span>
   </div>
   <div class="body mt-3" style="max-width:600px">
-    The agent economy has a Step 2 problem. Here is a real machine that turns map pins into paying customers. Live on stage, fails and all.
+    The agent economy has a Step 2 problem. I built a whole sales machine to fill it, solo. Here is what it does, and the tool that made it possible.
   </div>
   <div class="small mt-4">Andrew Demczuk, MSc &middot; OpenClaw Contributor &middot; 5-minute lightning talk</div>
   <div class="small mt-1" style="font-family:var(--mono);color:var(--purple)">github.com/ademczuk &middot; ViennaUP 2026</div>
@@ -280,48 +280,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     One cockpit for <span class="text-gradient-purple">100+ wranglers</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="body mt-2">Contacts, email, calls, meetings, calendar, social, metrics, a Kanban pipeline per wrangler. One login, one ecosystem.</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1040px;width:100%;margin-top:18px">
+  <div class="body mt-2">Contacts, email, calls, meetings, calendar, social, a Kanban pipeline. Every call teleprompted and transcribed live, so 100+ wranglers can dial 200 businesses a day and stay on script. One login, one ecosystem.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1040px;width:100%;margin-top:16px">
     <div><img src="Contacts.png" class="slide-img" alt="Contacts board"><div class="img-caption">Contacts</div></div>
     <div><img src="Email.png" class="slide-img" alt="Email inbox"><div class="img-caption">Email</div></div>
+    <div><img src="SIP.png" class="slide-img" alt="Calls cockpit"><div class="img-caption">Calls + teleprompter</div></div>
     <div><img src="Meetings.png" class="slide-img" alt="Meetings"><div class="img-caption">Meetings</div></div>
     <div><img src="Pipeline.png" class="slide-img" alt="Kanban pipeline"><div class="img-caption">Kanban pipeline</div></div>
     <div><img src="social.png" class="slide-img" alt="Social feed"><div class="img-caption">Social</div></div>
-    <div class="card card-glow-purple" style="display:flex;flex-direction:column;justify-content:center;text-align:center;padding:14px">
-      <div class="stat-num text-purple" style="font-size:1.7rem">100+</div>
-      <div class="stat-label">wranglers</div>
-      <div class="stat-num text-orange" style="font-size:1.7rem;margin-top:8px">200/day</div>
-      <div class="stat-label">businesses each</div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 5: Teleprompting at scale -->
-<div class="slide" data-title="Teleprompting">
-  <span class="badge badge-green">The trick</span>
-  <div class="big mt-2">
-    Every caller stays <span class="text-gradient-green">on script</span>
-  </div>
-  <div class="divider mt-3"></div>
-  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
-    <div style="flex:1.6;max-width:680px">
-      <img src="SIP.png" class="slide-img" alt="Calls cockpit with upcoming calls and call history">
-      <div class="img-caption">The calling cockpit: upcoming calls, history, connect rate, all in one place.</div>
-    </div>
-    <div style="flex:1;max-width:340px;display:flex;flex-direction:column;gap:12px">
-      <div class="card card-glow-green">
-        <h3><span class="text-green">Live teleprompter</span></h3>
-        <ul>
-          <li>The call is transcribed as it happens</li>
-          <li>The script branches in real time</li>
-          <li>Wranglers hold the pitch and still adapt</li>
-        </ul>
-      </div>
-      <div class="card card-glow-cyan">
-        <h3><span class="text-cyan">Why it matters</span></h3>
-        <p>100+ wranglers, up to 200 calls a day each. Staying on script at that volume is the whole game.</p>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -385,17 +351,52 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   </div>
 </div>
 
+<!-- SLIDE 7: How I built it - nimbalyst -->
+<div class="slide" data-title="How I built it">
+  <span class="badge badge-purple">How I built all this, solo</span>
+  <div class="big mt-2">
+    I stopped giving one agent a <span class="text-gradient-claw">goal</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">A build this big is too much for one session grinding on one prompt. So I changed how I drive the agents.</div>
+  <div class="vs-container mt-3">
+    <div class="vs-box" style="border-color:rgba(148,163,184,0.25)">
+      <div class="vs-label" style="color:var(--muted)">The usual way</div>
+      <h3 style="margin-bottom:8px">Claude Code, one Goal</h3>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; One session, one outcome</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Runs until it thinks it is done</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; You wait, and you can't see inside</li>
+      </ul>
+    </div>
+    <div class="vs-box card-glow-purple">
+      <div class="vs-label text-purple">What worked for me</div>
+      <h3 style="margin-bottom:8px"><span class="text-purple">nimbalyst</span>: a board of agents</h3>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Meta-agents plan and delegate the work</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; Parallel sessions, each in its own git worktree</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; A kanban: backlog, planning, building, done</li>
+        <li style="padding:6px 0;font-size:0.85rem;color:var(--dim)">&bull; I drive the board, not the prompt</li>
+      </ul>
+    </div>
+  </div>
+  <div class="small mt-3" style="color:var(--purple);font-family:var(--mono)">For a build this big, the board beat the single goal.</div>
+</div>
+
 <!-- SLIDE 8: Close / CTA - nimbalyst -->
 <div class="slide" data-title="nimbalyst">
-  <div class="big" style="margin-bottom:8px">
-    Want to build <span class="text-gradient-claw">agent fleets?</span>
+  <div class="big" style="margin-bottom:6px">
+    <span class="text-gradient-claw">nimbalyst</span> is open source
   </div>
-  <div class="small" style="color:var(--dim);margin-bottom:14px;font-size:0.95rem">This whole machine is a swarm of agents. The orchestration layer I build with is open source. Scan it.</div>
-  <div style="display:flex;align-items:center;justify-content:center;width:95vw">
-    <div class="card card-glow-purple" style="text-align:center;padding:20px 24px;width:80%;max-width:80vw">
-      <h3 style="font-size:1.3rem;margin-bottom:8px">Scan to visit <span class="text-purple">nimbalyst</span> on GitHub</h3>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=https://github.com/nimbalyst/nimbalyst" style="width:48%;height:auto;margin:10px auto;display:block;border-radius:8px;aspect-ratio:1" alt="nimbalyst GitHub QR code">
-      <p style="font-family:var(--mono);font-size:0.95rem">github.com/nimbalyst/nimbalyst</p>
+  <div class="small" style="color:var(--dim);margin-bottom:14px;font-size:0.95rem">Everything you just saw, one person built it on a kanban of agents. The tool is free. Go take it further than I did.</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;max-width:1100px;width:100%">
+    <div style="flex:1.1;max-width:520px">
+      <img src="nimbalyst-hero.png" class="slide-img" alt="nimbalyst orchestration: one conductor directing a fleet of agents">
+    </div>
+    <div class="card card-glow-purple" style="flex:0.9;text-align:center;padding:18px 22px">
+      <h3 style="font-size:1.15rem;margin-bottom:8px">Scan to visit <span class="text-purple">nimbalyst</span> on GitHub</h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=https://github.com/nimbalyst/nimbalyst" style="width:55%;height:auto;margin:8px auto;display:block;border-radius:8px;aspect-ratio:1" alt="nimbalyst GitHub QR code">
+      <p style="font-family:var(--mono);font-size:0.9rem">github.com/nimbalyst/nimbalyst</p>
     </div>
   </div>
   <div class="small mt-3" style="font-family:var(--mono);color:var(--purple);font-size:0.8rem">Thanks Vienna &middot; <span style="color:var(--cyan)">ClawCon #2 &middot; ViennaUP</span> &middot; @ademczuk</div>
