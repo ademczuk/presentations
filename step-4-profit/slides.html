@@ -206,7 +206,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
 </div>
 
 <!-- Slide counter -->
-<div id="slide-counter">1 / 7</div>
+<div id="slide-counter">1 / 8</div>
 
 <!-- Timer (5 min lightning slot) -->
 <div id="timer" onclick="toggleTimer()">5:00</div>
@@ -232,71 +232,124 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     Can an agent <span class="text-gradient-purple">actually make money?</span>
   </div>
   <div class="body mt-3" style="max-width:600px">
-    The agent economy has a Step 2 problem. Here is my honest attempt to fill it in, live on stage, fails and all.
+    The agent economy has a Step 2 problem. Here is a real machine that turns map pins into paying customers. Live on stage, fails and all.
   </div>
   <div class="small mt-4">Andrew Demczuk, MSc &middot; OpenClaw Contributor &middot; 5-minute lightning talk</div>
   <div class="small mt-1" style="font-family:var(--mono);color:var(--purple)">github.com/ademczuk &middot; ViennaUP 2026</div>
 </div>
 
-<!-- SLIDE 2: The Underpants Gnomes -->
-<div class="slide" data-title="The Gnomes">
-  <span class="badge badge-cyan">The Premise</span>
+<!-- SLIDE 2: Discover leads with Google Maps -->
+<div class="slide" data-title="Discover">
+  <span class="badge badge-cyan">Step 1: Find them</span>
   <div class="big mt-2">
-    The <span class="text-gradient-claw">Underpants Gnomes</span> business plan
+    Google Maps finds the <span class="text-gradient">bad websites</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="body mt-2">South Park, 1998. Three gnomes. One foolproof plan to get rich.</div>
-  <div class="steps-row mt-3">
-    <div class="step-card card-glow-purple">
-      <div class="step-num">Phase 1</div>
-      <div class="step-title">Collect underpants</div>
-    </div>
-    <div class="step-card card-glow-orange">
-      <div class="step-num">Phase 2</div>
-      <div class="step-title"><span class="step-q">?</span></div>
-    </div>
-    <div class="step-card card-glow-green">
-      <div class="step-num">Phase 3</div>
-      <div class="step-title">Profit</div>
-    </div>
-  </div>
-  <div class="quote-block cyan mt-3" style="max-width:760px">
-    <div style="font-size:0.95rem;font-weight:600">Swap underpants for AI agents and you get most of the agent-economy pitches I see. Phase 1: deploy agents. Phase 2: question mark. Phase 3: profit. Tonight is about the question mark.</div>
-  </div>
+  <div class="body mt-2">Sweep a city through the Maps API and score every business site with Lighthouse. A bad score is a lead. We find the businesses with terrible websites, then sell them a good one.</div>
+  <img src="geofence-crop.png" class="slide-img mt-3" style="max-width:1000px" alt="Map of Manila with a geofenced radius and scored business leads">
+  <div class="img-caption">One sweep of Manila: 68 leads, color-coded by website score. Red is a revamp candidate.</div>
 </div>
 
-<!-- SLIDE 3: LIVE demo - Tinder for websites -->
-<div class="slide" data-title="LIVE: Tinder for Websites">
-  <span class="badge badge-red"><span class="pulse-dot"></span>Live demo</span>
+<!-- SLIDE 3: LIVE demo - build + swipe -->
+<div class="slide" data-title="LIVE: Build + Swipe">
+  <span class="badge badge-red"><span class="pulse-dot"></span>Step 2 &middot; Live demo</span>
   <div class="big mt-2">
-    Tinder, but for <span class="text-gradient-green">your own website</span>
+    Agents build it. The customer <span class="text-gradient-green">swipes.</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="flow-row mt-3">
-    <div class="flow-box" style="border-color:rgba(168,85,247,0.3)"><span class="text-purple">1. Scrape</span><br><span style="font-size:0.72rem;color:var(--dim)">a real tradie lead</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(6,182,212,0.3)"><span class="text-cyan">2. Build</span><br><span style="font-size:0.72rem;color:var(--dim)">6 designs, no human</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(16,185,129,0.3)"><span class="text-green">3. Swipe</span><br><span style="font-size:0.72rem;color:var(--dim)">customer picks one</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box" style="border-color:rgba(245,158,11,0.4)"><span class="text-orange">4. Profit?</span><br><span style="font-size:0.72rem;color:var(--dim)">invoice $500</span></div>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
+  <div class="body mt-2">Six AI-built designs per lead. Imagery by Nano Banana, a 19-check audit with a local vision model, deployed in minutes. No human touches the build.</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:1.5vh;max-width:1100px;width:100%">
     <div style="flex:1.5;max-width:600px">
       <img src="tinder-swipe.png" class="slide-img" alt="Swipe deck card showing an AI-built plumbing site with pass and winner controls">
-      <div class="img-caption">Six AI-built designs of one real business. Swipe: pass, refine, pin, winner.</div>
+      <div class="img-caption">Six designs of one real business. Swipe: pass, refine, pin, winner.</div>
     </div>
     <div style="flex:1;max-width:320px;display:flex;flex-direction:column;gap:12px">
       <div class="card card-glow-red">
         <h3><span class="text-red">Switching live now</span></h3>
         <p style="font-family:var(--mono);font-size:0.92rem;color:var(--text)">aliasweb-tinder.pages.dev</p>
-        <p>Swiping a real plumber. Scrape to deploy: six designs, a <span class="text-orange">19-check audit</span>, a local vision model. No human touches the build.</p>
+        <p>Swiping a real plumber. No proposal, no meeting. The customer just picks the one they like.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 5: The spectacular fails -->
+<!-- SLIDE 4: The wrangler cockpit -->
+<div class="slide" data-title="The Cockpit">
+  <span class="badge badge-purple">Step 3: Sell at scale</span>
+  <div class="big mt-2">
+    One cockpit for <span class="text-gradient-purple">100+ wranglers</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">Contacts, email, calls, meetings, calendar, social, metrics, a Kanban pipeline per wrangler. One login, one ecosystem.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1040px;width:100%;margin-top:18px">
+    <div><img src="Contacts.png" class="slide-img" alt="Contacts board"><div class="img-caption">Contacts</div></div>
+    <div><img src="Email.png" class="slide-img" alt="Email inbox"><div class="img-caption">Email</div></div>
+    <div><img src="Meetings.png" class="slide-img" alt="Meetings"><div class="img-caption">Meetings</div></div>
+    <div><img src="Pipeline.png" class="slide-img" alt="Kanban pipeline"><div class="img-caption">Kanban pipeline</div></div>
+    <div><img src="social.png" class="slide-img" alt="Social feed"><div class="img-caption">Social</div></div>
+    <div class="card card-glow-purple" style="display:flex;flex-direction:column;justify-content:center;text-align:center;padding:14px">
+      <div class="stat-num text-purple" style="font-size:1.7rem">100+</div>
+      <div class="stat-label">wranglers</div>
+      <div class="stat-num text-orange" style="font-size:1.7rem;margin-top:8px">200/day</div>
+      <div class="stat-label">businesses each</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Teleprompting at scale -->
+<div class="slide" data-title="Teleprompting">
+  <span class="badge badge-green">The trick</span>
+  <div class="big mt-2">
+    Every caller stays <span class="text-gradient-green">on script</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:2vh;max-width:1100px;width:100%">
+    <div style="flex:1.6;max-width:680px">
+      <img src="SIP.png" class="slide-img" alt="Calls cockpit with upcoming calls and call history">
+      <div class="img-caption">The calling cockpit: upcoming calls, history, connect rate, all in one place.</div>
+    </div>
+    <div style="flex:1;max-width:340px;display:flex;flex-direction:column;gap:12px">
+      <div class="card card-glow-green">
+        <h3><span class="text-green">Live teleprompter</span></h3>
+        <ul>
+          <li>The call is transcribed as it happens</li>
+          <li>The script branches in real time</li>
+          <li>Wranglers hold the pitch and still adapt</li>
+        </ul>
+      </div>
+      <div class="card card-glow-cyan">
+        <h3><span class="text-cyan">Why it matters</span></h3>
+        <p>100+ wranglers, up to 200 calls a day each. Staying on script at that volume is the whole game.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: The numbers, honestly -->
+<div class="slide" data-title="The Numbers">
+  <span class="badge badge-orange">Step 4, honestly</span>
+  <div class="big mt-2">
+    So where's the <span class="text-gradient-gold">profit?</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:center;gap:2vw;margin-top:1.5vh;max-width:1120px;width:100%">
+    <div style="flex:1.5;max-width:700px">
+      <img src="Merics.png" class="slide-img" alt="Analytics dashboard: revenue, deal funnel, win rate, top reps">
+      <div class="img-caption">The loop closes here: every call, deal, and dollar in one funnel.</div>
+    </div>
+    <div style="flex:1;max-width:340px;display:flex;flex-direction:column;gap:12px">
+      <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);max-width:none;gap:12px">
+        <div class="stat-block"><div class="stat-num text-purple">~$1</div><div class="stat-label">to build a site</div></div>
+        <div class="stat-block"><div class="stat-num text-green">$500</div><div class="stat-label">the ask</div></div>
+      </div>
+      <div class="quote-block orange">
+        <div style="font-size:0.9rem;font-weight:600">The site costs about a dollar to build. The hard part was never the generation. It's the funnel: discover, demo, dial, close. Agents run Steps 1 to 3. Step 4 is still a human saying yes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: The spectacular fails -->
 <div class="slide" data-title="Spectacular Fails">
   <span class="badge badge-red">Celebrate the fails</span>
   <div class="big mt-2">
@@ -332,60 +385,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   </div>
 </div>
 
-<!-- SLIDE 6: Step 4 - the honest answer -->
-<div class="slide" data-title="The Honest Answer">
-  <span class="badge badge-orange">Step 4, honestly</span>
-  <div class="big mt-2">
-    So where's the <span class="text-gradient-gold">profit?</span>
-  </div>
-  <div class="divider mt-3"></div>
-  <div class="body mt-2">Building the site is basically free now. Whether it converts to $500 is still the open question. The real work was never the generation.</div>
-  <div class="stat-grid mt-3">
-    <div class="stat-block">
-      <div class="stat-num text-cyan">6</div>
-      <div class="stat-label">Designs per lead</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-num text-orange">19</div>
-      <div class="stat-label">Audit checks</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-num text-purple">~$1</div>
-      <div class="stat-label">AI cost to build</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-num text-green">$500</div>
-      <div class="stat-label">The ask</div>
-    </div>
-  </div>
-  <div class="quote-block orange mt-3" style="max-width:800px">
-    <div style="font-size:0.95rem;font-weight:600">Phase 2 was never a question mark. It's 19 audit checks and a vision model saying "that's copper, do it again." The moat isn't making the website. It's making one a stranger trusts enough to pay for.</div>
-  </div>
-</div>
-
-<!-- SLIDE 7: Close / CTA -->
-<div class="slide" data-title="Swipe a real one">
+<!-- SLIDE 8: Close / CTA - nimbalyst -->
+<div class="slide" data-title="nimbalyst">
   <div class="big" style="margin-bottom:8px">
-    Step 4 is still a <span class="text-gradient-gold">question mark</span>
+    Want to build <span class="text-gradient-claw">agent fleets?</span>
   </div>
-  <div class="small" style="color:var(--dim);margin-bottom:14px;font-size:0.95rem">But Steps 1 through 3 are real, running, and live right now. Scan it. Swipe a real plumber.</div>
+  <div class="small" style="color:var(--dim);margin-bottom:14px;font-size:0.95rem">This whole machine is a swarm of agents. The orchestration layer I build with is open source. Scan it.</div>
   <div style="display:flex;align-items:center;justify-content:center;width:95vw">
-    <div class="card card-glow-orange" style="text-align:center;padding:20px 24px;width:80%;max-width:80vw">
-      <h3 style="font-size:1.3rem;margin-bottom:8px">Scan to <span class="text-orange">swipe the deck</span></h3>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=https://aliasweb-tinder.pages.dev/" style="width:48%;height:auto;margin:10px auto;display:block;border-radius:8px;aspect-ratio:1" alt="QR code to the live swipe deck">
-      <p style="font-family:var(--mono);font-size:0.95rem">aliasweb-tinder.pages.dev</p>
+    <div class="card card-glow-purple" style="text-align:center;padding:20px 24px;width:80%;max-width:80vw">
+      <h3 style="font-size:1.3rem;margin-bottom:8px">Scan to visit <span class="text-purple">nimbalyst</span> on GitHub</h3>
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=https://github.com/nimbalyst/nimbalyst" style="width:48%;height:auto;margin:10px auto;display:block;border-radius:8px;aspect-ratio:1" alt="nimbalyst GitHub QR code">
+      <p style="font-family:var(--mono);font-size:0.95rem">github.com/nimbalyst/nimbalyst</p>
     </div>
   </div>
   <div class="small mt-3" style="font-family:var(--mono);color:var(--purple);font-size:0.8rem">Thanks Vienna &middot; <span style="color:var(--cyan)">ClawCon #2 &middot; ViennaUP</span> &middot; @ademczuk</div>
-</div>
-
-<!-- SLIDE 8: Post-credits easter egg -->
-<div class="slide" data-title="Phase 2">
-  <div class="mega" style="font-size:clamp(2rem,7vw,5rem)">
-    Phase 2:
-  </div>
-  <div class="mega mt-2" style="font-family:var(--mono);color:var(--orange)">?????</div>
-  <div class="small mt-4" style="color:var(--muted);font-family:var(--mono)">production note: the gnomes never did figure it out either</div>
 </div>
 
 </div><!-- /deck -->
