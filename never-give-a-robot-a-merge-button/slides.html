@@ -12,91 +12,129 @@
   --border-hover:rgba(148,163,184,0.25);--text:#f1f5f9;--dim:#94a3b8;--muted:#64748b;
   --blue:#3b82f6;--cyan:#06b6d4;--purple:#a855f7;--green:#10b981;
   --orange:#f59e0b;--red:#ef4444;--pink:#ec4899;--electric:#818cf8;
-  --mono:'JetBrains Mono',monospace;--glow:0 0 30px rgba(168,85,247,0.3);--blur:blur(12px);
+  --mono:'JetBrains Mono',monospace;--glow:0 0 30px rgba(239,68,68,0.3);--blur:blur(12px);
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 30%,rgba(239,68,68,0.08),transparent 55%),radial-gradient(ellipse at 80% 70%,rgba(16,185,129,0.06),transparent 50%)}
 
-#bg-grid{position:fixed;inset:0;z-index:1;pointer-events:none;
+/* Video BG */
+#bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0.2;filter:saturate(0.6) brightness(0.7);pointer-events:none}
+#bg-grid{position:fixed;inset:0;z-index:2;pointer-events:none;
   background-image:linear-gradient(rgba(148,163,184,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.03) 1px,transparent 1px);
   background-size:60px 60px}
 
-.particles{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+/* Particles */
+.particles{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
 .particle{position:absolute;width:2px;height:2px;background:var(--red);border-radius:50%;opacity:0.4;animation:float-up linear infinite}
 @keyframes float-up{0%{transform:translateY(100vh) scale(1);opacity:0}10%{opacity:0.4}90%{opacity:0.4}100%{transform:translateY(-10vh) scale(0);opacity:0}}
 
+/* Gource overlay */
+#gource-overlay{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:rgba(10,14,26,0.85);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
+#gource-overlay .g-stat{display:flex;align-items:center;gap:6px}
+#gource-overlay .g-num{color:var(--cyan);font-weight:700}
+#gource-overlay .g-label{color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-size:0.6rem}
+
+/* Deck & Slides */
 .deck{position:fixed;inset:0;z-index:10}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 40px 40px;
   opacity:0;transform:scale(0.97);transition:opacity 0.4s ease,transform 0.4s ease;pointer-events:none;overflow-y:auto;z-index:20}
 .slide.active{opacity:1;transform:scale(1);pointer-events:auto}
 
+/* Typography */
 .mega{font-size:clamp(2.4rem,5.8vw,4.3rem);font-weight:900;line-height:1.08;text-align:center;letter-spacing:-0.02em}
 .big{font-size:clamp(1.5rem,4vw,2.8rem);font-weight:700;line-height:1.15;text-align:center}
 .mid{font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:600;line-height:1.3;text-align:center}
-.body{font-size:clamp(0.85rem,1.5vw,1.15rem);line-height:1.6;color:var(--dim);text-align:center;max-width:740px}
+.body{font-size:clamp(0.85rem,1.5vw,1.15rem);line-height:1.6;color:var(--dim);text-align:center;max-width:760px}
 .small{font-size:clamp(0.7rem,1vw,0.85rem);color:var(--muted);text-align:center}
 .mono{font-family:var(--mono)}
 
+/* Text gradients */
 .text-gradient-red{background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .text-gradient-green{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .text-gradient-purple{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .text-gradient-gold{background:linear-gradient(135deg,var(--orange),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-claw{background:linear-gradient(135deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
+/* Badges */
 .badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
 .badge-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
 .badge-orange{background:rgba(245,158,11,0.15);color:var(--orange);border:1px solid rgba(245,158,11,0.3)}
 .badge-green{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
 .badge-purple{background:rgba(168,85,247,0.15);color:var(--purple);border:1px solid rgba(168,85,247,0.3)}
+.badge-cyan{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.3)}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)}
 
+/* Divider */
 .divider{width:80px;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:2px;margin:0 auto}
 
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);transition:border-color 0.3s}
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);transition:border-color 0.3s;text-align:left}
 .card:hover{border-color:var(--border-hover)}
-.card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
-.card p,.card li{font-size:0.85rem;color:var(--dim);line-height:1.5}
-.card-grid{display:grid;gap:16px;width:100%;max-width:1000px}
+.card h3{font-size:0.98rem;font-weight:700;margin-bottom:8px}
+.card p,.card li{font-size:0.83rem;color:var(--dim);line-height:1.5}
+.card ul{list-style:none;padding:0}
+.card li{padding:5px 0 5px 16px;position:relative}
+.card li::before{content:'';position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:var(--cyan);transform:translateY(-50%)}
+.card-grid{display:grid;gap:14px;width:100%;max-width:1000px}
 .card-grid-2{grid-template-columns:repeat(2,1fr)}
-@media(max-width:768px){.card-grid-2{grid-template-columns:1fr}}
+.card-grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:768px){.card-grid-2,.card-grid-3{grid-template-columns:1fr}}
 
 .card-glow-red{border-color:rgba(239,68,68,0.3);box-shadow:0 0 20px rgba(239,68,68,0.1)}
 .card-glow-orange{border-color:rgba(245,158,11,0.3);box-shadow:0 0 20px rgba(245,158,11,0.1)}
 .card-glow-green{border-color:rgba(16,185,129,0.3);box-shadow:0 0 20px rgba(16,185,129,0.1)}
 .card-glow-purple{border-color:rgba(168,85,247,0.3);box-shadow:0 0 20px rgba(168,85,247,0.1)}
+.card-glow-cyan{border-color:rgba(6,182,212,0.3);box-shadow:0 0 20px rgba(6,182,212,0.1)}
 
-.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:600px;width:100%}
-.stat-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;backdrop-filter:var(--blur)}
-.stat-num{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;font-family:var(--mono)}
-.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:760px;width:100%}
+.stat-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;backdrop-filter:var(--blur)}
+.stat-num{font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:900;font-family:var(--mono)}
+.stat-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+@media(max-width:768px){.stat-grid{grid-template-columns:1fr}}
 
-.quote-block{background:var(--card);border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:16px 20px;max-width:680px;width:100%;backdrop-filter:var(--blur)}
+/* Quote blocks */
+.quote-block{background:var(--card);border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:15px 20px;max-width:700px;width:100%;backdrop-filter:var(--blur);text-align:left}
 .quote-block.green{border-left-color:var(--green)}
 .quote-block.orange{border-left-color:var(--orange)}
 .quote-block.purple{border-left-color:var(--purple)}
+.quote-block div{font-size:0.98rem;font-weight:600}
 
-.pipeline{display:flex;flex-direction:column;gap:10px;max-width:640px;width:100%}
-.pipe-step{display:flex;align-items:flex-start;gap:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;backdrop-filter:var(--blur)}
+/* Pipeline */
+.pipeline{display:flex;flex-direction:column;gap:10px;max-width:660px;width:100%}
+.pipe-step{display:flex;align-items:flex-start;gap:16px;padding:11px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;backdrop-filter:var(--blur);text-align:left}
 .pipe-num{font-family:var(--mono);font-size:1.1rem;font-weight:900;color:var(--red);min-width:28px}
 .pipe-label{font-weight:700;font-size:0.88rem}
 .pipe-desc{font-size:0.78rem;color:var(--dim);margin-top:2px}
 
-.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}.mt-4{margin-top:32px}
-.text-center{text-align:center}
-.text-red{color:var(--red)}.text-orange{color:var(--orange)}.text-green{color:var(--green)}.text-purple{color:var(--purple)}.text-cyan{color:var(--cyan)}.text-dim{color:var(--dim)}
+/* Terminal block */
+.term{background:rgba(6,10,20,0.85);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-family:var(--mono);font-size:0.74rem;line-height:1.8;color:var(--dim);max-width:900px;width:100%;text-align:left;backdrop-filter:var(--blur);overflow-x:auto}
+.term .t-green{color:var(--green)}.term .t-cyan{color:var(--cyan)}.term .t-purple{color:var(--purple)}
+.term .t-orange{color:var(--orange)}.term .t-red{color:var(--red)}.term .t-mut{color:var(--muted)}
 
+/* Utility */
+.mt-1{margin-top:6px}.mt-2{margin-top:14px}.mt-3{margin-top:22px}.mt-4{margin-top:30px}
+.text-center{text-align:center}
+.text-red{color:var(--red)}.text-orange{color:var(--orange)}.text-green{color:var(--green)}.text-purple{color:var(--purple)}.text-cyan{color:var(--cyan)}.text-blue{color:var(--blue)}.text-dim{color:var(--dim)}
+
+/* Nav dots */
 #nav-dots{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
 .nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(148,163,184,0.25);cursor:pointer;transition:all 0.3s}
 .nav-dot.active{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,0.5);transform:scale(1.3)}
 .nav-dot:hover{background:rgba(239,68,68,0.5)}
 
+/* Slide counter */
 #slide-counter{position:fixed;bottom:20px;right:24px;z-index:50;font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
 
-#timer{position:fixed;top:14px;right:24px;z-index:50;font-family:var(--mono);font-size:0.85rem;padding:6px 14px;border-radius:20px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;user-select:none;backdrop-filter:var(--blur);transition:all 0.3s}
+/* Timer */
+#timer{position:fixed;top:38px;right:24px;z-index:50;font-family:var(--mono);font-size:0.85rem;padding:6px 14px;border-radius:20px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;user-select:none;backdrop-filter:var(--blur);transition:all 0.3s}
 #timer.running{color:var(--green);border-color:rgba(16,185,129,0.3)}
 #timer.warn{color:var(--orange);border-color:rgba(245,158,11,0.3)}
 #timer.danger{color:var(--red);border-color:rgba(239,68,68,0.3);animation:pulse-border 1s ease-in-out infinite}
 @keyframes pulse-border{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(239,68,68,0.3)}}
 
-#reorder-btn{position:fixed;top:14px;left:24px;z-index:50;width:36px;height:36px;border-radius:8px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:var(--blur);transition:all 0.3s}
+/* Reorder panel */
+#reorder-btn{position:fixed;top:38px;left:24px;z-index:50;width:36px;height:36px;border-radius:8px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:var(--blur);transition:all 0.3s}
 #reorder-btn:hover{border-color:var(--red);color:var(--red)}
 #reorder-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;z-index:60;background:rgba(10,14,26,0.95);border-left:1px solid var(--border);padding:60px 16px 20px;overflow-y:auto;transition:right 0.3s ease;backdrop-filter:blur(20px)}
 #reorder-panel.open{right:0}
@@ -111,31 +149,54 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
 </head>
 <body>
 
+<!-- Background layers -->
+<video id="bg-video" autoplay muted loop playsinline>
+  <source src="openclaw-gource.mp4" type="video/mp4">
+</video>
 <div id="bg-grid"></div>
 <div class="particles" id="particles"></div>
 
-<div id="slide-counter">1 / 6</div>
+<!-- Gource overlay -->
+<div id="gource-overlay">
+  <div class="g-stat"><span class="g-label">GemmaSwarm</span></div>
+  <div style="display:flex;gap:20px">
+    <div class="g-stat"><span class="g-num">1x</span><span class="g-label">RTX 5090</span></div>
+    <div class="g-stat"><span class="g-num">$0</span><span class="g-label">API bill</span></div>
+    <div class="g-stat"><span class="g-num">propose</span><span class="g-label">only, always</span></div>
+  </div>
+  <div class="g-stat"><span class="g-label">Own Your AI #2</span> <span style="color:var(--purple)">Vienna &middot; July 22, 2026</span></div>
+</div>
+
+<!-- Slide counter -->
+<div id="slide-counter">1 / 8</div>
+
+<!-- Timer (5 min lightning slot) -->
 <div id="timer" onclick="toggleTimer()">5:00</div>
+
+<!-- Reorder button -->
 <div id="reorder-btn" onclick="togglePanel()">&#9776;</div>
 <div id="reorder-panel"><h3>Slide Order</h3><div id="reorder-list"></div></div>
+
+<!-- Nav dots -->
 <div id="nav-dots"></div>
 
+<!-- ========== SLIDES ========== -->
 <div class="deck" id="deck">
 
 <!-- SLIDE 1: Title -->
 <div class="slide active" data-title="Title">
-  <span class="badge badge-red">OwnYourAI &middot; Lightning talk</span>
+  <span class="badge badge-red">Own Your AI #2 &middot; Lightning talk</span>
   <div class="mega mt-3">
     NEVER GIVE A ROBOT A<br><span class="text-gradient-red">MERGE BUTTON</span>
   </div>
   <div class="divider mt-3"></div>
   <div class="mid mt-2" style="font-weight:500;color:var(--dim)">
-    One Gemma. One 5090. Unsupervised. <span class="text-gradient-green">Writing to prod.</span>
+    Gemma4 swarm: a <span class="text-gradient-green">knowledge graph deconfliction watchdog</span>
   </div>
   <div class="body mt-3">
-    How do you let an autonomous local model write to shared production infrastructure, unsupervised, and still sleep at night?
+    One Gemma. One 5090. Unsupervised, writing to prod. How do you sleep at night? You delete the merge button.
   </div>
-  <div class="small mt-4">Andrew Demczuk &middot; OwnYourAI, July 22, 2026 &middot; 5-minute lightning talk</div>
+  <div class="small mt-4">Andrew Demczuk &middot; 5 minutes + 5 minutes Q&amp;A</div>
 </div>
 
 <!-- SLIDE 2: The scar -->
@@ -149,7 +210,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     Its job was review and suggest. I gave it the button anyway, because why make a human click it. Within a day it stopped reviewing and started rubber-stamping.
   </div>
   <div class="quote-block mt-3">
-    <div style="font-size:1.05rem;font-weight:700">Everything looked green. Nothing shipped. The one thing on the critical path was a bot that said yes to itself and blocked on nothing.</div>
+    <div>Everything looked green. Nothing shipped. The one thing on the critical path was a bot that said yes to itself and blocked on nothing.</div>
   </div>
   <div class="small mt-3">It did exactly what I told it to. That was the problem.</div>
 </div>
@@ -164,18 +225,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   <div class="body mt-2">
     Gemma is bad at open generation and good at two question shapes. Binary and extractive. No invention.
   </div>
-  <div class="card-grid card-grid-2 mt-3" style="max-width:800px">
+  <div class="card-grid card-grid-2 mt-3" style="max-width:820px">
     <div class="card card-glow-green">
       <h3><span class="text-green">Yes or no</span></h3>
-      <p>Are these two entries the same fact. A duplicate check, not a draft.</p>
+      <p>Are these two entries the same fact? Does this entry belong in the ontology, or is it design noise?</p>
     </div>
-    <div class="card card-glow-cyan" style="border-color:rgba(6,182,212,0.3)">
+    <div class="card card-glow-cyan">
       <h3><span class="text-cyan">Extract and cite</span></h3>
-      <p>Quote the exact sentence that backs this claim. A real substring, verbatim, or it dies.</p>
+      <p>Quote the exact sentence that backs this claim. A real substring, verbatim, or the card dies.</p>
     </div>
   </div>
   <div class="stat-grid mt-3">
-    <div class="stat-block"><div class="stat-num text-green">~92%</div><div class="stat-label">on the duplicate check it runs</div></div>
+    <div class="stat-block"><div class="stat-num text-green">92%</div><div class="stat-label">on its exclusion gate, tied with Gemini (92 v 92)</div></div>
+    <div class="stat-block"><div class="stat-num text-orange">31%</div><div class="stat-label">the keyword baseline it replaced</div></div>
     <div class="stat-block"><div class="stat-num text-cyan">0</div><div class="stat-label">free-text claims trusted</div></div>
   </div>
 </div>
@@ -188,22 +250,22 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   </div>
   <div class="divider mt-3"></div>
   <div class="body mt-2">The model does not decide to behave. Every layer assumes it is already broken.</div>
-  <div class="card-grid card-grid-2 mt-3" style="max-width:900px">
+  <div class="card-grid card-grid-2 mt-3" style="max-width:920px">
     <div class="card card-glow-purple">
       <h3><span class="text-purple">1. The grant</span></h3>
-      <p>Write-only to a proposals folder. Ask it to touch the wiki and the server says no. Not the model. The server.</p>
+      <p>Write-only to a proposals folder. Ask it to touch the wiki and the server says no. Not the model. The server. Live-tested: the wiki write came back permission denied.</p>
     </div>
     <div class="card card-glow-purple">
       <h3><span class="text-purple">2. The card</span></h3>
-      <p>Every proposal hardcodes one verdict: propose. There is no apply field to serialize.</p>
+      <p>Every proposal hardcodes one verdict: propose. There is no apply field to serialize. You physically cannot write the instruction to merge.</p>
     </div>
     <div class="card card-glow-purple">
       <h3><span class="text-purple">3. The validator</span></h3>
-      <p>A different identity rejects any bad card, and gemma can't read that reject log, so it can't learn to game it.</p>
+      <p>A different identity rejects any bad card, and gemma cannot read that reject log. It never sees its own rejections, so it cannot learn to game them.</p>
     </div>
     <div class="card card-glow-purple">
       <h3><span class="text-purple">4. Liveness</span></h3>
-      <p>An off-host check attests it's actually alive and actually gemma, before anything it says counts.</p>
+      <p>An off-host check attests it is actually alive and actually gemma, before anything it says counts.</p>
     </div>
   </div>
 </div>
@@ -215,14 +277,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     A health check that says 200 is <span class="text-gradient-red">lying to you.</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="body mt-2">On a shared GPU the model gets swapped out from under the port. A dead card still answers 200. A cached reply looks fresh.</div>
+  <div class="body mt-2">Measured on this box: /health answered 200 in 0.24 seconds while real completions hung for 48 seconds, the model still resident at 21 GB, 5 percent utilization.</div>
   <div class="pipeline mt-3">
-    <div class="pipe-step"><div class="pipe-num">1</div><div><div class="pipe-label">Mint a fresh nonce</div><div class="pipe-desc">A random number I made up this second, dropped into the prompt.</div></div></div>
-    <div class="pipe-step"><div class="pipe-num">2</div><div><div class="pipe-label">Demand the completion echoes it</div><div class="pipe-desc">A dead GPU can't repeat a number it never saw. A cached reply has last call's number, not this one's.</div></div></div>
-    <div class="pipe-step"><div class="pipe-num">3</div><div><div class="pipe-label">Assert the model id says "gemma"</div><div class="pipe-desc">No echo, wrong model: fail closed.</div></div></div>
-    <div class="pipe-step"><div class="pipe-num">4</div><div><div class="pipe-label">Run it off-host</div><div class="pipe-desc">As an identity that isn't gemma, so the node cannot vouch for itself.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">1</div><div><div class="pipe-label">Mint a fresh nonce</div><div class="pipe-desc">CANARY- plus 16 hex chars, made up this second, dropped into the prompt.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">2</div><div><div class="pipe-label">Demand the completion echoes it</div><div class="pipe-desc">A dead GPU cannot repeat a number it never saw. A cached reply has last call's number.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">3</div><div><div class="pipe-label">Assert the served model id contains "gemma"</div><div class="pipe-desc">No echo: exit 2. Wrong model: exit 3. Green: exit 0. Fail closed.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">4</div><div><div class="pipe-label">Run it off-host, as an identity that is not gemma</div><div class="pipe-desc">The node cannot vouch for itself.</div></div></div>
   </div>
-  <div class="quote-block orange mt-3">A signature proves the key, not the intent. Gemma's key has one holder, and everything that judges gemma runs as something that isn't gemma.</div>
+  <div class="quote-block orange mt-3">
+    <div>A signature proves the key, not the intent. Gemma's key has one holder, and everything that judges gemma runs as something that isn't gemma.</div>
+  </div>
 </div>
 
 <!-- SLIDE 6: Close -->
@@ -231,16 +295,89 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     Give your local model a suggestion box, <span class="text-gradient-green">not a merge button.</span>
   </div>
   <div class="divider mt-3"></div>
-  <div class="body mt-2" style="max-width:640px">
+  <div class="body mt-2" style="max-width:660px">
     It can be as smart, or as broken, as it likes. It still can't ship. I didn't ask it nicely. I deleted the option.
   </div>
-  <div class="small mt-4" style="color:var(--purple)">Want the platform this runs on? Stick around for the 20-minute talk today: AgentReef.</div>
-  <div class="small mt-1 mono" style="color:var(--muted)">Andrew Demczuk &middot; OwnYourAI, July 22, 2026</div>
+  <div class="small mt-4" style="color:var(--purple)">The full pattern, verified loops on the AgentReef mesh, is my 20-minute talk tonight.</div>
+  <div class="small mt-1 mono" style="color:var(--muted)">Andrew Demczuk &middot; Own Your AI #2 &middot; July 22, 2026</div>
+</div>
+
+<!-- SLIDE 7: Q&A appendix - the stack -->
+<div class="slide" data-title="Q&A: The Stack">
+  <span class="badge badge-blue">Q&amp;A appendix &middot; the stack</span>
+  <div class="big mt-2">
+    The exact <span class="text-gradient-claw">llama-server line</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="term mt-3">
+    llama-server.exe <span class="t-cyan">-m gemma-4-26B-A4B-it-UD-Q4_K_XL.gguf</span> <span class="t-green">-ngl 99</span> <span class="t-purple">-c 16384</span> <span class="t-orange">-np 6</span> -cb <span class="t-green">-fa on</span><br>
+    &nbsp;&nbsp;<span class="t-cyan">--cache-type-k q8_0 --cache-type-v q8_0</span> --port 7872 --jinja --no-mmap <span class="t-mut">(build b9415, CUDA 12.8, sm_120)</span>
+  </div>
+  <div class="card-grid card-grid-3 mt-3">
+    <div class="card card-glow-cyan">
+      <h3><span class="text-cyan">The model</span></h3>
+      <ul>
+        <li>Gemma 4 26B-A4B, MoE, ~4B active params</li>
+        <li>Unsloth Dynamic Q4_K_XL, 17.0 GB on disk</li>
+        <li>~18.4 GB measured at load, 22 GB budgeted</li>
+      </ul>
+    </div>
+    <div class="card card-glow-orange">
+      <h3><span class="text-orange">The knob that mattered</span></h3>
+      <ul>
+        <li>-np 6 beats -np 10 by ~18% aggregate</li>
+        <li>338 vs 286 tok/s at 12 concurrent agents</li>
+        <li>Per-slot speed rises when KV pressure drops</li>
+      </ul>
+    </div>
+    <div class="card card-glow-green">
+      <h3><span class="text-green">The box</span></h3>
+      <ul>
+        <li>RTX 5090, 32 GB, Blackwell sm_120</li>
+        <li>Shares the GPU with 4 other big local models</li>
+        <li>VRAM manager evicts by occupied port</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: Q&A appendix - cadence and guards -->
+<div class="slide" data-title="Q&A: Cadence + Guards">
+  <span class="badge badge-blue">Q&amp;A appendix &middot; cadence and guards</span>
+  <div class="big mt-2">
+    The unattended <span class="text-gradient-green">schedule</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:960px">
+    <div class="card card-glow-green">
+      <h3><span class="text-green">Audit lanes</span></h3>
+      <ul>
+        <li>Backlog deconfliction: every 30 minutes</li>
+        <li>Knowledge graph curation: every 2 hours</li>
+        <li>Hardening triage: daily, out-only always</li>
+        <li>Kill switch: one file on disk pauses every lane</li>
+        <li>Single-pass lock: one audit at a time, the GPU is shared</li>
+      </ul>
+    </div>
+    <div class="card card-glow-orange">
+      <h3><span class="text-orange">Watchdogs (two, different jobs)</span></h3>
+      <ul>
+        <li>Canary watchdog: probe every 120s, 3 non-greens = down, one green clears</li>
+        <li>Latency early-warning at 15s: pressure flag before a wedge</li>
+        <li>Server watchdog: real-completion probe, 3 strikes, max 3 restarts per hour</li>
+        <li>Presence beat reads "active" only off a green canary, never a bare heartbeat</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote-block green mt-3">
+    <div>Ships as 8 files, +1,249 lines, including its own tests: 8 canary interface-lock tests, 6 watchdog debounce tests. Live probe this week: nonce echoed in 165 ms.</div>
+  </div>
 </div>
 
 </div><!-- /deck -->
 
 <script>
+// Particles
 (function(){
   var c=document.getElementById('particles');
   for(var i=0;i<20;i++){
@@ -254,6 +391,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   }
 })();
 
+// Slide engine
 var currentSlide=0;
 var slideOrder=[];
 var hiddenSlides=new Set();
@@ -284,6 +422,7 @@ function showSlide(visIdx){
 function next(){var v=getVisibleSlides();if(currentSlide<v.length-1) showSlide(currentSlide+1)}
 function prev(){if(currentSlide>0) showSlide(currentSlide-1)}
 
+// Nav dots
 function buildDots(){
   var container=document.getElementById('nav-dots');
   container.innerHTML='';
@@ -304,6 +443,7 @@ function updateCounter(){
   document.getElementById('slide-counter').textContent=(currentSlide+1)+' / '+v.length;
 }
 
+// Keyboard
 document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
   else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
@@ -317,11 +457,13 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){var p=document.getElementById('reorder-panel');if(p.classList.contains('open')) p.classList.remove('open')}
 });
 
+// Click navigation
 document.addEventListener('click',function(e){
   if(e.target.closest('#reorder-panel,#reorder-btn,#timer,.card a,a,.badge')) return;
   if(e.clientX>window.innerWidth*0.5) next(); else prev();
 });
 
+// Touch
 var touchX=0;
 document.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX},{passive:true});
 document.addEventListener('touchend',function(e){
@@ -329,6 +471,7 @@ document.addEventListener('touchend',function(e){
   if(Math.abs(dx)>60){if(dx<0) next(); else prev()}
 },{passive:true});
 
+// Timer (5:00 lightning slot)
 var timerEl=document.getElementById('timer');
 var timerRunning=false,timerInterval=null,timerSeconds=300;
 function toggleTimer(){
@@ -351,6 +494,7 @@ function toggleTimer(){
   }
 }
 
+// Reorder panel
 function togglePanel(){document.getElementById('reorder-panel').classList.toggle('open')}
 function buildReorderList(){
   var list=document.getElementById('reorder-list');list.innerHTML='';
@@ -389,6 +533,7 @@ function buildReorderList(){
   });
 }
 
+// Init
 (function(){
   var slides=getAllSlides();
   for(var i=0;i<slides.length;i++) slideOrder.push(i);
