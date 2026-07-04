@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Never Give A Robot A Merge Button</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--card:rgba(17,24,39,0.7);--border:rgba(148,163,184,0.12);
+  --border-hover:rgba(148,163,184,0.25);--text:#f1f5f9;--dim:#94a3b8;--muted:#64748b;
+  --blue:#3b82f6;--cyan:#06b6d4;--purple:#a855f7;--green:#10b981;
+  --orange:#f59e0b;--red:#ef4444;--pink:#ec4899;--electric:#818cf8;
+  --mono:'JetBrains Mono',monospace;--glow:0 0 30px rgba(168,85,247,0.3);--blur:blur(12px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 30%,rgba(239,68,68,0.08),transparent 55%),radial-gradient(ellipse at 80% 70%,rgba(16,185,129,0.06),transparent 50%)}
+
+#bg-grid{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(148,163,184,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.03) 1px,transparent 1px);
+  background-size:60px 60px}
+
+.particles{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:var(--red);border-radius:50%;opacity:0.4;animation:float-up linear infinite}
+@keyframes float-up{0%{transform:translateY(100vh) scale(1);opacity:0}10%{opacity:0.4}90%{opacity:0.4}100%{transform:translateY(-10vh) scale(0);opacity:0}}
+
+.deck{position:fixed;inset:0;z-index:10}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;
+  opacity:0;transform:scale(0.97);transition:opacity 0.4s ease,transform 0.4s ease;pointer-events:none;overflow-y:auto;z-index:20}
+.slide.active{opacity:1;transform:scale(1);pointer-events:auto}
+
+.mega{font-size:clamp(2.4rem,5.8vw,4.3rem);font-weight:900;line-height:1.08;text-align:center;letter-spacing:-0.02em}
+.big{font-size:clamp(1.5rem,4vw,2.8rem);font-weight:700;line-height:1.15;text-align:center}
+.mid{font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:600;line-height:1.3;text-align:center}
+.body{font-size:clamp(0.85rem,1.5vw,1.15rem);line-height:1.6;color:var(--dim);text-align:center;max-width:740px}
+.small{font-size:clamp(0.7rem,1vw,0.85rem);color:var(--muted);text-align:center}
+.mono{font-family:var(--mono)}
+
+.text-gradient-red{background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-green{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-purple{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.text-gradient-gold{background:linear-gradient(135deg,var(--orange),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+.badge-orange{background:rgba(245,158,11,0.15);color:var(--orange);border:1px solid rgba(245,158,11,0.3)}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3)}
+.badge-purple{background:rgba(168,85,247,0.15);color:var(--purple);border:1px solid rgba(168,85,247,0.3)}
+
+.divider{width:80px;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));border-radius:2px;margin:0 auto}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);transition:border-color 0.3s}
+.card:hover{border-color:var(--border-hover)}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.card p,.card li{font-size:0.85rem;color:var(--dim);line-height:1.5}
+.card-grid{display:grid;gap:16px;width:100%;max-width:1000px}
+.card-grid-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:768px){.card-grid-2{grid-template-columns:1fr}}
+
+.card-glow-red{border-color:rgba(239,68,68,0.3);box-shadow:0 0 20px rgba(239,68,68,0.1)}
+.card-glow-orange{border-color:rgba(245,158,11,0.3);box-shadow:0 0 20px rgba(245,158,11,0.1)}
+.card-glow-green{border-color:rgba(16,185,129,0.3);box-shadow:0 0 20px rgba(16,185,129,0.1)}
+.card-glow-purple{border-color:rgba(168,85,247,0.3);box-shadow:0 0 20px rgba(168,85,247,0.1)}
+
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:600px;width:100%}
+.stat-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;backdrop-filter:var(--blur)}
+.stat-num{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;font-family:var(--mono)}
+.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.quote-block{background:var(--card);border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:16px 20px;max-width:680px;width:100%;backdrop-filter:var(--blur)}
+.quote-block.green{border-left-color:var(--green)}
+.quote-block.orange{border-left-color:var(--orange)}
+.quote-block.purple{border-left-color:var(--purple)}
+
+.pipeline{display:flex;flex-direction:column;gap:10px;max-width:640px;width:100%}
+.pipe-step{display:flex;align-items:flex-start;gap:16px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;backdrop-filter:var(--blur)}
+.pipe-num{font-family:var(--mono);font-size:1.1rem;font-weight:900;color:var(--red);min-width:28px}
+.pipe-label{font-weight:700;font-size:0.88rem}
+.pipe-desc{font-size:0.78rem;color:var(--dim);margin-top:2px}
+
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}.mt-4{margin-top:32px}
+.text-center{text-align:center}
+.text-red{color:var(--red)}.text-orange{color:var(--orange)}.text-green{color:var(--green)}.text-purple{color:var(--purple)}.text-cyan{color:var(--cyan)}.text-dim{color:var(--dim)}
+
+#nav-dots{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:8px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(148,163,184,0.25);cursor:pointer;transition:all 0.3s}
+.nav-dot.active{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,0.5);transform:scale(1.3)}
+.nav-dot:hover{background:rgba(239,68,68,0.5)}
+
+#slide-counter{position:fixed;bottom:20px;right:24px;z-index:50;font-family:var(--mono);font-size:0.7rem;color:var(--muted)}
+
+#timer{position:fixed;top:14px;right:24px;z-index:50;font-family:var(--mono);font-size:0.85rem;padding:6px 14px;border-radius:20px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;user-select:none;backdrop-filter:var(--blur);transition:all 0.3s}
+#timer.running{color:var(--green);border-color:rgba(16,185,129,0.3)}
+#timer.warn{color:var(--orange);border-color:rgba(245,158,11,0.3)}
+#timer.danger{color:var(--red);border-color:rgba(239,68,68,0.3);animation:pulse-border 1s ease-in-out infinite}
+@keyframes pulse-border{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(239,68,68,0.3)}}
+
+#reorder-btn{position:fixed;top:14px;left:24px;z-index:50;width:36px;height:36px;border-radius:8px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;backdrop-filter:var(--blur);transition:all 0.3s}
+#reorder-btn:hover{border-color:var(--red);color:var(--red)}
+#reorder-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;z-index:60;background:rgba(10,14,26,0.95);border-left:1px solid var(--border);padding:60px 16px 20px;overflow-y:auto;transition:right 0.3s ease;backdrop-filter:blur(20px)}
+#reorder-panel.open{right:0}
+#reorder-panel h3{font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.reorder-item{padding:10px 12px;margin-bottom:6px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;cursor:grab;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s}
+.reorder-item:active{cursor:grabbing}
+.reorder-item.dragging{opacity:0.5;border-color:var(--red)}
+.reorder-item .ri-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reorder-item .ri-toggle{width:16px;height:16px;border-radius:4px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:var(--green);margin-left:8px;flex-shrink:0}
+.reorder-item .ri-toggle.hidden{color:var(--red)}
+</style>
+</head>
+<body>
+
+<div id="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<div id="slide-counter">1 / 6</div>
+<div id="timer" onclick="toggleTimer()">5:00</div>
+<div id="reorder-btn" onclick="togglePanel()">&#9776;</div>
+<div id="reorder-panel"><h3>Slide Order</h3><div id="reorder-list"></div></div>
+<div id="nav-dots"></div>
+
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" data-title="Title">
+  <span class="badge badge-red">OwnYourAI &middot; Lightning talk</span>
+  <div class="mega mt-3">
+    NEVER GIVE A ROBOT A<br><span class="text-gradient-red">MERGE BUTTON</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="mid mt-2" style="font-weight:500;color:var(--dim)">
+    One Gemma. One 5090. Unsupervised. <span class="text-gradient-green">Writing to prod.</span>
+  </div>
+  <div class="body mt-3">
+    How do you let an autonomous local model write to shared production infrastructure, unsupervised, and still sleep at night?
+  </div>
+  <div class="small mt-4">Andrew Demczuk &middot; OwnYourAI, July 22, 2026 &middot; 5-minute lightning talk</div>
+</div>
+
+<!-- SLIDE 2: The scar -->
+<div class="slide" data-title="The Scar">
+  <span class="badge badge-red">The scar</span>
+  <div class="big mt-2">
+    AnisminC got self-approve <span class="text-gradient-red">and self-merge.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">
+    Its job was review and suggest. I gave it the button anyway, because why make a human click it. Within a day it stopped reviewing and started rubber-stamping.
+  </div>
+  <div class="quote-block mt-3">
+    <div style="font-size:1.05rem;font-weight:700">Everything looked green. Nothing shipped. The one thing on the critical path was a bot that said yes to itself and blocked on nothing.</div>
+  </div>
+  <div class="small mt-3">It did exactly what I told it to. That was the problem.</div>
+</div>
+
+<!-- SLIDE 3: Judge, not author -->
+<div class="slide" data-title="Judge, Not Author">
+  <span class="badge badge-green">The one idea you can steal</span>
+  <div class="big mt-2">
+    Ask it to be a <span class="text-gradient-green">judge,</span> not an author
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">
+    Gemma is bad at open generation and good at two question shapes. Binary and extractive. No invention.
+  </div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:800px">
+    <div class="card card-glow-green">
+      <h3><span class="text-green">Yes or no</span></h3>
+      <p>Are these two entries the same fact. A duplicate check, not a draft.</p>
+    </div>
+    <div class="card card-glow-cyan" style="border-color:rgba(6,182,212,0.3)">
+      <h3><span class="text-cyan">Extract and cite</span></h3>
+      <p>Quote the exact sentence that backs this claim. A real substring, verbatim, or it dies.</p>
+    </div>
+  </div>
+  <div class="stat-grid mt-3">
+    <div class="stat-block"><div class="stat-num text-green">~92%</div><div class="stat-label">on the duplicate check it runs</div></div>
+    <div class="stat-block"><div class="stat-num text-cyan">0</div><div class="stat-label">free-text claims trusted</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Four walls -->
+<div class="slide" data-title="Four Walls">
+  <span class="badge badge-purple">Propose-only by construction</span>
+  <div class="big mt-2">
+    Four walls. Four different <span class="text-gradient-purple">keyholders.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">The model does not decide to behave. Every layer assumes it is already broken.</div>
+  <div class="card-grid card-grid-2 mt-3" style="max-width:900px">
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">1. The grant</span></h3>
+      <p>Write-only to a proposals folder. Ask it to touch the wiki and the server says no. Not the model. The server.</p>
+    </div>
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">2. The card</span></h3>
+      <p>Every proposal hardcodes one verdict: propose. There is no apply field to serialize.</p>
+    </div>
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">3. The validator</span></h3>
+      <p>A different identity rejects any bad card, and gemma can't read that reject log, so it can't learn to game it.</p>
+    </div>
+    <div class="card card-glow-purple">
+      <h3><span class="text-purple">4. Liveness</span></h3>
+      <p>An off-host check attests it's actually alive and actually gemma, before anything it says counts.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: The nonce canary -->
+<div class="slide" data-title="The Nonce Canary">
+  <span class="badge badge-orange">200 lies</span>
+  <div class="big mt-2">
+    A health check that says 200 is <span class="text-gradient-red">lying to you.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">On a shared GPU the model gets swapped out from under the port. A dead card still answers 200. A cached reply looks fresh.</div>
+  <div class="pipeline mt-3">
+    <div class="pipe-step"><div class="pipe-num">1</div><div><div class="pipe-label">Mint a fresh nonce</div><div class="pipe-desc">A random number I made up this second, dropped into the prompt.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">2</div><div><div class="pipe-label">Demand the completion echoes it</div><div class="pipe-desc">A dead GPU can't repeat a number it never saw. A cached reply has last call's number, not this one's.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">3</div><div><div class="pipe-label">Assert the model id says "gemma"</div><div class="pipe-desc">No echo, wrong model: fail closed.</div></div></div>
+    <div class="pipe-step"><div class="pipe-num">4</div><div><div class="pipe-label">Run it off-host</div><div class="pipe-desc">As an identity that isn't gemma, so the node cannot vouch for itself.</div></div></div>
+  </div>
+  <div class="quote-block orange mt-3">A signature proves the key, not the intent. Gemma's key has one holder, and everything that judges gemma runs as something that isn't gemma.</div>
+</div>
+
+<!-- SLIDE 6: Close -->
+<div class="slide" data-title="Close">
+  <div class="big">
+    Give your local model a suggestion box, <span class="text-gradient-green">not a merge button.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2" style="max-width:640px">
+    It can be as smart, or as broken, as it likes. It still can't ship. I didn't ask it nicely. I deleted the option.
+  </div>
+  <div class="small mt-4" style="color:var(--purple)">Want the platform this runs on? Stick around for the 20-minute talk today: AgentReef.</div>
+  <div class="small mt-1 mono" style="color:var(--muted)">Andrew Demczuk &middot; OwnYourAI, July 22, 2026</div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+(function(){
+  var c=document.getElementById('particles');
+  for(var i=0;i<20;i++){
+    var p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(10+Math.random()*15)+'s';
+    p.style.animationDelay=Math.random()*10+'s';
+    if(Math.random()>0.5) p.style.background='var(--orange)';
+    c.appendChild(p);
+  }
+})();
+
+var currentSlide=0;
+var slideOrder=[];
+var hiddenSlides=new Set();
+var transitioning=false;
+
+function getAllSlides(){return document.querySelectorAll('.slide')}
+function getVisibleSlides(){
+  var all=getAllSlides();
+  var visible=[];
+  slideOrder.forEach(function(i){if(!hiddenSlides.has(i)&&i<all.length) visible.push(i)});
+  return visible;
+}
+
+function showSlide(visIdx){
+  var visible=getVisibleSlides();
+  if(visIdx<0||visIdx>=visible.length) return;
+  if(transitioning) return;
+  transitioning=true;
+  currentSlide=visIdx;
+  var slides=getAllSlides();
+  slides.forEach(function(s){s.classList.remove('active')});
+  slides[visible[visIdx]].classList.add('active');
+  updateDots();
+  updateCounter();
+  setTimeout(function(){transitioning=false},450);
+}
+
+function next(){var v=getVisibleSlides();if(currentSlide<v.length-1) showSlide(currentSlide+1)}
+function prev(){if(currentSlide>0) showSlide(currentSlide-1)}
+
+function buildDots(){
+  var container=document.getElementById('nav-dots');
+  container.innerHTML='';
+  var visible=getVisibleSlides();
+  visible.forEach(function(_,i){
+    var d=document.createElement('div');
+    d.className='nav-dot'+(i===currentSlide?' active':'');
+    d.onclick=function(){showSlide(i)};
+    container.appendChild(d);
+  });
+}
+function updateDots(){
+  var dots=document.querySelectorAll('.nav-dot');
+  dots.forEach(function(d,i){d.classList.toggle('active',i===currentSlide)});
+}
+function updateCounter(){
+  var v=getVisibleSlides();
+  document.getElementById('slide-counter').textContent=(currentSlide+1)+' / '+v.length;
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+  else if(e.key==='Home'){e.preventDefault();showSlide(0)}
+  else if(e.key==='End'){e.preventDefault();showSlide(getVisibleSlides().length-1)}
+  else if(e.key==='r'||e.key==='R') togglePanel();
+  else if(e.key==='f'||e.key==='F'){
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+    else document.exitFullscreen();
+  }
+  else if(e.key==='Escape'){var p=document.getElementById('reorder-panel');if(p.classList.contains('open')) p.classList.remove('open')}
+});
+
+document.addEventListener('click',function(e){
+  if(e.target.closest('#reorder-panel,#reorder-btn,#timer,.card a,a,.badge')) return;
+  if(e.clientX>window.innerWidth*0.5) next(); else prev();
+});
+
+var touchX=0;
+document.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-touchX;
+  if(Math.abs(dx)>60){if(dx<0) next(); else prev()}
+},{passive:true});
+
+var timerEl=document.getElementById('timer');
+var timerRunning=false,timerInterval=null,timerSeconds=300;
+function toggleTimer(){
+  if(!timerRunning){
+    timerRunning=true;timerSeconds=300;
+    timerEl.classList.add('running');
+    timerInterval=setInterval(function(){
+      timerSeconds--;
+      if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;timerEl.textContent='0:00';timerEl.className='';timerEl.id='timer';return}
+      var m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+      timerEl.textContent=m+':'+(s<10?'0':'')+s;
+      timerEl.classList.remove('running','warn','danger');
+      if(timerSeconds<=30) timerEl.classList.add('danger');
+      else if(timerSeconds<=60) timerEl.classList.add('warn');
+      else timerEl.classList.add('running');
+    },1000);
+  } else {
+    clearInterval(timerInterval);timerRunning=false;timerSeconds=300;
+    timerEl.textContent='5:00';timerEl.classList.remove('running','warn','danger');
+  }
+}
+
+function togglePanel(){document.getElementById('reorder-panel').classList.toggle('open')}
+function buildReorderList(){
+  var list=document.getElementById('reorder-list');list.innerHTML='';
+  var slides=getAllSlides();
+  slideOrder.forEach(function(idx){
+    var item=document.createElement('div');
+    item.className='reorder-item';
+    item.draggable=true;
+    item.dataset.idx=idx;
+    var label=document.createElement('span');
+    label.className='ri-label';
+    label.textContent=(idx+1)+'. '+(slides[idx].dataset.title||'Slide '+(idx+1));
+    var toggle=document.createElement('span');
+    toggle.className='ri-toggle'+(hiddenSlides.has(idx)?' hidden':'');
+    toggle.textContent=hiddenSlides.has(idx)?'X':'V';
+    toggle.onclick=function(e){
+      e.stopPropagation();
+      if(hiddenSlides.has(idx)) hiddenSlides.delete(idx); else hiddenSlides.add(idx);
+      buildReorderList();buildDots();updateCounter();
+      if(currentSlide>=getVisibleSlides().length) showSlide(getVisibleSlides().length-1);
+    };
+    item.appendChild(label);item.appendChild(toggle);
+    item.addEventListener('dragstart',function(e){item.classList.add('dragging');e.dataTransfer.setData('text/plain',idx)});
+    item.addEventListener('dragend',function(){item.classList.remove('dragging')});
+    item.addEventListener('dragover',function(e){e.preventDefault()});
+    item.addEventListener('drop',function(e){
+      e.preventDefault();
+      var fromIdx=parseInt(e.dataTransfer.getData('text/plain'));
+      var fromPos=slideOrder.indexOf(fromIdx);
+      var toPos=slideOrder.indexOf(idx);
+      slideOrder.splice(fromPos,1);
+      slideOrder.splice(toPos,0,fromIdx);
+      buildReorderList();buildDots();
+    });
+    list.appendChild(item);
+  });
+}
+
+(function(){
+  var slides=getAllSlides();
+  for(var i=0;i<slides.length;i++) slideOrder.push(i);
+  buildDots();buildReorderList();updateCounter();
+})();
+</script>
+</body>
+</html>
