@@ -169,7 +169,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
 </div>
 
 <!-- Slide counter -->
-<div id="slide-counter">1 / 8</div>
+<div id="slide-counter">1 / 9</div>
 
 <!-- Timer (5 min lightning slot) -->
 <div id="timer" onclick="toggleTimer()">5:00</div>
@@ -290,7 +290,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   </div>
 </div>
 
-<!-- SLIDE 6: Close -->
+<!-- SLIDE 6: Live demo -->
+<div class="slide" data-title="LIVE Demo">
+  <span class="badge badge-green">Live &middot; localhost:3006</span>
+  <div class="big mt-2">
+    12 agents. One 5090. <span class="text-gradient-green">Right now.</span>
+  </div>
+  <div class="divider mt-3"></div>
+  <div class="body mt-2">One orchestrator call splits the theme into 12 drawing tasks. Twelve Gemma sub-agents stream SVGs concurrently through llama-server's continuous batching. Watch the aggregate tokens per second.</div>
+  <img src="demo-gallery.png" class="slide-img mt-3" style="max-height:46vh;width:auto;max-width:94%;border-radius:12px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,0.4)" alt="Gemma 4 Parallel Playground: subagent execution grid and the SVG vector art gallery it produced">
+  <div class="small mt-2 mono" style="color:var(--muted)">gemma-4-26b-a4b &middot; 12 concurrent sub-agents &middot; $0 API &middot; if the live run dies, this screenshot is what it did last time</div>
+</div>
+
+<!-- SLIDE 7: Close -->
 <div class="slide" data-title="Close">
   <div class="big">
     Give your local model a suggestion box, <span class="text-gradient-green">not a merge button.</span>
