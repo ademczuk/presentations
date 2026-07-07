@@ -492,6 +492,29 @@ grapple    18    5      1.0s    hook pull, wall slam for bonus</div>
   <div class="small mt-2">Fast and cheap or slow and far. The sword hits hardest up close, the bow keeps you safe at range. These numbers are live from /api/v1/bot-setup, so they are exactly what the server runs.</div>
 </div>
 
+<!-- 16c. VIBE-CODE YOUR BOT -->
+<div class="slide" data-title="Vibe-code your bot (optional)">
+  <span class="badge badge-purple">Optional path &middot; you do not have to hand-type it</span>
+  <div class="big mt-2">Or just <span class="text-gradient-purple">vibe-code it</span></div>
+  <div class="divider purple mt-3"></div>
+  <div class="body mt-2">You know the pieces now: one class, on_tick, ten actions, twenty points. Hand-write it, or hand that spec to an AI assistant (Claude Code, Gemini CLI, Codex) and let it write your on_tick. Same bot, same board.</div>
+  <div class="codebox mt-3"><span class="c"># tell your assistant to build it</span>
+Write an Arena SDK bot in Python. Subclass ArenaBot, call
+set_loadout with stats that sum to 20, and override on_tick
+to return one action. Strategy: move toward the closest
+enemy, attack when adjacent, grapple a runner.
+
+<span class="c"># iterate the exact same way</span>
+My bot dies too fast. Here is the code: [paste it].
+Make it grab a health pickup when hp is low, and dodge
+when an enemy is charging.</div>
+  <div class="card-grid card-grid-3 mt-3">
+    <div class="card card-glow-green"><h3 class="text-green">Start here</h3><p>Move toward the enemy and attack. That is a whole working bot.</p></div>
+    <div class="card card-glow-cyan"><h3 class="text-cyan">Then</h3><p>Circle the arena, attack only when an enemy is close, and grab pickups.</p></div>
+    <div class="card card-glow-purple"><h3 class="text-purple">Show off</h3><p>A state machine: search, attack, retreat, heal. Read the round modifier and adapt.</p></div>
+  </div>
+</div>
+
 <!-- 17. HEAT 1 -->
 <div class="slide" data-title="Heat 1: warmup">
   <span class="badge badge-orange">Heat 1 &middot; unscored warmup</span>
