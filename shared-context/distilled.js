@@ -284,7 +284,7 @@
     'padding:14px 26px 14px 18px;border-radius:999px;background:linear-gradient(90deg,#67e8f9,#c4b5fd);box-shadow:0 18px 40px -12px rgba(0,0,0,.8),0 0 40px rgba(103,232,249,.35);}',
     '.dst-mo-export svg{width:34px;height:34px;}',
 
-    '@media (prefers-reduced-motion: reduce){.dst-root,.dst-root *,.dst-root *:before,.dst-root *:after{transition:none!important;animation:none!important;}}'
+    'html.calm .dst-root,html.calm .dst-root *,html.calm .dst-root *:before,html.calm .dst-root *:after{transition:none!important;animation:none!important;}'
   ].join('\n');
 
   function injectStyle() {

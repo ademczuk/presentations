@@ -308,7 +308,7 @@
     '.plg-ex-env{position:absolute;left:0;top:0;width:54px;height:40px;z-index:30;opacity:0;pointer-events:none;',
     'filter:drop-shadow(0 6px 6px rgba(60,40,0,.35));}',
 
-    '@media (prefers-reduced-motion: reduce){.plg-root,.plg-root *,.plg-root *:before,.plg-root *:after{transition:none!important;animation:none!important;}}'
+    'html.calm .plg-root,html.calm .plg-root *,html.calm .plg-root *:before,html.calm .plg-root *:after{transition:none!important;animation:none!important;}'
   ].join('\n');
 
   function injectStyle() {

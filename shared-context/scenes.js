@@ -160,7 +160,7 @@
     '.scn-newlbl{position:absolute;left:1500px;width:200px;top:566px;text-align:center;font-size:27px;font-weight:700;color:#67e8f9;}',
     '.scn-footer{position:absolute;left:100px;right:100px;top:716px;text-align:center;font-size:28px;font-weight:600;color:#d8b4fe;}',
 
-    '@media (prefers-reduced-motion: reduce){.scn-root,.scn-root *,.scn-root *:before,.scn-root *:after{transition:none!important;animation:none!important;}}'
+    'html.calm .scn-root,html.calm .scn-root *,html.calm .scn-root *:before,html.calm .scn-root *:after{transition:none!important;animation:none!important;}'
   ].join('\n');
 
   function injectStyle() {
