@@ -594,7 +594,7 @@
         '<div class="scn-card scn-pr" style="top:' + top + 'px;--tx:' + tx + 'px;--ty:' + ty + 'px"' +
           ' data-at="4" data-cls="moved" data-cd="' + d + '">' +
           '<span class="scn-prnum scn-mono">' + n + '</span>' +
-          '<span class="scn-prby scn-fade"' + at(0, 0, ' data-off="4"') + '>agent-written</span>' +
+          '<span class="scn-prby scn-fade"' + at(0, 0, ' data-off="4"') + '>open</span>' +
           '<span class="scn-check scn-pop"' + at(4, d + 650) + '>' + checkIcon() + '</span>' +
         '</div>';
     });
@@ -646,22 +646,22 @@
     var track =
       '<div class="scn-mainlbl scn-mono">main</div>' +
       '<div class="scn-newlbl scn-mono scn-fade"' + at(5, 550) + '>new main</div>' +
-      '<div class="scn-footer scn-fade"' + at(6, 500) + '>authors, reviewers, gate, merger: four machines, one shared context</div>';
+      '<div class="scn-footer scn-fade"' + at(6, 500) + '>authors, reviewers, gate, merger: one shared context</div>';
 
     return svg + track + review + gate + merge + chips + prs;
   }
 
   var mergePipeline = makeScene({
     name: 'merge-pipeline',
-    label: 'This morning\'s merge: four agent pull requests are reviewed, gated twice, and merged into main by another agent.',
+    label: 'This morning\'s merge: four pull requests are reviewed, gated twice, and merged into main by another agent.',
     captions: [
-      'Four pull requests, written by agents.',
+      'Four pull requests, ready for review.',
       'A different agent reviews each one. Authors never review themselves.',
       'The full test gate runs on the combined tree. It fails once, on a random collision in a test fixture.',
       'The flake is diagnosed, the same tree is gated again, and it passes.',
       'A third agent merges them, each pinned to its reviewed commit and checked after every merge.',
-      'Main moves forward. Every agent sees it within seconds.',
-      'Humans set the rules and approve the risky steps. The routine runs itself.'
+      'Main moves forward. Every agent can see it.',
+      'People set the rules and approve the risky steps.'
     ],
     html: mergePipelineHtml,
     forward: function (i, fx) {
