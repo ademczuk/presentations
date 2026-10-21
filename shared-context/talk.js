@@ -59,6 +59,21 @@
     '.tk-ev .who{font-size:28px;font-weight:700}.tk-ev .who small{display:block;font-size:20px;font-weight:600;color:#8b857d;margin-top:6px}' +
     '.tk-ev .res{font-size:34px;line-height:1.25}.tk-ev .res b{color:#ff6a1f}.tk-ev .res small{display:block;font-size:21px;color:#a6a098;margin-top:6px}' +
     '.tk-ev .src{position:absolute;left:120px;bottom:30px;font-size:18px;color:#8b857d}' +
+    // tips, in kinetic type: each tip's words rise in one after another, key words in orange
+    '.tk-tips{background:radial-gradient(circle at 25% 15%,#2a2622 0,transparent 55%),#0e0d0c;color:#f2ece4;padding:96px 130px}' +
+    '.tk-tips .hd{font:600 26px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#a6a098}' +
+    '.tk-tips .tip{display:grid;grid-template-columns:120px 1fr;gap:30px;margin-top:58px;transition:opacity .6s ease}' +
+    '.tk-tips .tip.dim{opacity:.34}' +
+    '.tk-tips .n{width:92px;height:92px;border-radius:50%;border:3px solid #ff6a1f;display:grid;place-items:center;font:700 44px/1 "Source Serif 4",Georgia,serif;color:#ff6a1f;opacity:0;transform:scale(.4);transition:opacity .4s ease,transform .5s cubic-bezier(.2,1.4,.4,1)}' +
+    '.tk-tips .tip.on .n{opacity:1;transform:none}' +
+    '.tk-tips .t1{font:700 74px/1.1 "Source Serif 4",Georgia,serif;letter-spacing:-.01em}' +
+    '.tk-tips .t2{margin-top:14px;font:600 40px/1.3 Manrope,Arial,sans-serif;color:#d9d2c9;max-width:1480px}' +
+    '.tk-tips .w{display:inline-block;white-space:pre;opacity:0;filter:blur(8px);transform:translateY(46px) rotate(4deg);transition:opacity .45s ease,filter .45s ease,transform .6s cubic-bezier(.2,.9,.25,1)}' +
+    '.tk-tips .tip.on .w{opacity:1;filter:none;transform:none}' +
+    '.tk-tips .w.k{color:#ff6a1f}' +
+    '.tk-tips .tip.on .w.k{animation:tk-pop .5s ease both;animation-delay:inherit}' +
+    '@keyframes tk-pop{0%{transform:scale(1)}55%{transform:scale(1.14)}100%{transform:scale(1)}}' +
+    '@media (prefers-reduced-motion: reduce){.tk-tips .w,.tk-tips .n{transition:none;filter:none}}' +
     // close
     '.tk-close{background:radial-gradient(circle at 30% 20%,#2a2622 0,transparent 45%),#0e0d0c;display:flex;align-items:center;justify-content:space-between;padding:0 120px}' +
     '.tk-close h1{margin:0;font:700 92px/1.04 "Source Serif 4",Georgia,serif;letter-spacing:-.02em;max-width:1000px;color:#f2ece4}' +
@@ -250,13 +265,48 @@
     step: function (i) { fades(evidence._root, i); }
   };
 
+  // Three tips, Andrew's words. A word wrapped in *stars* is a key word.
+  var TIPS = [
+    ["Don't get your top chef to cut your vegetables.", "Use *Sonnet*, with *Opus* as its */advisor*."],
+    ["Have your agent *mine* *your* *transcripts*.", "Then have it ask you, with *AskUserQuestion*, which fixes to make for the top three problems your system keeps repeating."],
+    ["Ask: *\"Are* *you* *sure?\"*", "Or have *Codex* check Claude's work."]
+  ];
+  function words(line, startDelay) {
+    var out = '', i = 0;
+    line.split(' ').forEach(function (w) {
+      var k = /^\*.*\*[.,]?$/.test(w), txt = w.replace(/\*/g, '');
+      out += '<span class="w' + (k ? ' k' : '') + '" style="transition-delay:' + (startDelay + i * 55) + 'ms">' + txt + ' </span>';
+      i++;
+    });
+    return { html: out, n: i };
+  }
+  var tips = {
+    steps: 3,
+    mount: function (host) {
+      host.classList.add('tk-full');
+      var h = '<div class="tk tk-tips"><div class="hd">Three tips for working with agents</div>';
+      TIPS.forEach(function (t, k) {
+        var a = words(t[0], 120), b = words(t[1], 120 + a.n * 55 + 180);
+        h += '<div class="tip" data-i="' + k + '"><div class="n">' + (k + 1) + '</div><div><div class="t1">' + a.html + '</div><div class="t2">' + b.html + '</div></div></div>';
+      });
+      host.innerHTML = ''; tips._root = el(h + '</div>'); host.appendChild(tips._root);
+    },
+    step: function (i) {
+      tips._root.querySelectorAll('.tip').forEach(function (e) {
+        var k = +e.dataset.i;
+        e.classList.toggle('on', k <= i);
+        e.classList.toggle('dim', k < i);
+      });
+    }
+  };
+
   var close = {
     steps: 1,
     mount: function (host) {
       host.classList.add('tk-full');
       host.innerHTML = '<div class="tk tk-close"><div><h1>Shared context is the frontier.</h1>' +
         '<p>Better models matter. The next advantage is a team and its AI working from the same context.</p>' +
-        '<p style="font-size:28px;color:#8ea2c8">Andrew Demczuk, Forward Deployed Engineer</p></div>' +
+        '<p style="font-size:28px;color:#8ea2c8">Andrew Demczuk, Forward Deployed \'rate limit\' Engineer (FDE), Benjamin</p></div>' +
         '<figure><img src="qr-talk.png" alt="QR code for this deck"><span>This deck</span></figure></div>';
     },
     step: function () {}
@@ -280,7 +330,8 @@
       sub: 'Every repository of the build in one graph, so the agents doing the work see the same map we do.'
     }),
     evidence: evidence,
-    close: close
+    close: close,
+    tips: tips
   };
   // the wiring slide's scene lives in wiring.js (loaded before this file)
   Object.defineProperty(window.Talk, 'wiring', { get: function () { return window.Wiring && window.Wiring.wiring; } });
