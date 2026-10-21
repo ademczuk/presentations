@@ -88,15 +88,16 @@
   // A page that plays an HTML animation (Altitude, or the team version) from its first frame.
   // The film loads when the deck starts and waits on frame 0, so entering the page shows it at once (no placeholder);
   // step(0) sends 'play'; a second right press sends 'end' (jump to the held last frame) before the deck moves on.
-  function framePage(getSrc, fallback) {
-    var frame = null, ready = false, used = false, lastStart = 0, pending = null;
+  function framePage(getSrc, fallback, filmMs) {
+    var frame = null, ready = false, used = false, lastStart = 0, pending = null, doneT = 0, api;
+    function arm() { clearTimeout(doneT); if (filmMs) doneT = setTimeout(function () { api.steps = 1; }, filmMs); }
     function send(msg) { try { frame.contentWindow.postMessage(msg, '*'); } catch (e) {} }
     function load() {
-      var src = getSrc(); ready = false; used = false;
+      var src = getSrc(); ready = false; used = false; clearTimeout(doneT); if (api) api.steps = 2;
       frame.src = src + (src.indexOf('?') < 0 ? '?' : '&') + 'deck=1&wait=1&r=' + (++load.n);
     }
     load.n = 0;
-    return {
+    return (api = {
       steps: 2,
       mount: function (host) {
         var src = getSrc();
@@ -105,7 +106,7 @@
         host.innerHTML = '';
         var box = el('<div class="tk"></div>'); frame = document.createElement('iframe');
         frame.title = 'animation'; frame.tabIndex = -1; frame.style.pointerEvents = 'none';
-        frame.onload = function () { ready = true; if (pending) { send(pending); if (pending === 'play') used = true; pending = null; } try { window.focus(); } catch (e) {} };
+        frame.onload = function () { ready = true; if (pending) { send(pending); if (pending === 'play') { used = true; arm(); } pending = null; } try { window.focus(); } catch (e) {} };
         box.appendChild(frame); host.appendChild(box); load();
       },
       step: function (i) {
@@ -115,10 +116,10 @@
           if (now - lastStart < 1200) return;            // the deck activates a page twice; start it once
           lastStart = now;
           if (used) { load(); pending = 'play'; return; }  // re-entry: reload, then play from frame 0
-          if (ready) { send('play'); used = true; } else pending = 'play';
-        } else if (i === 1) send('end');
+          if (ready) { send('play'); used = true; arm(); } else pending = 'play';
+        } else if (i === 1) { clearTimeout(doneT); send('end'); }
       }
-    };
+    });
   }
 
   // A full-screen looping film of one of our graphs, with a caption that builds over it.
@@ -268,7 +269,7 @@
   // Three tips, Andrew's words. A word wrapped in *stars* is a key word.
   var TIPS = [
     ["Don't get your top chef to cut your vegetables.", "Use *Sonnet*, with *Opus* as its */advisor*."],
-    ["Have your agent *mine* *your* *transcripts*.", "Then have it ask you, with *AskUserQuestion*, which fixes to make for the top three problems your system keeps repeating."],
+    ["Ask your agent to *mine* *your* *transcripts*,", "then to *AskUserQuestion* you with the fixes for the top three problems your system keeps repeating."],
     ["Ask: *\"Are* *you* *sure?\"*", "Or have *Codex* check Claude's work."]
   ];
   function words(line, startDelay) {
@@ -313,8 +314,8 @@
   };
 
   window.Talk = {
-    altitude: framePage(function () { return CONFIG.altitude; }, '<div class="scene-fallback">Ask for the outcome, not the task.</div>'),
-    together: framePage(function () { return CONFIG.together; }, '<div class="scene-fallback">Shared context: one team, one shared picture.</div>'),
+    altitude: framePage(function () { return CONFIG.altitude; }, '<div class="scene-fallback">Ask for the outcome, not the task.</div>', 20500),
+    together: framePage(function () { return CONFIG.together; }, '<div class="scene-fallback">Shared context: one team, one shared picture.</div>', 23500),
     lexifina: lexifina,
     firstGraph: graphFilm({
       src: 'media/talk/agentreef-graph.mp4', poster: 'media/talk/agentreef-graph-poster.jpg', steps: 2,

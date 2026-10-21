@@ -27,7 +27,7 @@
     '.t3 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}' +
     '.t3 .ov{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;pointer-events:none;color:' + INK + ';font-family:Manrope,Arial,sans-serif}' +
     '.t3 .f{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}' +
-    '.t3 .f.on{opacity:1;transform:none}.t3 .f.dim{opacity:.38}' +
+    '.t3 .f.on{opacity:1;transform:none}.t3 .f.dim{opacity:.38;transform:none}' +
     '.t3 .kick{font:600 22px/1 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:' + MUTED + '}' +
     '.t3 .h{font:700 64px/1.05 "Source Serif 4",Georgia,serif;letter-spacing:-.01em}' +
     '.t3 .cap{position:absolute;left:0;right:0;bottom:84px;text-align:center;font:700 52px/1.15 "Source Serif 4",Georgia,serif;text-shadow:0 2px 24px #000}' +
@@ -214,9 +214,9 @@
         '<div class="f l0" data-at="0">&gt; grep "processOrder"</div>' +
         '<div class="f l1" data-at="0">60 matches across 12 packages</div>' +
         '<div class="f l2" data-at="0">&gt; reads 60 files, one after another...</div>' +
-        '<div class="f l3 bad" data-at="0">a full context window pushes out the first ones</div>' +
+        '<div class="f l3 bad" data-at="0">context fills, early files drop out</div>' +
         '<div class="f l4 good" data-at="3">&gt; trace processOrder in the graph</div>' +
-        '<div class="f l5" data-at="3">its callers and what they touch, in one call</div>' +
+        '<div class="f l5" data-at="3">its callers and effects, in one call</div>' +
         '</div></div>' +
         '<div class="cap f c1" data-at="1">these aren\'t text, <em>they\'re edges</em>.</div>' +
         '<div class="cap f c2" data-at="2">each definition a node, each reference an edge</div>' +
@@ -263,7 +263,7 @@
     var LIT = [[], [4, 3], [0, 1, 2, 3, 4, 5, 6], [1, 2], [4, 3, 5, 1, 0], [0, 1, 2, 3, 4, 5, 6]];
     function py(p) { return (3 - p) * GAP; }
     function draw(c, step, t, total) {
-      var yaw = -0.55 + total * 0.07, pitch = 0.48, dist = 2050;
+      var yaw = -0.55 + 0.18 * Math.sin(total * 0.2), pitch = 0.48, dist = 2050;
       var proj = camera([0, 0, 0], yaw, pitch, dist, 760, 560, 1300);
       var build = step === 0 ? t : 99;
       var litSet = LIT[step] || [], since = step === 0 ? 0 : t;
@@ -283,7 +283,7 @@
           if (on) { c.shadowColor = OR; c.shadowBlur = 10 * glow; }
           c.beginPath(); c.arc(v[0], v[1], r, 0, Math.PI * 2); c.fill(); c.shadowBlur = 0;
         });
-        var lab = proj(-PW, y, PD); if (lab) {
+        var lab = cs.reduce(function (m, v) { return v[0] < m[0] ? v : m; }); if (lab) {
           c.font = '700 26px Manrope,Arial,sans-serif'; c.textAlign = 'right';
           var lx = Math.max(lab[0] - 18, c.measureText(PL[p]).width + 40);
           c.lineWidth = 7; c.strokeStyle = BG; c.strokeText(PL[p], lx, lab[1] + 7);
@@ -368,7 +368,7 @@
       return { t: [0, 1, 2].map(function (i) { return lerp(A.t[i], B.t[i], p); }), d: lerp(A.d, B.d, p) - Math.sin(p * Math.PI) * -900, yaw: lerp(A.yaw, B.yaw, p) };
     }
     function draw(c, step, t, total) {
-      var P = poseAt(step, t), proj = camera(P.t, P.yaw + total * 0.02, 0.32, P.d, 1150, 520, 1100);
+      var P = poseAt(step, t), proj = camera(P.t, P.yaw + total * 0.02, 0.32, P.d, 1320, 470, 1100);
       EDG.forEach(function (e) {
         var a = PTS[e[0]], b = PTS[e[1]], va = proj(a.x, a.y, a.z), vb = proj(b.x, b.y, b.z); if (!va || !vb) return;
         var on = a.k === step && b.k === step && t > 1.4, seen = a.k < step && b.k < step;
@@ -399,15 +399,15 @@
           '<div class="who">' + S.who + '</div><div class="when">' + S.when + '</div>' +
           '<div class="big">' + bigHtml(S.big) + '</div><div class="cav">' + S.cav + '</div></div>';
       });
-      return h + '<div class="note" style="position:absolute;left:80px;bottom:40px">Sources: atlassian.com/blog (15 Jul 2026), arxiv.org/abs/2603.27277, microsoft.com/research (2 Jul 2024), honcho.dev</div>';
+      return h + '<div class="note" style="position:absolute;left:80px;bottom:78px">Sources: atlassian.com/blog (15 Jul 2026), arxiv.org/abs/2603.27277, microsoft.com/research (2 Jul 2024), honcho.dev</div>';
     }
     var raf = 0;
     function onStep(ov, i, back) {
       ov.querySelectorAll('.card').forEach(function (e) { e.classList.toggle('on', +e.dataset.at === i); });
       cancelAnimationFrame(raf);
-      var card = ov.querySelector('.card[data-at="' + i + '"]'), cnts = card.querySelectorAll('.cnt'), t0 = performance.now() + (back || RM ? -99999 : 1300);
+      var card = ov.querySelector('.card[data-at="' + i + '"]'), cnts = card.querySelectorAll('.cnt'), t0 = performance.now() + (back || RM ? -99999 : 1000);
       function tick(now) {
-        var p = eo((now - t0) / 1300);
+        var p = eo((now - t0) / 800);
         cnts.forEach(function (e) { var v = +e.dataset.v * p, d = +e.dataset.d; e.textContent = (d ? v.toFixed(d) : Math.round(v)) + e.dataset.s; });
         if (p < 1) raf = requestAnimationFrame(tick);
       }

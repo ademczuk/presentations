@@ -43,7 +43,7 @@
   ];
 
   var MEM = { x: 790, y: 390, w: 340, h: 220 };
-  var BOT = { cx: 1420, cy: 470, w: 260, h: 120 };
+  var BOT = { cx: 1420, cy: 470, w: 330, h: 120 };
   var AG_CX = 1755, AG_W = 220, AG_H = 80;
 
   var css = '' +
@@ -224,7 +224,7 @@
 
     // company bot
     refs.nodes.bot = div('wr-node wr-bot', 'left:' + (BOT.cx - BOT.w / 2) + 'px;top:' + (BOT.cy - BOT.h / 2) + 'px;width:' +
-      BOT.w + 'px;height:' + BOT.h + 'px', '<b>company bot</b><span>meta-orchestrator</span>', stage);
+      BOT.w + 'px;height:' + BOT.h + 'px', '<b>company bot (pilot)</b><span>meta-orchestrator</span>', stage);
     refs.botHot = div('wr-hotring', '', '', refs.nodes.bot);
 
     // agents
