@@ -1,290 +1,373 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Altitude, rebuilt as f(t)</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Altitude</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
 <style>
-  html,body{margin:0;background:#0e0d0c;overflow:hidden}
-  canvas{display:block;position:fixed;inset:0;width:100vw;height:100vh}
-  #hud{position:fixed;left:16px;bottom:12px;font:13px system-ui,sans-serif;color:rgba(242,236,228,.55);user-select:none}
-</style></head>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0e0d0c; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0e0d0c; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0e0d0c }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
 <body>
-<canvas id="c"></canvas><div id="hud"></div>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Altitude: a 22-second contour-map animation">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        #quote text, #h1, #h2, #h3 { paint-order:stroke;stroke:#0e0d0c;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <radialGradient id="bgGlow" cx="50%" cy="56%" r="58%">
+          <stop offset="0" stop-color="#2a2622"/>
+          <stop offset="1" stop-color="#0e0d0c"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+      </defs>
+      <rect width="1920" height="1080" fill="#0e0d0c"/>
+      <rect width="1920" height="1080" fill="url(#bgGlow)" opacity=".55"/>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="dots" fill="#d9d2c9"></g>
+      <g id="walker" fill="#ff6a1f" filter="url(#og)"></g>
+      <path id="arc" fill="none" stroke="#ff6a1f" stroke-width="5" stroke-dasharray="20 15" stroke-linecap="round" filter="url(#og)"/>
+      <circle id="arcHead" r="6" fill="#ff6a1f"/>
+      <g id="labels"></g>
+      <g id="quote" class="serif" text-anchor="middle">
+        <text x="960" y="438" font-size="66" fill="#f2ece4">“letting the model operate</text>
+        <text x="960" y="518" font-size="66" fill="#f2ece4">at a <tspan fill="#ff6a1f">higher abstraction</tspan>”</text>
+        <text x="960" y="584" font-size="30" fill="#a6a098" class="sans" style="font-weight:600">Felix Rieseberg</text>
+      </g>
+      <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
+        <text id="h1" x="960" y="142">A task is often just your best guess</text>
+        <text id="h2" x="960" y="142">Ask for the outcome</text>
+        <text id="h3" x="960" y="142">Better still: the goal beyond the goal</text>
+      </g>
+      <rect id="fadeB" width="1920" height="1080" fill="#0e0d0c"/>
+      <g id="title">
+        <rect width="1920" height="1080" fill="#0e0d0c"/>
+        <rect width="1920" height="1080" fill="url(#bgGlow)" opacity=".55"/>
+        <text id="titleWord" class="serif" x="960" y="462" font-size="168" text-anchor="middle" fill="#f2ece4">Altitude</text>
+        <g id="titleRings" fill="none" stroke="#d9d2c9" stroke-width="3"></g>
+        <circle id="titleGlow" r="22" fill="#ff6a1f" opacity=".25"/>
+        <circle id="titleDot" r="9" fill="#ff6a1f"/>
+        <rect id="fadeA" width="1920" height="1080" fill="#0e0d0c"/>
+      </g>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="22" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 22.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
 <script>
-// Every frame is a pure function of t (seconds). window.render(t) draws it; same t, same picture.
-const W = 1920, H = 1080, DUR = 22;
-const cv = document.getElementById('c'), g = cv.getContext('2d');
-const ORANGE = '#ff6a1f', INK = '#f2ece4', BG = '#0e0d0c';
+(function () {
+  const NS = 'http://www.w3.org/2000/svg', DUR = 22, T2 = 2.8;
+  const clamp01 = x => Math.min(1, Math.max(0, x));
+  const seg = (t, a, b) => clamp01((t - a) / (b - a));
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x * x;
+  const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  function rng(s) { let a = s >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const $ = id => document.getElementById(id);
 
-// ---------- terrain: a height field, contoured once, projected every frame ----------
-const HILLS = {
-  outcome: { x: 0.44, y: 0.10, a: 0.86, s: 0.19 },
-  goal:    { x: -0.22, y: 0.98, a: 1.02, s: 0.31 },
-  right:   { x: 1.25, y: 0.55, a: 0.70, s: 0.28 },
-  back:    { x: 0.55, y: 1.65, a: 0.55, s: 0.30 },
-};
-function height(x, y) {
-  let h = 0;
-  for (const k in HILLS) { const q = HILLS[k]; const d2 = (x-q.x)**2 + (y-q.y)**2; h += q.a * Math.exp(-d2 / (2*q.s*q.s)); }
-  // low rolling ground so the flat land carries wandering contour loops
-  h += 0.075*Math.sin(3.1*x+0.7)*Math.cos(2.3*y-0.4) + 0.05*Math.sin(5.3*x*y+1.3) + 0.045*Math.cos(4.1*x-2.7*y) + 0.03*Math.sin(7.7*x+3.1*y);
-  return h;
-}
-const GX0 = -1.6, GX1 = 2.2, GY0 = -1.0, GY1 = 2.4, N = 190;
-const STEP_LEVEL = 0.04, LEVELS = [];
-for (let z = 0.02; z < 1.3; z += STEP_LEVEL) LEVELS.push(z);
-const segs = [], TOPLV = {}; // {ax,ay,bx,by,z,lv}
-(function contour() {
-  const dx = (GX1-GX0)/N, dy = (GY1-GY0)/N, F = [];
-  for (let j = 0; j <= N; j++) { F[j] = []; for (let i = 0; i <= N; i++) F[j][i] = height(GX0+i*dx, GY0+j*dy); }
-  const lerp = (a, b, va, vb, z) => a + (b-a) * (z-va) / (vb-va);
-  LEVELS.forEach((z, lv) => {
-    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-      const x0 = GX0+i*dx, y0 = GY0+j*dy, x1 = x0+dx, y1 = y0+dy;
-      const v0 = F[j][i], v1 = F[j][i+1], v2 = F[j+1][i+1], v3 = F[j+1][i];
-      const idx = (v0>z) | (v1>z)<<1 | (v2>z)<<2 | (v3>z)<<3;
-      if (idx === 0 || idx === 15) continue;
-      const e = [
-        [lerp(x0,x1,v0,v1,z), y0], [x1, lerp(y0,y1,v1,v2,z)],
-        [lerp(x0,x1,v3,v2,z), y1], [x0, lerp(y0,y1,v0,v3,z)],
-      ];
-      const T = {1:[[3,0]],2:[[0,1]],3:[[3,1]],4:[[1,2]],5:[[3,0],[1,2]],6:[[0,2]],7:[[3,2]],
-                 8:[[2,3]],9:[[0,2]],10:[[0,1],[2,3]],11:[[1,2]],12:[[1,3]],13:[[0,1]],14:[[0,3]]}[idx];
-      for (const [p, q] of T) segs.push({ ax: e[p][0], ay: e[p][1], bx: e[q][0], by: e[q][1], z, lv });
+  // ---------- world ----------
+  const F = 1150;
+  const K = [
+    { t: 2.0, tx: -60, ty: 0, tz: 250, d: 2700, yaw: -0.22, pitch: 1.30 },
+    { t: 7.8, tx: -150, ty: 70, tz: 80, d: 1550, yaw: -0.05, pitch: 0.40 },
+    { t: 11.6, tx: -160, ty: 70, tz: 20, d: 1250, yaw: 0.04, pitch: 0.36 },
+    { t: 15.0, tx: 200, ty: 250, tz: 440, d: 2750, yaw: -0.36, pitch: 0.36 },
+    { t: 19.2, tx: 210, ty: 250, tz: 460, d: 2620, yaw: -0.40, pitch: 0.37 }];
+  const HILLS = [
+    { id: 'o', x: -120, z: 0, h: 150, r: 260, n: 11, seed: 3, fade: 1 },
+    { id: 'm', x: 520, z: 900, h: 540, r: 620, n: 26, seed: 7, fade: 1 },
+    { id: 'w', x: -950, z: 520, h: 120, r: 520, n: 9, seed: 11, fade: 0.9 },
+    { id: 'f', x: -350, z: 2100, h: 260, r: 620, n: 14, seed: 5, fade: 0.55 }];
+  const TASK = [-253, 0, -177], OUT = [-120, 150, 0], TOP = [520, 560, 900];
+  const PATH = [[-900, -700], [-760, -610], [-640, -560], [-560, -450], [-470, -380], [-380, -330], [-310, -262], [-292, -205]];
+  const BODY = ['0000110000', '0011111100', '0111111110', '0110110110', '0111111110', '1111111111', '0111111110', '0011111100'];
+  const LEGS = [['0110000110', '0110000110'], ['0011001100', '0001001000']];
+  const MAIN = [217, 210, 201], ACC = [255, 106, 31];
+  const mix = k => [0, 1, 2].map(i => Math.round(lerp(MAIN[i], ACC[i], k)));
+
+  function cam(t) {
+    let a = K[0], b = K[0], p = 0;
+    if (t > K[0].t && t < K[K.length - 1].t) {
+      for (let i = 0; i < K.length - 1; i++) if (t >= K[i].t && t <= K[i + 1].t) { a = K[i]; b = K[i + 1]; const s = seg(t, a.t, b.t); p = i === 3 ? (s + eio(s)) / 2 : eio(s); break; }
+    } else if (t >= K[K.length - 1].t) a = b = K[K.length - 1];
+    const c = {}; for (const k of ['tx', 'ty', 'tz', 'd', 'yaw', 'pitch']) c[k] = lerp(a[k], b[k], p);
+    c.yaw += 0.004 * t; c.d -= 6 * t;
+    const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
+    c.F = [sy * cp, -sp, cy * cp]; c.R = [cy, 0, -sy]; c.U = [sy * sp, cp, cy * sp];
+    c.C = [c.tx - c.d * c.F[0], c.ty - c.d * c.F[1], c.tz - c.d * c.F[2]];
+    return c;
+  }
+  function proj(c, x, y, z, o) {
+    const vx = x - c.C[0], vy = y - c.C[1], vz = z - c.C[2];
+    const zc = vx * c.F[0] + vy * c.F[1] + vz * c.F[2];
+    o[0] = 960 + F * (vx * c.R[0] + vz * c.R[2]) / zc;
+    o[1] = 540 - F * (vx * c.U[0] + vy * c.U[1] + vz * c.U[2]) / zc;
+    o[2] = zc; return o;
+  }
+  function ring(cx, cz, y, rad, wob, ph, sx, sz) {
+    const N = 72, a = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const th = i / N * Math.PI * 2;
+      const rr = rad * (1 + wob * (0.55 * Math.sin(2 * th + ph[0]) + 0.3 * Math.sin(3 * th + ph[1]) + 0.18 * Math.sin(5 * th + ph[2])));
+      a[i * 3] = cx + Math.cos(th) * rr * sx; a[i * 3 + 1] = y; a[i * 3 + 2] = cz + Math.sin(th) * rr * sz;
     }
+    return a;
+  }
+  function curve(pts, per) {
+    const out = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      for (let j = 0; j < per; j++) {
+        const s = j / per, s2 = s * s, s3 = s2 * s;
+        out.push([0, 1].map(k => 0.5 * (2 * p1[k] + (-p0[k] + p2[k]) * s + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * s2 + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * s3)));
+      }
+    }
+    out.push(pts[pts.length - 1].slice());
+    const len = [0];
+    for (let i = 1; i < out.length; i++) len.push(len[i - 1] + Math.hypot(out[i][0] - out[i - 1][0], out[i][1] - out[i - 1][1]));
+    return { pts: out, len, total: len[len.length - 1] };
+  }
+  function along(path, s) {
+    const L = path.len; let i = 1;
+    while (i < L.length - 1 && L[i] < s) i++;
+    const p = clamp01((s - L[i - 1]) / ((L[i] - L[i - 1]) || 1));
+    return [lerp(path.pts[i - 1][0], path.pts[i][0], p), lerp(path.pts[i - 1][1], path.pts[i][1], p)];
+  }
+
+  // ---------- build terrain lines ----------
+  const lines = [];
+  HILLS.forEach(H => {
+    const r = rng(H.seed); const ph = [r() * 6.3, r() * 6.3, r() * 6.3]; const lean = r() * 6.3;
+    for (let i = 0; i < H.n; i++) {
+      const qv = 0.05 + 0.935 * i / (H.n - 1);
+      const cx = H.x + Math.cos(lean) * H.r * 0.07 * qv, cz = H.z + Math.sin(lean) * H.r * 0.07 * qv;
+      lines.push({ pts: ring(cx, cz, qv * H.h, H.r * Math.sqrt(Math.log(qv) / Math.log(0.05)), 0.11 * (1 - 0.6 * qv), ph, 1, 1), closed: true, fade: H.fade, hill: H.id, ring: i });
+    }
+    const tq = 0.985, tx = H.x + Math.cos(lean) * H.r * 0.07 * tq, tz = H.z + Math.sin(lean) * H.r * 0.07 * tq;
+    if (H.id === 'o') { OUT[0] = tx; OUT[1] = H.h * tq; OUT[2] = tz; }
+    if (H.id === 'm') { TOP[0] = tx; TOP[1] = H.h * tq; TOP[2] = tz; }
+    if (H.id !== 'f') [1.14, 1.34, 1.6].forEach((m, j) => {
+      lines.push({ pts: ring(H.x, H.z, 0, H.r * m, 0.16 + j * 0.05, [ph[0] + j * 0.7, ph[1] - j * 0.9, ph[2] + j * 1.3], 1.05, 0.95), closed: true, fade: H.fade * 0.85 });
+    });
   });
-  // which hill a segment belongs to (for the orange climb), by distance to the hill centre at its level
-  for (const s of segs) {
-    const mx = (s.ax+s.bx)/2, my = (s.ay+s.by)/2;
-    s.hill = null; let best = 0.12;
-    for (const k in HILLS) { const q = HILLS[k]; const c = q.a*Math.exp(-((mx-q.x)**2+(my-q.y)**2)/(2*q.s*q.s)); if (c > best) { best = c; s.hill = k; } }
-    if (s.hill !== 'outcome' && s.hill !== 'goal') s.hill = null;
+  const rr = rng(21);
+  for (let n = 0; n < 70 && lines.length < 140; n++) {
+    const x = lerp(-2600, 2600, rr()), z = lerp(-1100, 3400, rr()), rad = 45 + rr() * 170;
+    const sx = 0.7 + rr() * 0.7, ph = [rr() * 6.3, rr() * 6.3, rr() * 6.3], k = 1 + Math.floor(rr() * 3);
+    if (HILLS.some(H => Math.hypot(x - H.x, z - H.z) < H.r * 1.6 + rad)) continue;
+    if (Math.hypot(x + 520, z + 420) < 330) continue;
+    for (let j = 0; j < k; j++) lines.push({ pts: ring(x, z, 0, rad * (1 - j * 0.3), 0.26, ph, sx, 2 - sx), closed: true, fade: 0.8 });
   }
-  for (const s of segs) if (s.hill) TOPLV[s.hill] = Math.max(TOPLV[s.hill] || 0, s.lv);
+  for (let i = 0; i < 7; i++) {
+    const ph = rr() * 6.3, ph2 = rr() * 6.3, z0 = -900 + i * 620 + rr() * 200; let cur = [];
+    for (let x = -3000; x <= 3000; x += 70) {
+      const z = z0 + 130 * Math.sin(x / 420 + ph) + 55 * Math.sin(x / 160 + ph2);
+      if (HILLS.some(H => Math.hypot(x - H.x, z - H.z) < H.r * 1.75)) { if (cur.length > 3) lines.push({ pts: new Float32Array(cur), closed: false, fade: 0.7 }); cur = []; }
+      else cur.push(x, 0, z);
+    }
+    if (cur.length > 3) lines.push({ pts: new Float32Array(cur), closed: false, fade: 0.7 });
+  }
+  const terrain = $('terrain');
+  lines.forEach(L => { L.el = mk('path', {}, terrain); L.glow = false; });
+
+  const walkPath = curve(PATH, 12);
+  const dots = [];
+  for (let s = 0; s < walkPath.total; s += 24) dots.push({ s, el: mk('circle', { r: 2 }, $('dots')) });
+  const pix = [];
+  for (let r = 0; r < 10; r++) for (let q = 0; q < 10; q++) pix.push({ r, q, el: mk('rect', {}, $('walker')) });
+
+  // labels
+  const labelsG = $('labels'), labels = {};
+  [['task', 'the task', 86], ['out', 'the outcome', 120], ['goal', 'the goal beyond the goal', 112]].forEach(([k, txt, len]) => {
+    const g = mk('g', {}, labelsG);
+    const lead = mk('line', { 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+    const pin = mk('ellipse', { rx: 7, ry: 4 }, g);
+    const halo = mk('rect', { rx: 16, fill: 'none', stroke: '#ff6a1f', 'stroke-width': 6, filter: 'url(#halo)' }, g);
+    const box = mk('rect', { rx: 16, fill: '#252321', 'stroke-width': 2 }, g);
+    const text = mk('text', { class: 'sans', 'font-size': 30, fill: '#f2ece4', 'text-anchor': 'middle' }, g);
+    text.textContent = txt;
+    labels[k] = { g, lead, pin, halo, box, text, len, w: 220, h: 56 };
+  });
+  function measure() { for (const k in labels) { const L = labels[k]; try { L.w = L.text.getComputedTextLength() + 48; } catch (e) {} } }
+
+  // title rings
+  const TR = [[150, 26, 770], [112, 20, 734], [76, 14, 701], [40, 8, 672]];
+  const titleRings = TR.map(r => mk('ellipse', { cx: 960, cy: r[2], rx: r[0], ry: r[1], pathLength: 100, 'stroke-dasharray': '100 100' }, $('titleRings')));
+
+  // ---------- render ----------
+  const P = [0, 0, 0];
+  const fx = n => n.toFixed(1);
+  function renderTitle(t) {
+    $('title').style.display = t < T2 ? '' : 'none';
+    if (t >= T2) return;
+    $('titleWord').setAttribute('transform', 'translate(0 ' + fx(lerp(6, -4, seg(t, 0, 2.8))) + ')');
+    $('titleWord').setAttribute('opacity', 0.85 + 0.15 * eo(seg(t, 0, 0.4)));
+    titleRings.forEach((el, i) => { const p = eio(seg(t, 0.05 + i * 0.16, 0.6 + i * 0.16)); el.setAttribute('stroke-dashoffset', 100 - 100 * p); el.setAttribute('opacity', 0.35 + 0.65 * p); });
+    const p = eio(seg(t, 0.9, 2.0)), y = lerp(796, 662, p), x = 960 + Math.sin(p * Math.PI * 1.5) * lerp(70, 0, p), v = eo(seg(t, 0.7, 1.0));
+    for (const id of ['titleDot', 'titleGlow']) { $(id).setAttribute('cx', fx(x)); $(id).setAttribute('cy', fx(y)); }
+    $('titleDot').setAttribute('opacity', v); $('titleGlow').setAttribute('opacity', 0.25 * v);
+    $('titleGlow').setAttribute('r', fx(18 + 6 * eo(seg(t, 1.9, 2.3))));
+    $('fadeA').setAttribute('opacity', ei(seg(t, 2.2, 2.8)));
+  }
+  function renderClimb(t) {
+    const c = cam(t), A = eio(seg(t, 2.2, 3.8));
+    const kO = i => eio(seg(t, 9.8 + i * 0.13, 10.25 + i * 0.13)) * (1 - eio(seg(t, 11.9, 12.9)));
+    const kM = i => eio(seg(t, 13.0 + i * 0.075, 13.45 + i * 0.075));
+    terrain.style.display = A > 0.001 ? '' : 'none';
+    if (A > 0.001) for (const L of lines) {
+      const pts = L.pts, n = pts.length / 3, k = L.hill === 'o' ? kO(L.ring) : L.hill === 'm' ? kM(L.ring) : 0;
+      let d = '', pen = false, zs = 0, zn = 0;
+      for (let i = 0; i <= n; i++) {
+        if (i === n && !L.closed) break;
+        const j = (i % n) * 3; proj(c, pts[j], pts[j + 1], pts[j + 2], P);
+        if (P[2] < 60 || P[0] < -800 || P[0] > 2720) { pen = false; continue; }
+        zs += P[2]; zn++;
+        d += (pen ? 'L' : 'M') + fx(P[0]) + ' ' + fx(P[1]); pen = true;
+      }
+      L.el.setAttribute('d', d || 'M0 0');
+      if (!zn) { L.el.setAttribute('stroke-opacity', 0); continue; }
+      const da = Math.min(0.95, Math.max(0.16, 1.2 - (zs / zn - 700) / 3400)), col = mix(k);
+      L.el.setAttribute('stroke', 'rgb(' + col.join(',') + ')');
+      L.el.setAttribute('stroke-opacity', (lerp(da * L.fade * 0.85, 1, k) * A).toFixed(3));
+      L.el.setAttribute('stroke-width', lerp(2.0, 2.8, k).toFixed(2));
+      const g = k > 0.02; if (g !== L.glow) { L.glow = g; if (g) L.el.setAttribute('filter', 'url(#og)'); else L.el.removeAttribute('filter'); }
+    }
+    // walker and dotted path
+    const wp = seg(t, 6.0, 9.0), sNow = walkPath.total * (wp * wp * (3 - 2 * wp) * 0.35 + wp * 0.65), wv = eo(seg(t, 5.9, 6.2)) * A;
+    $('dots').setAttribute('opacity', (0.9 * wv).toFixed(3));
+    for (const D of dots) {
+      if (wv <= 0 || D.s >= sNow - 30) { D.el.setAttribute('r', 0); continue; }
+      const g = along(walkPath, D.s); proj(c, g[0], 0, g[1], P);
+      if (P[2] < 60) { D.el.setAttribute('r', 0); continue; }
+      D.el.setAttribute('cx', fx(P[0])); D.el.setAttribute('cy', fx(P[1])); D.el.setAttribute('r', Math.max(1.6, 2600 / P[2]).toFixed(2));
+    }
+    const wg = along(walkPath, sNow); proj(c, wg[0], 0, wg[1], P);
+    const walker = $('walker');
+    if (wv > 0 && P[2] > 60) {
+      walker.style.display = ''; walker.setAttribute('opacity', wv.toFixed(3));
+      const ps = 6.5 * F / P[2], fr = t > 6.0 && t < 9.0 ? Math.floor(t * 4) % 2 : 0, rows = BODY.concat(LEGS[fr]);
+      const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4) * ps * 0.15, x0 = P[0] - ps * 5, y0 = P[1] - ps * rows.length + bob;
+      for (const px of pix) {
+        if (rows[px.r][px.q] !== '1') { px.el.setAttribute('width', 0); continue; }
+        px.el.setAttribute('x', fx(x0 + px.q * ps)); px.el.setAttribute('y', fx(y0 + px.r * ps));
+        px.el.setAttribute('width', (ps + 0.6).toFixed(2)); px.el.setAttribute('height', (ps + 0.6).toFixed(2));
+      }
+    } else walker.style.display = 'none';
+    // arc
+    const au = eio(seg(t, 15.2, 16.6));
+    if (au > 0) {
+      const mid = [(OUT[0] + TOP[0]) / 2, (OUT[1] + TOP[1]) / 2 + 340, (OUT[2] + TOP[2]) / 2];
+      let d = ''; const N = 80, end = Math.round(N * au);
+      for (let i = 0; i <= end; i++) {
+        const s = i / N, u = 1 - s;
+        proj(c, u * u * OUT[0] + 2 * u * s * mid[0] + s * s * TOP[0], u * u * OUT[1] + 2 * u * s * mid[1] + s * s * TOP[1], u * u * OUT[2] + 2 * u * s * mid[2] + s * s * TOP[2], P);
+        d += (i ? 'L' : 'M') + fx(P[0]) + ' ' + fx(P[1]);
+      }
+      $('arc').setAttribute('d', d); $('arc').style.display = '';
+      $('arcHead').setAttribute('cx', fx(P[0])); $('arcHead').setAttribute('cy', fx(P[1])); $('arcHead').style.display = au < 1 ? '' : 'none';
+    } else { $('arc').style.display = 'none'; $('arcHead').style.display = 'none'; }
+    // labels
+    const place = (k, pt, grow, show, drop, aimK) => {
+      const L = labels[k]; proj(c, pt[0], pt[1], pt[2], P);
+      if (P[2] < 60 || (grow <= 0 && show <= 0)) { L.g.style.display = 'none'; return; }
+      L.g.style.display = '';
+      const x = P[0], y = P[1] - drop, len = L.len, m = mix(aimK), col = 'rgb(' + m.join(',') + ')';
+      L.pin.setAttribute('cx', fx(x)); L.pin.setAttribute('cy', fx(y)); L.pin.setAttribute('opacity', Math.min(1, grow * 3));
+      L.pin.setAttribute('fill', col);
+      L.lead.setAttribute('x1', fx(x)); L.lead.setAttribute('x2', fx(x)); L.lead.setAttribute('y1', fx(y)); L.lead.setAttribute('y2', fx(y - len * grow));
+      L.lead.setAttribute('stroke', col);
+      const bx = x - L.w / 2, by = y - len - L.h + (1 - show) * 14;
+      for (const r of [L.box, L.halo]) { r.setAttribute('x', fx(bx)); r.setAttribute('y', fx(by)); r.setAttribute('width', fx(L.w)); r.setAttribute('height', L.h); }
+      const border = k === 'task' ? 'rgb(116,112,107)' : 'rgb(' + mix(aimK).map((v, i) => Math.round(lerp([116, 112, 107][i], v, aimK))).join(',') + ')';
+      L.box.setAttribute('stroke', border); L.box.setAttribute('opacity', show.toFixed(3));
+      L.halo.setAttribute('opacity', (show * aimK * 0.55).toFixed(3));
+      L.text.setAttribute('x', fx(x)); L.text.setAttribute('y', fx(by + L.h / 2 + 10.5)); L.text.setAttribute('opacity', show.toFixed(3));
+    };
+    const dropP = eo(seg(t, 5.5, 6.05));
+    place('task', TASK, eo(seg(t, 5.5, 5.75)), eo(seg(t, 5.75, 6.2)), (1 - dropP) * 90 - Math.sin(seg(t, 6.05, 6.35) * Math.PI) * 6, 0);
+    place('out', OUT, eo(seg(t, 9.4, 9.9)), eo(seg(t, 9.75, 10.2)), 0, 1 - eio(seg(t, 11.9, 12.9)));
+    place('goal', TOP, eo(seg(t, 14.9, 15.35)), eo(seg(t, 15.2, 15.6)), 0, 1);
+    // quote and headlines
+    const qIn = eo(seg(t, 0, 0.7)), qUp = eio(seg(t, 2.4, 3.8)), qOut = ei(seg(t, 5.0, 5.5));
+    const q = $('quote'); q.setAttribute('opacity', (qIn * (1 - qOut)).toFixed(3));
+    const dy = (1 - qIn) * 24 + lerp(0, -322, qUp) - qOut * 16, s = lerp(1, 0.8, qUp);
+    q.setAttribute('transform', 'translate(960 ' + fx(380 + dy) + ') scale(' + s.toFixed(4) + ') translate(-960 -380)');
+    [[5.9, 8.9], [9.4, 11.4], [12.6, 99]].forEach((H, i) => {
+      const a = eo(seg(t, H[0], H[0] + 0.6)), b = ei(seg(t, H[1], H[1] + 0.4)), el = $('h' + (i + 1));
+      el.setAttribute('opacity', (a * (1 - b)).toFixed(3));
+      el.setAttribute('transform', 'translate(0 ' + fx((1 - a) * 24 - b * 16 - Math.max(0, t - H[0]) * 1.2) + ')');
+    });
+    $('fadeB').setAttribute('opacity', eio(seg(t, 18.4, 19.2)).toFixed(3));
+  }
+  function render(T) { renderTitle(T); renderClimb(Math.max(0, T - T2)); }
+
+  // ---------- player ----------
+  const DECK = document.documentElement.classList.contains('deck'), HOLD = 21.0; // deck: play once from 0, hold before the fade to black
+  const WAIT = /[?&]wait/.test(location.search);   // the deck preloads the film on frame 0 and sends 'play'
+  let now = 0, playing = (DECK && !WAIT) || (!DECK && !matchMedia('(prefers-reduced-motion: reduce)').matches), last = null;
+  addEventListener('message', e => { if (e.data === 'play') { now = 0; playing = true; last = null; } if (e.data === 'end') { now = DECK ? HOLD : DUR; playing = false; show(); } });
+  const playBtn = $('play'), scrub = $('scrub'), time = $('time');
+  function show() { render(now); scrub.value = now; time.textContent = now.toFixed(1) + ' / ' + DUR.toFixed(1) + ' s'; playBtn.textContent = playing ? 'Pause' : 'Play'; }
+  function tick(ts) {
+    if (playing) { if (last !== null) now += (ts - last) / 1000; if (DECK && now >= HOLD) { now = HOLD; playing = false; } else if (now >= DUR) { now = DUR; playing = false; } }
+    last = ts; show(); requestAnimationFrame(tick);
+  }
+  playBtn.addEventListener('click', () => { if (!playing && now >= DUR) now = 0; playing = !playing; last = null; show(); });
+  scrub.addEventListener('input', () => { now = +scrub.value; show(); });
+  document.addEventListener('keydown', e => {
+    if (e.target === scrub) return;
+    if (e.code === 'Space') { e.preventDefault(); playBtn.click(); }
+    if (e.code === 'ArrowRight') { now = Math.min(DUR, now + 1 / 30); playing = false; show(); }
+    if (e.code === 'ArrowLeft') { now = Math.max(0, now - 1 / 30); playing = false; show(); }
+  });
+  $('save').addEventListener('click', () => {
+    const svg = $('film').cloneNode(true);
+    svg.setAttribute('width', 1920); svg.setAttribute('height', 1080);
+    const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'altitude-' + now.toFixed(2) + 's.svg'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  window.altitude = { seek(t) { now = t; playing = false; show(); }, render };
+  window.DURATION = DECK ? HOLD : DUR; window.render = render; window.seek = window.altitude.seek;
+  window.play = () => { if (now >= window.DURATION) now = 0; playing = true; last = null; }; window.pause = () => { playing = false; };
+  measure(); show();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); show(); });
+  requestAnimationFrame(tick);
 })();
-const peak = k => ({ x: HILLS[k].x, y: HILLS[k].y, z: height(HILLS[k].x, HILLS[k].y) });
-
-// ---------- camera ----------
-const ZS = 0.78; // vertical exaggeration
-const ease = u => u<=0?0:u>=1?1:u*u*(3-2*u);
-const easeIO = u => u<=0?0:u>=1?1:(u<0.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2);
-const mix = (a, b, u) => a + (b-a)*u;
-const mix3 = (A, B, u) => A.map((v, i) => mix(v, B[i], u));
-function camera(t) {
-  const A = { p: [0.50, -1.85, 1.10], tg: [0.38, 0.55, 0.12] };   // terrain arrives
-  const B = { p: [0.56, -1.40, 1.00], tg: [0.40, 0.50, 0.34] };   // dolly in on the small hill
-  const C = { p: [0.22, -1.30, 1.40], tg: [0.02, 0.78, 0.45] };  // lift and pan: the mountain behind
-  let p, tg;
-  if (t < 15.6) { const u = easeIO((t-5.2)/10.4); p = mix3(A.p, B.p, u); tg = mix3(A.tg, B.tg, u); }
-  else { const u = easeIO((t-15.6)/3.4); p = mix3(B.p, C.p, u); tg = mix3(B.tg, C.tg, u); }
-  const f = norm(sub(tg, p)), r = norm(cross(f, [0,0,1])), up = cross(r, f);
-  return { p, f, r, up, focal: 1250 };
-}
-const sub = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
-const dot = (a, b) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
-const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
-const norm = a => { const l = Math.hypot(...a); return a.map(v => v/l); };
-function proj(cam, x, y, z) {
-  const d = sub([x, y, z*ZS], cam.p), zc = dot(d, cam.f);
-  if (zc < 0.08) return null;
-  return [W/2 + cam.focal*dot(d, cam.r)/zc, H/2 - cam.focal*dot(d, cam.up)/zc, zc];
-}
-
-// ---------- drawing helpers ----------
-function serif(txt, x, y, size, alpha, color = INK) {
-  g.save(); g.globalAlpha = alpha; g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = `600 ${size}px Georgia, "Times New Roman", serif`; g.fillText(txt, x, y); g.restore();
-}
-function pill(txt, x, y, alpha, hot) {
-  if (alpha <= 0) return;
-  g.save(); g.globalAlpha = alpha; g.font = '600 34px "Segoe UI", system-ui, sans-serif';
-  const w = g.measureText(txt).width + 44, h = 58, rx = x - w/2, ry = y - h/2;
-  g.beginPath(); g.roundRect(rx, ry, w, h, 10);
-  g.fillStyle = hot ? '#2a140a' : '#151413'; g.fill();
-  g.lineWidth = 2; g.strokeStyle = hot ? ORANGE : 'rgba(242,236,228,0.45)';
-  if (hot) { g.shadowColor = ORANGE; g.shadowBlur = 18; }
-  g.stroke(); g.shadowBlur = 0;
-  g.fillStyle = INK; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, x, y + 1);
-  g.restore();
-}
-// our own 8-bit walker (not anyone's mascot): 11 x 8 cells
-const BOT = ['..X.....X..', '...X...X...', '..XXXXXXX..', '.XX.XXX.XX.', 'XXXXXXXXXXX', 'X.XXXXXXX.X', 'X.X.....X.X', '...XX.XX...'];
-function bot(x, y, s, alpha, step) {
-  g.save(); g.globalAlpha = alpha; g.fillStyle = ORANGE; g.shadowColor = ORANGE; g.shadowBlur = 12;
-  const rows = BOT.slice(); if (step % 2) rows[7] = '..XX...XX..';
-  rows.forEach((row, j) => [...row].forEach((c, i) => { if (c === 'X') g.fillRect(x + (i-5.5)*s, y + (j-8)*s, s+0.5, s+0.5); }));
-  g.restore();
-}
-
-// the bot's route over the ground to the task, as terrain points
-const TASK = { x: 0.20, y: 0.02 };
-const ROUTE = [[-0.16,-0.50],[-0.12,-0.42],[-0.30,-0.47],[-0.18,-0.33],[-0.02,-0.30],[0.10,-0.16],[TASK.x, TASK.y]];
-function routeAt(u) { // point along the polyline by arc fraction
-  const L = []; let tot = 0;
-  for (let i = 1; i < ROUTE.length; i++) { const l = Math.hypot(ROUTE[i][0]-ROUTE[i-1][0], ROUTE[i][1]-ROUTE[i-1][1]); L.push(l); tot += l; }
-  let d = u*tot;
-  for (let i = 0; i < L.length; i++) { if (d <= L[i]) { const k = d/L[i]; return [mix(ROUTE[i][0], ROUTE[i+1][0], k), mix(ROUTE[i][1], ROUTE[i+1][1], k)]; } d -= L[i]; }
-  return ROUTE[ROUTE.length-1];
-}
-
-// ---------- the timeline ----------
-const win = (t, a, b) => ease((t-a)/(b-a));   // 0..1 ramp between a and b
-function render(t) {
-  g.setTransform(1,0,0,1,0,0); g.fillStyle = BG; g.fillRect(0, 0, cv.width, cv.height);
-  g.setTransform(VIEW.k,0,0,VIEW.k,VIEW.x,VIEW.y);
-  g.save(); g.beginPath(); g.rect(0, 0, W, H); g.clip();
-  try { draw(t); } finally { g.restore(); }
-}
-function draw(t) {
-  g.fillStyle = BG; g.fillRect(0, 0, W, H);
-  const vg = g.createRadialGradient(W/2, H*0.45, 200, W/2, H*0.5, 1250);
-  vg.addColorStop(0, 'rgba(40,34,30,0.55)'); vg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
-
-  // 0 to 2.6 s: title card, an arrow lifts off the ground line
-  const tc = win(t, 0, 0.6) * (1 - win(t, 2.2, 2.7));
-  if (tc > 0) {
-    serif('Altitude', W/2, 430, 150, tc);
-    g.save(); g.globalAlpha = tc; g.strokeStyle = 'rgba(242,236,228,0.5)'; g.setLineDash([6, 8]); g.lineWidth = 2;
-    g.beginPath(); g.moveTo(W/2-180, 610); g.lineTo(W/2+180, 610); g.moveTo(W/2, 610); g.lineTo(W/2, 680); g.stroke();
-    g.setLineDash([]); g.strokeStyle = INK; g.lineWidth = 3; g.strokeRect(W/2-16, 594, 32, 32);
-    const lift = 40 * ease((t-0.6)/1.2);
-    g.strokeStyle = ORANGE; g.lineWidth = 5; g.beginPath(); g.moveTo(W/2, 590); g.lineTo(W/2, 590-lift); g.stroke();
-    if (lift > 10) { g.fillStyle = ORANGE; g.beginPath(); g.moveTo(W/2, 590-lift-16); g.lineTo(W/2-12, 590-lift+2); g.lineTo(W/2+12, 590-lift+2); g.fill(); }
-    g.restore();
-  }
-
-  // 2.8 to 9 s: the quote, sliding up once the terrain arrives
-  const qa = win(t, 2.8, 3.4) * (1 - win(t, 8.6, 9.2));
-  if (qa > 0) {
-    const qy = mix(H/2 - 20, 150, win(t, 5.0, 6.4));
-    g.save(); g.globalAlpha = qa; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '600 46px Georgia, serif';
-    const a = '"letting the model operate at a ', b = 'higher abstraction', c = '"';
-    const wa = g.measureText(a).width, wb = g.measureText(b).width, wc = g.measureText(c).width, x0 = W/2 - (wa+wb+wc)/2;
-    g.textAlign = 'left'; g.fillStyle = INK; g.fillText(a, x0, qy); g.fillStyle = ORANGE; g.fillText(b, x0+wa, qy); g.fillStyle = INK; g.fillText(c, x0+wa+wb, qy);
-    g.font = '500 24px "Segoe UI", sans-serif'; g.fillStyle = 'rgba(242,236,228,0.75)'; g.textAlign = 'center'; g.fillText('Felix Rieseberg', W/2, qy + 50);
-    g.restore();
-  }
-
-  // terrain from 5.0 s
-  const ta = win(t, 5.0, 6.8);
-  if (ta <= 0) return;
-  const cam = camera(t);
-  const climbOutcome = win(t, 10.2, 12.4) * (1 - win(t, 16.0, 17.2));   // the small hill lights from the base up
-  const climbGoal = win(t, 16.4, 18.6);                                   // then the mountain behind it
-  const maxLv = LEVELS.length;
-  const buckets = { w: [[], [], [], []], o: [[], [], [], []] };
-  for (const s of segs) {
-    const A = proj(cam, s.ax, s.ay, s.z), B = proj(cam, s.bx, s.by, s.z);
-    if (!A || !B) continue;
-    if ((A[0] < -50 && B[0] < -50) || (A[0] > W+50 && B[0] > W+50) || (A[1] < -50 && B[1] < -50) || (A[1] > H+50 && B[1] > H+50)) continue;
-    const depth = (A[2]+B[2])/2, band = Math.min(3, Math.max(0, Math.floor((depth-1.1)/0.6)));
-    let hot = false;
-    if (s.hill === 'outcome') hot = s.lv / TOPLV.outcome < climbOutcome * 1.02;
-    if (s.hill === 'goal') hot = s.lv / TOPLV.goal < climbGoal * 1.02;
-    buckets[hot ? 'o' : 'w'][band].push(A[0], A[1], B[0], B[1]);
-  }
-  const alphaW = [0.62, 0.45, 0.30, 0.18], alphaO = [1, 0.9, 0.75, 0.6];
-  g.save(); g.lineCap = 'round';
-  for (let b = 3; b >= 0; b--) {
-    for (const kind of ['w', 'o']) {
-      const arr = buckets[kind][b]; if (!arr.length) continue;
-      g.globalAlpha = ta * (kind === 'w' ? alphaW[b] : alphaO[b]);
-      g.strokeStyle = kind === 'w' ? '#d9d2c9' : ORANGE; g.lineWidth = kind === 'w' ? 1.6 : 2.6;
-      if (kind === 'o') { g.shadowColor = ORANGE; g.shadowBlur = 10; } else g.shadowBlur = 0;
-      g.beginPath(); for (let i = 0; i < arr.length; i += 4) { g.moveTo(arr[i], arr[i+1]); g.lineTo(arr[i+2], arr[i+3]); } g.stroke();
-    }
-  }
-  g.restore();
-
-  // the task: a pin at the foot of the small hill
-  const tk = proj(cam, TASK.x, TASK.y, height(TASK.x, TASK.y));
-  const tka = win(t, 8.8, 9.6);
-  if (tk && tka > 0) {
-    const drop = (1 - ease((t-8.8)/0.6)) * -40;
-    g.save(); g.globalAlpha = tka; g.strokeStyle = INK; g.lineWidth = 3;
-    g.beginPath(); g.moveTo(tk[0], tk[1] - 150 + drop); g.lineTo(tk[0], tk[1]); g.stroke();
-    g.fillStyle = INK; g.beginPath(); g.ellipse(tk[0], tk[1], 9, 5, 0, 0, 7); g.fill(); g.restore();
-    pill('the task', tk[0], tk[1] - 182 + drop, tka, false);
-  }
-
-  // the outcome: the small hill's peak
-  const pk = peak('outcome'), op = proj(cam, pk.x, pk.y, pk.z);
-  const oa = win(t, 10.0, 10.8);
-  if (op && oa > 0) {
-    g.save(); g.globalAlpha = oa; g.strokeStyle = ORANGE; g.lineWidth = 3;
-    g.beginPath(); g.moveTo(op[0], op[1] - 115); g.lineTo(op[0], op[1]); g.stroke();
-    g.fillStyle = ORANGE; g.beginPath(); g.ellipse(op[0], op[1], 10, 6, 0, 0, 7); g.fill(); g.restore();
-    pill('the outcome', op[0], op[1] - 145, oa, climbOutcome > 0.2 || climbGoal > 0.2);
-  }
-
-  // the bot walks a dotted route to the task
-  const wa = win(t, 12.0, 12.6);
-  if (wa > 0) {
-    const u = ease((t-12.4)/3.0), pts = [];
-    for (let k = 0; k <= 60; k++) { const q = routeAt(k/60*u); const P = proj(cam, q[0], q[1], height(q[0], q[1])); if (P) pts.push(P); }
-    g.save(); g.globalAlpha = wa; g.fillStyle = INK;
-    for (let k = 0; k < pts.length-1; k++) { g.beginPath(); g.arc(pts[k][0], pts[k][1], 3.4, 0, 7); g.fill(); }
-    g.restore();
-    const head = pts[pts.length-1];
-    if (head) bot(head[0], head[1] - 6, 6.4, wa, Math.floor(t*6) * (u < 1 ? 1 : 0));
-  }
-
-  // headlines
-  serif('Your best guess', W/2, 92, 84, win(t, 13.2, 13.8) * (1 - win(t, 15.6, 16.2)));
-  serif('The goal beyond the goal', W/2, 92, 84, win(t, 17.0, 17.7));
-
-  // the goal beyond the goal: a flag on the mountain, a dashed arc from the outcome to it
-  const gk = peak('goal'), gp = proj(cam, gk.x, gk.y, gk.z);
-  const fa = win(t, 18.2, 18.8);
-  if (gp && fa > 0) {
-    const rise = 90 * ease((t-18.2)/0.6);
-    g.save(); g.globalAlpha = fa; g.strokeStyle = INK; g.lineWidth = 3;
-    g.beginPath(); g.moveTo(gp[0], gp[1]); g.lineTo(gp[0], gp[1] - rise); g.stroke();
-    g.fillStyle = ORANGE; g.shadowColor = ORANGE; g.shadowBlur = 14;
-    g.beginPath(); g.moveTo(gp[0], gp[1]-rise); g.lineTo(gp[0]+62, gp[1]-rise+18); g.lineTo(gp[0], gp[1]-rise+38); g.fill();
-    g.restore();
-  }
-  const arcU = win(t, 18.6, 20.2);
-  if (arcU > 0) {
-    const pts = [];
-    for (let k = 0; k <= 80*arcU; k++) {
-      const u = k/80, x = mix(pk.x, gk.x, u), y = mix(pk.y, gk.y, u), z = mix(pk.z, gk.z, u) + 0.35*Math.sin(Math.PI*u);
-      const P = proj(cam, x, y, z); if (P) pts.push(P);
-    }
-    g.save(); g.strokeStyle = ORANGE; g.lineWidth = 5; g.setLineDash([18, 14]); g.shadowColor = ORANGE; g.shadowBlur = 10;
-    g.beginPath(); pts.forEach((P, i) => i ? g.lineTo(P[0], P[1]) : g.moveTo(P[0], P[1])); g.stroke(); g.restore();
-  }
-
-  // 21 to 22 s: fade out
-  const out = win(t, 21.2, 22);
-  if (out > 0) { g.fillStyle = `rgba(14,13,12,${out})`; g.fillRect(0, 0, W, H); }
-}
-// ---------- viewport: the 1920x1080 stage is fitted to the window at device resolution, so lines stay sharp ----------
-const VIEW = { k: 1, x: 0, y: 0 };
-function fit() {
-  const dpr = window.devicePixelRatio || 1, w = innerWidth, h = innerHeight;
-  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
-  const k = Math.min(w/W, h/H)*dpr;
-  VIEW.k = k; VIEW.x = (cv.width - W*k)/2; VIEW.y = (cv.height - H*k)/2;
-}
-// ---------- playback: plays and loops; ?t=12.5 freezes one frame (the renderer uses that) ----------
-const Q = new URLSearchParams(location.search), FROZEN = Q.has('t'), DECK = Q.has('deck'), HOLD = 21.0; // ?deck: play once from 0, hold the last frame, no help line
-let clock = FROZEN ? +Q.get('t') : 0, playing = !FROZEN, last = null;
-const hud = document.getElementById('hud');
-function frame(now) {
-  if (playing) { if (last !== null) clock += (now - last)/1000; if (DECK && clock >= HOLD) { clock = HOLD; playing = false; } else if (clock >= DUR) clock = 0; }
-  last = now;
-  render(clock);
-  if (!FROZEN && !DECK) hud.textContent = `${clock.toFixed(1)} / ${DUR}s   space pause   left/right seek   home restart   f fullscreen`;
-  if (!FROZEN) requestAnimationFrame(frame);
-}
-addEventListener('resize', () => { fit(); if (FROZEN) render(clock); });
-addEventListener('keydown', e => {
-  if (e.code === 'Space') { playing = !playing; e.preventDefault(); }
-  else if (e.key === 'ArrowRight') clock = Math.min(DUR - 0.01, clock + 1);
-  else if (e.key === 'ArrowLeft') clock = Math.max(0, clock - 1);
-  else if (e.key === 'Home') clock = 0;
-  else if (e.key === 'f') (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen());
-});
-fit();
-window.render = render; window.DUR = DUR;
-if (FROZEN) { hud.style.display = 'none'; render(clock); } else requestAnimationFrame(frame);
 </script>
-</body></html>
+</body>
+</html>
