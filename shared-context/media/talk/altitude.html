@@ -221,7 +221,8 @@
     text.textContent = txt;
     labels[k] = { g, lead, pin, halo, box, text, len, w: 220, h: 56 };
   });
-  function measure() { for (const k in labels) { const L = labels[k]; try { L.w = L.text.getComputedTextLength() + 48; } catch (e) {} } }
+  function measure() { for (const k in labels) { const L = labels[k]; if (!L.wr) L.w = Math.round(30 * L.text.textContent.length * 0.55 + 48); try { const n = L.text.getComputedTextLength(); if (n > 0) { L.w = n + 48; L.wr = 1; } } catch (e) {} } }
+  addEventListener('resize', () => { measure(); try { render(now); } catch (e) {} });
 
   // title rings
   const TR = [[150, 26, 770], [112, 20, 734], [76, 14, 701], [40, 8, 672]];
@@ -335,10 +336,11 @@
   function render(T) { renderTitle(T); renderClimb(Math.max(0, T - T2)); }
 
   // ---------- player ----------
-  const DECK = document.documentElement.classList.contains('deck'), HOLD = 21.0; // deck: play once from 0, hold before the fade to black
+  const QS = new URLSearchParams(location.search), FROM = +(QS.get('from') || 0);
+  const DECK = document.documentElement.classList.contains('deck'), HOLD = QS.has('to') ? +QS.get('to') : 21.0; // deck: play once from 0, hold before the fade to black
   const WAIT = /[?&]wait/.test(location.search);   // the deck preloads the film on frame 0 and sends 'play'
-  let now = 0, playing = (DECK && !WAIT) || (!DECK && !matchMedia('(prefers-reduced-motion: reduce)').matches), last = null;
-  addEventListener('message', e => { if (e.data === 'play') { now = 0; playing = true; last = null; } if (e.data === 'end') { now = DECK ? HOLD : DUR; playing = false; show(); } });
+  let now = FROM, playing = (DECK && !WAIT) || (!DECK && !matchMedia('(prefers-reduced-motion: reduce)').matches), last = null;
+  addEventListener('message', e => { if (e.data === 'play') { measure(); now = FROM; playing = true; last = null; } if (e.data === 'end') { now = DECK ? HOLD : DUR; playing = false; show(); } });
   const playBtn = $('play'), scrub = $('scrub'), time = $('time');
   function show() { render(now); scrub.value = now; time.textContent = now.toFixed(1) + ' / ' + DUR.toFixed(1) + ' s'; playBtn.textContent = playing ? 'Pause' : 'Play'; }
   function tick(ts) {

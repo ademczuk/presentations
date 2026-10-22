@@ -232,7 +232,8 @@
   addLabel('task', 'the task', 86); addLabel('out', 'the outcome', 120); addLabel('goal', 'the goal beyond the goal', 112);
   addLabel('shared', 'the shared goal', 150);
   PEOPLE.forEach(P => addLabel('r_' + P.hill, P.role, 70));
-  function measure() { for (const k in labels) { const L = labels[k]; try { L.w = L.text.getComputedTextLength() + 48; } catch (e) {} } if (typeof CHIPS !== 'undefined') CHIPS.forEach(C => { try { C.w = C.tx.getComputedTextLength() + 44; } catch (e) {} }); }
+  function measure() { for (const k in labels) { const L = labels[k]; if (!L.wr) L.w = Math.round(30 * L.text.textContent.length * 0.55 + 48); try { const n = L.text.getComputedTextLength(); if (n > 0) { L.w = n + 48; L.wr = 1; } } catch (e) {} } if (typeof CHIPS !== 'undefined') CHIPS.forEach(C => { try { const n = C.tx.getComputedTextLength(); if (n > 0) C.w = n + 44; } catch (e) {} }); }
+  addEventListener('resize', () => { measure(); try { render(now); } catch (e) {} });
 
   // ---------- links between maps, guesses toward the summit, arcs to the shared goal ----------
   const peaks = PEOPLE.map(P => P.hill);
@@ -353,7 +354,7 @@
       if (v <= 0) { C.g.style.display = 'none'; return; }
       C.g.style.display = '';
       const q = bez(TOPS[C.from], TOPS[C.to], 110, u); proj(c, q[0], q[1], q[2], P3);
-      const x = P3[0], y = P3[1] - 64, w = C.w;
+      const x = P3[0], y = P3[1] - 164, w = C.w;   // rides above the role labels (they sit 70 to 126 px over a hill)
       C.box.setAttribute('x', fx(x - w / 2)); C.box.setAttribute('y', fx(y - 26)); C.box.setAttribute('width', fx(w)); C.box.setAttribute('height', 52);
       C.tx.setAttribute('x', fx(x)); C.tx.setAttribute('y', fx(y + 10)); C.g.setAttribute('opacity', v.toFixed(3));
     });
@@ -417,7 +418,7 @@
   const Q = new URLSearchParams(location.search), FROZEN = Q.has('t'), DECK = Q.has('deck');
   const WAIT = Q.has('wait');
   let now = FROZEN ? +Q.get('t') : 0, playing = !FROZEN && !WAIT, last = null;
-  addEventListener('message', e => { if (e.data === 'play') { now = 0; playing = true; last = null; } if (e.data === 'end') { now = DUR; playing = false; render(now); } });
+  addEventListener('message', e => { if (e.data === 'play') { measure(); now = 0; playing = true; last = null; } if (e.data === 'end') { now = DUR; playing = false; render(now); } });
   window.DURATION = DUR; window.render = render;
   window.seek = t => { now = t; playing = false; render(now); };
   window.play = () => { if (now >= DUR) now = 0; playing = true; last = null; };
