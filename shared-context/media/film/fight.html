@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fight</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Fight: orange Claude figures hold the slope against the purple horde with tools that refuse, a gate that pushes a message back, a rope between a writer and a reviewer, a lantern that shows how old the map is, and a carrier that waits for a signed yes">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        .cap text { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+        .kicker { letter-spacing:6px }
+      </style>
+      <defs>
+        <radialGradient id="sky" cx="50%" cy="30%" r="75%">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+        <radialGradient id="flashG" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>
+          <stop offset=".5" stop-color="#ffe7a3" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#ffe7a3" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="world">
+        <g id="skyMask"></g>
+        <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="lamp"></g>
+        <g id="arch" fill="none" stroke="#ff6a1f" stroke-linecap="round" stroke-linejoin="round">
+          <path id="archGlow" filter="url(#og)" opacity=".55"/>
+          <path id="archPath"/>
+        </g>
+        <path id="slot" fill="#0b0d12" fill-opacity=".55" stroke="#c9ced6" stroke-width="3" stroke-dasharray="9 7"/>
+        <g id="flag"><line id="pole" stroke="#f2ece4" stroke-width="4" stroke-linecap="round"/><path id="pennant" fill="#ff6a1f" filter="url(#og)"/></g>
+        <g id="team"></g>
+        <path id="rope" fill="none" stroke="#ff6a1f" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round"/>
+        <g id="ropeFx"></g>
+        <g id="gate">
+          <path id="gateGlow" fill="#ff6a1f" filter="url(#og)" opacity=".5"/>
+          <path id="gatePosts" fill="#ff6a1f" stroke="#7a2e08" stroke-width="1.5"/>
+          <path id="gateFlash" fill="#ffffff" opacity="0"/>
+        </g>
+        <g id="dust" fill="#c8bba3"></g>
+        <g id="keeper"></g>
+        <g id="monsters"></g>
+        <g id="props"></g>
+        <ellipse id="flash" rx="0" ry="0" fill="url(#flashG)" opacity="0"/>
+        <g id="labels"></g>
+      </g>
+      <g id="cap1" class="cap" text-anchor="middle">
+        <text id="k1" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">A GATE THAT REFUSES</text>
+        <text id="h1" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">Refused, not flagged.</text>
+        <text id="s1" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">Built after a refusal was printed and the post went out anyway.</text>
+      </g>
+      <g id="cap2" class="cap" text-anchor="middle">
+        <text id="k2" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">A ROPE BETWEEN TWO CLIMBERS</text>
+        <text id="h2" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One writer. A different reviewer. Every change.</text>
+        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">On that change, a second reviewer caught a new defect every time.</text>
+      </g>
+      <g id="cap3" class="cap" text-anchor="middle">
+        <text id="k3" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">AN INDEX WITH A DATE ON IT</text>
+        <text id="h3" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">A map that says how old it is.</text>
+        <text id="s3" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">One index was 67 commits behind the code.</text>
+      </g>
+      <g id="cap4" class="cap" text-anchor="middle">
+        <text id="h4" class="serif" x="960" y="142" font-size="76" fill="#f2ece4">Tools that refuse, not warn.</text>
+        <text id="s4" class="sans" style="font-weight:600" x="960" y="204" font-size="40" fill="#c9ced6">And a map that says how old it is.</text>
+      </g>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="33" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 33.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$, seg = K.seg, lerp = K.lerp, eo = K.eo, ei = K.ei, eio = K.eio, fx = K.fx, c01 = K.clamp01;
+  // Four beats. The deck stops on each: ?deck&from=0&to=8, ?from=8&to=16, ?from=16&to=24, ?from=24&to=32.
+  // A camera key sits exactly on every from time and every move has settled at least 0.8 s before each hold.
+  // Nothing is eliminated in this scene: the tools push the horde back or keep it out (ledger W1 to W5).
+  const DUR = 33, HOLD = 32, B1 = 8, B2 = 16, B3 = 24;
+  const H3_VERSIONS = null; // set on the day from the ledger; this scene shows no version count
+  const CREAM = '#ffe7a3', GOLD = '#ffd36b', WOOD = '#c9b27a';
+
+  // ---------- world layout: a path up the main mountain's camera-facing slope (s = 0 foot, s = 1 top) ----------
+  // Laid out as a slope (s, side), then placed in Altitude's world: s = PIV_S sits on Altitude's task point and
+  // the path runs from the task over the outcome hill toward the summit, as in the horde scene.
+  const FOOT = [160, 330], TOPP = [470, 840];
+  const TASK = [-253, -177], PIV_S = 0.47, HO = K.HILLS.find(H => H.id === 'o');
+  const PIV = [lerp(FOOT[0], TOPP[0], PIV_S), lerp(FOOT[1], TOPP[1], PIV_S)];
+  const ROT = Math.atan2(HO.x - TASK[0], HO.z - TASK[1]) - Math.atan2(TOPP[0] - FOOT[0], TOPP[1] - FOOT[1]);
+  const CR = Math.cos(ROT), SR = Math.sin(ROT);
+  const place = (x, z) => { const vx = x - PIV[0], vz = z - PIV[1]; return [TASK[0] + vx * CR + vz * SR, TASK[1] - vx * SR + vz * CR]; };
+  const at = (s, side) => { const q = place(lerp(FOOT[0], TOPP[0], s) + side, lerp(FOOT[1], TOPP[1], s) - side * 0.35); return [q[0], K.groundY(q[0], q[1]), q[1]]; };
+  // A camera key written for the slope layout, moved with it: the target is placed, its height kept above the
+  // ground it now stands on, and the yaw turned by the same angle.
+  const moveKey = v => { const q = place(v.tx, v.tz); return Object.assign({}, v, { tx: q[0], tz: q[1], ty: v.ty - K.groundY(v.tx, v.tz) + K.groundY(q[0], q[1]), yaw: v.yaw + ROT }); };
+  const P = [0, 0, 0];
+  const proj = w => { K.proj(cam, w[0], w[1], w[2], P); return [P[0], P[1], P[2]]; };
+  const HERO = 11, MON = 8.8;         // world pixel size: the hero draws 1.25x the monsters
+  const GATE_S = 0.2, HOLD_S = GATE_S - 0.2, POST_H = 150;
+  const POSTS = []; for (let i = 0; i < 9; i++) POSTS.push({ side: -650 + i * 162.5, rank: Math.abs(i - 4) });
+  const postLand = p => 1.95 + 0.04 * p.rank + 0.3;   // the mallet lands at 1.95; each post falls 0.3 s
+
+  // ---------- camera keys ----------
+  const K1 = { tx: 150, ty: 115, tz: 400, d: 1250, yaw: -0.86, pitch: 0.28 };
+  const K1b = { tx: 160, ty: 110, tz: 400, d: 1160, yaw: -0.9, pitch: 0.28 };
+  const K2 = { tx: 315, ty: 280, tz: 640, d: 760, yaw: -0.1, pitch: 0.36 };
+  const K3 = { tx: -200, ty: 180, tz: 640, d: 1900, yaw: -0.22, pitch: 0.33 };
+  const K4 = { tx: 395, ty: 170, tz: 510, d: 1350, yaw: -0.45, pitch: 0.34 };
+  const key = (t, v) => Object.assign({ t }, moveKey(v));
+  const KEYS = [key(0, K1), key(6.6, K1b), key(B1, K1b), key(9.8, K2), key(B2, K2), key(17.8, K3), key(B3, K3), key(26.2, K4), key(33, K4)];
+  let cam = K.keyCamera(KEYS, 0);
+
+  // ---------- builds ----------
+  const stars = K.stars($('stars'), 150, 41, 520);
+  const mask = K.skyMask($('skyMask'));
+  const T = K.terrain($('terrain'));
+  const HM = K.HILLS.find(H => H.id === 'm');
+  T.lines.forEach(L => { if (L.hill === 'm') L.ring = Math.round((L.q - 0.05) / 0.935 * (HM.n - 1)); });
+  const lantern = K.lantern($('lamp'));
+  const r = K.rng(4401);
+
+  // The team. The three bots of the horde's last beat (writer, reviewer, and the scene 1 hero with the lantern,
+  // who stands at the top of the rope and is the named merger) plus the gatekeeper; in beat 4 a carrier arrives.
+  const bot = () => K.sprite($('team'), { glow: true });
+  const KEEP = { S: K.sprite($('keeper'), { glow: true }), ph: 0.4 };
+  const WRITER = { S: bot(), ph: 1.3 }, REVIEWER = { S: bot(), ph: 2.1 }, BEARER = { S: bot(), ph: 0.0 }, CARRIER = { S: bot(), ph: 2.9 };
+  const W_POS = [0.47, -220], R_POS = [0.47, 220], B_POS = [0.6, 40];
+  const ARCH = [0.62, 380], SLOT = [0.62, 495], CAR_FROM = [0.7, 900], CAR_STOP = [0.62, 565];
+  const W0 = [0.64, 330], R0 = [0.6, 190];   // the rope pair waits up the slope beside the bearer until beat 2
+
+  // The horde: eight purple bodies, all on screen to the end; the gate keeps them below it.
+  // A clump of two loose rows (side, row): front row nearest the gate.
+  // Four loose files down the slope, two abreast: [side, s at rest]. The front file stands 0.23 below the gate.
+  const HSPOT = [[-120, -0.03], [130, -0.03], [-30, -0.2], [210, -0.2], [-150, -0.37], [90, -0.37], [-40, -0.54], [190, -0.54]];
+  const HORDE = HSPOT.map(([side, rs], i) => ({
+    side: side + (r() - 0.5) * 30, rest: rs - r() * 0.02, start: rs - 0.28 - r() * 0.1,
+    t0: 0.0 + r() * 0.5, t1: 2.3 + r() * 0.35, cad: 3.2 + r() * 1.2, ph: r() * 2, sway: r() * 6.3,
+    flip: false, S: K.sprite($('monsters'), { outline: true }) }));
+  const CARRY = HORDE[1];                     // the body that carries the post up to the gate
+  // Bodies that press the gate are pushed back a step, never removed: [body, start time].
+  const PRESSES = [[CARRY, 3.0], [HORDE[0], 6.0], [HORDE[0], 27.0], [HORDE[1], 27.6]];
+  const PRESS_UP = 0.9, PRESS_BACK = 0.55;
+
+  // Dust kicked up when each post lands: seeded once.
+  const DUST = [];
+  POSTS.forEach(p => { for (let k = 0; k < 8; k++) DUST.push({ p, ang: r() * 6.283, sp: 60 + r() * 90, up: 120 + r() * 160, sz: 3 + r() * 3, el: K.mk('rect', {}, $('dust')) }); });
+
+  // Props.
+  const mallet = K.mk('g', {}, $('keeper'));
+  const malletHandle = K.mk('line', { stroke: WOOD, 'stroke-linecap': 'round' }, mallet);
+  const malletHead = K.mk('rect', { fill: '#d9d2c9', stroke: '#0b0d12', 'stroke-width': 1.5 }, mallet);
+  const env = K.mk('g', {}, $('props'));
+  const envBody = K.mk('rect', { fill: '#f2ece4', stroke: '#0b0d12', 'stroke-width': 2 }, env);
+  const envFlap = K.mk('path', { fill: 'none', stroke: '#6b665f', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, env);
+  const box = K.mk('g', {}, $('team'));
+  const boxBody = K.mk('rect', { fill: WOOD, stroke: '#0b0d12', 'stroke-width': 2 }, box);
+  const boxTape = K.mk('rect', { fill: '#8a6f3a' }, box);
+  const blocks = [0, 1, 2, 3].map(() => K.mk('rect', { fill: '#f2ece4', stroke: '#0b0d12', 'stroke-width': 2 }, $('ropeFx')));
+  const marks = [0, 1, 2].map(() => K.mk('rect', { fill: K.RED }, $('ropeFx')));
+  const sparks = [0, 1, 2, 3].map(() => K.mk('rect', { fill: K.RED }, $('ropeFx')));
+  const check = K.mk('path', { fill: 'none', stroke: CREAM, 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', filter: 'url(#og)' }, $('ropeFx'));
+
+  // Pills (Altitude's pinned construction), widths measured once the fonts are ready.
+  const LB = $('labels');
+  const L_post = K.label(LB, 'the post', { lift: 78 });
+  const L_ref = K.label(LB, 'refused', { lift: 70 });
+  const L_wr = K.label(LB, 'writes', { lift: 70 });
+  const L_rv = K.label(LB, 'reviews', { lift: 70 });
+  const L_mg = K.label(LB, 'merged: the reviewed version', { lift: 96 });
+  const L_old = K.label(LB, '67 commits behind', { lift: 110 });
+  const L_slot = K.label(LB, "waiting for this build's signed yes", { lift: 150 });
+  const L_car = K.label(LB, 'live since 27 October, 0 builds carried', { lift: 70, size: 24, h: 46 });
+
+  // A pill whose box is slid sideways from its leader, so two pins close together can carry two pills.
+  // (Local: K.drawLabel always centers the pill on its pin.)
+  function labelAt(L, x, y, px, grow, show, color) {
+    K.drawLabel(L, x, y, grow, show, color);
+    if (L.g.style.display === 'none') return;
+    const bx = px - L.width / 2;
+    for (const R of [L.box, L.halo]) R.setAttribute('x', fx(bx));
+    L.text.setAttribute('x', fx(px));
+  }
+
+  // ---------- motion helpers (pure functions of t) ----------
+  // A climber's walk frame and bob, with its own phase so nobody steps or breathes in sync.
+  function pose(t, ps, moving, cad, ph) {
+    const fr = moving ? Math.floor(t * cad + ph) % 2 : 0;
+    const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4 + ph) * ps * 0.15;
+    return { fr, bob };
+  }
+  function drawBot(B, t, w, ps, op, moving, extra) {
+    const q = pose(t, ps, moving, 4, B.ph);
+    const o = Object.assign({ t: 0, phase: q.fr, cadence: 0, bob: false }, extra || {});
+    K.drawSprite(B.S, 'climber', w[0], w[1] + q.bob, ps, K.ORANGE, op, o);
+    return { x: w[0], y: w[1] + q.bob, foot: w[1], ps, z: w[2] };
+  }
+  // The keeper walks in, dips, raises the mallet, and brings it down; the posts fall from that moment.
+  function keeperState(t) {
+    const walk = eio(seg(t, 0.6, 1.4));
+    const s = lerp(0.42, 0.27, walk), side = lerp(-160, 60, walk);
+    const dip = Math.sin(Math.PI * seg(t, 1.45, 1.62)) * 0.1;
+    const lift = eo(seg(t, 1.62, 1.88)) * (1 - ei(seg(t, 1.88, 1.96)));
+    const scaleY = 1 - dip + 0.1 * lift + 0.06 * Math.sin(Math.PI * seg(t, 1.96, 2.2)) * -1;
+    let ang = 120;                                     // degrees: the mallet hangs forward and down
+    ang = lerp(ang, -55, eio(seg(t, 1.5, 1.88)));     // raised overhead
+    ang = lerp(ang, 105, ei(seg(t, 1.88, 1.96)));     // and slammed down
+    return { s, side, walking: t > 0.6 && t < 1.4, scaleY, ang };
+  }
+  // A horde body's place on the slope: walk up, settle at its rest line, press the gate and be pushed back.
+  function hordeState(h, t) {
+    const a = eio(seg(t, h.t0, h.t1));
+    let s = lerp(h.start, h.rest, a), hop = 0, squash = 1, moving = t > h.t0 && t < h.t1, flash = 0;
+    for (const [b, t0] of PRESSES) {
+      if (b !== h) continue;
+      const up = eio(seg(t, t0, t0 + PRESS_UP)), back = seg(t, t0 + PRESS_UP, t0 + PRESS_UP + PRESS_BACK);
+      const contact = GATE_S - 0.03;
+      s = lerp(s, contact, up * (1 - eo(back)));
+      if (t > t0 && t < t0 + PRESS_UP) moving = true;
+      hop += Math.sin(Math.PI * back) * 1;
+      if (back > 0 && back < 1) { flash = Math.max(flash, 1 - seg(t, t0 + PRESS_UP, t0 + PRESS_UP + 0.18)); }
+      squash *= 1 - 0.18 * Math.sin(Math.PI * seg(t, t0 + PRESS_UP + PRESS_BACK, t0 + PRESS_UP + PRESS_BACK + 0.25));
+    }
+    return { s, hop, squash, moving, flash };
+  }
+  // The rope's four versions: [leave writer, reach reviewer]. Three come back flagged; the fourth is checked.
+  const VTIMES = [10.2, 11.35, 12.5, 13.65], VTRAVEL = 0.55, VBACK = 0.5;
+
+  // ---------- render ----------
+  function render(t) {
+    cam = K.keyCamera(KEYS, t);
+    const open = eo(seg(t, 0, 0.9));
+    K.drawStars(stars, t, open);
+    K.drawSkyMask(mask, T, cam, ['m', 'w', 'o', 'f'], '#0e121a');
+    $('skyMask').setAttribute('opacity', open.toFixed(3));
+
+    // ---- the lamp's light: rings of the main mountain warm one at a time outward from the bearer ----
+    const lampUp = eio(seg(t, 16.5, 16.9)) * (1 - eio(seg(t, B3, B3 + 0.7)));
+    const lampOn = 0.45 + 0.55 * eo(seg(t, 16.75, 17.1)) * (1 - eio(seg(t, B3, B3 + 1.0)));
+    const bw = at(B_POS[0], B_POS[1]), ringB = Math.round((bw[1] / HM.h - 0.05) / 0.935 * (HM.n - 1));
+    const cool = 1 - eio(seg(t, B3, B3 + 1.2));
+    const warmK = L => {
+      if (L.hill !== 'm') return 0;
+      const dd = Math.abs(L.ring - ringB); if (dd > 3) return 0;
+      const a = 17.0 + 0.2 * dd;
+      return eio(seg(t, a, a + 0.3)) * (1 - 0.18 * dd) * cool;
+    };
+    const stale = eio(seg(t, 17.3, 18.1)) * cool;
+    K.drawTerrain(T, cam, open, L => {
+      const k = warmK(L);
+      if (k > 0) { const col = Math.abs(L.ring - ringB) <= 1 ? [255, 231, 163] : [255, 211, 107];
+        return [Math.round(lerp(118, col[0], k)), Math.round(lerp(132, col[1], k)), Math.round(lerp(160, col[2], k)), 1 + 0.5 * k]; }
+      if (L.hill === 'w') return [Math.round(lerp(118, 90, stale)), Math.round(lerp(132, 97, stale)), Math.round(lerp(160, 112, stale)), 1];
+      return [118, 132, 160, 1];
+    }, { nearFade: true });
+    for (const L of T.lines) {
+      const k = warmK(L);
+      if (k > 0.02) { L.el.setAttribute('stroke-width', lerp(2, 3, k).toFixed(2)); if (!L.glow) { L.el.setAttribute('filter', 'url(#og)'); L.glow = 1; } }
+      else if (L.glow) { L.el.removeAttribute('filter'); L.glow = 0; }
+      if (L.hill === 'w') {
+        if (stale > 0.01) { L.el.setAttribute('stroke-dasharray', '10 9');
+          L.el.setAttribute('stroke-opacity', lerp(+L.el.getAttribute('stroke-opacity'), 0.45 * open, stale).toFixed(3)); }
+        else L.el.removeAttribute('stroke-dasharray');
+      }
+    }
+
+    // ---- the palisade: nine posts drop from above, staggered from the center out, then two crossbars ----
+    const KS = keeperState(t);
+    let posts = '', glow = '', flashD = '';
+    const tops = [];
+    const envHit = 3.0 + PRESS_UP;                        // the post meets the gate
+    const hitFlash = 1 - seg(t, envHit, envHit + 0.35);
+    POSTS.forEach((p, i) => {
+      const t0 = postLand(p) - 0.3, f = seg(t, t0, t0 + 0.3), land = postLand(p);
+      let off = (1 - ei(f)) * 220;                        // falls from above with ease-in
+      off += -0.08 * POST_H * Math.sin(Math.PI * seg(t, land, land + 0.15));   // 8 percent overshoot, settles
+      const vis = f > 0 ? 1 : 0;
+      const b = at(GATE_S, p.side), B = proj([b[0], b[1] + off, b[2]]), Tp = proj([b[0], b[1] + off + POST_H, b[2]]);
+      const Tip = proj([b[0], b[1] + off + POST_H + 18, b[2]]);
+      const hw = 9 * K.F / B[2];
+      tops.push({ b, off, z: B[2], vis });
+      if (!vis) return;
+      const d = 'M' + fx(B[0] - hw) + ' ' + fx(B[1]) + 'L' + fx(B[0] + hw) + ' ' + fx(B[1]) + 'L' + fx(Tp[0] + hw) + ' ' + fx(Tp[1]) +
+        'L' + fx(Tip[0]) + ' ' + fx(Tip[1]) + 'L' + fx(Tp[0] - hw) + ' ' + fx(Tp[1]) + 'Z';
+      posts += d; glow += d;
+      if (hitFlash > 0 && hitFlash < 1 && Math.abs(p.side - CARRY.side) < 260 && t >= envHit) flashD += d;
+    });
+    // Crossbars at 35 and 72 percent of the post height, as foreshortened strips.
+    const bars = seg(t, 2.42, 2.62);
+    if (bars > 0) [0.35, 0.72].forEach((hq, j) => {
+      const drop = (1 - ei(seg(t, 2.42 + j * 0.06, 2.62 + j * 0.06))) * 90;
+      let top = '', bot = '';
+      POSTS.forEach((p, i) => {
+        const b = at(GATE_S, p.side), y = b[1] + POST_H * hq + drop;
+        const A = proj([b[0], y + 6, b[2]]), C = proj([b[0], y - 6, b[2]]);
+        top += (i ? 'L' : 'M') + fx(A[0]) + ' ' + fx(A[1]);
+        bot = 'L' + fx(C[0]) + ' ' + fx(C[1]) + bot;
+      });
+      const d = top + bot + 'Z';
+      posts += d; glow += d;
+      if (hitFlash > 0 && hitFlash < 1 && t >= envHit) flashD += d;
+    });
+    $('gatePosts').setAttribute('d', posts || 'M0 0'); $('gateGlow').setAttribute('d', glow || 'M0 0');
+    $('gateFlash').setAttribute('d', flashD || 'M0 0');
+    $('gateFlash').setAttribute('opacity', (t >= envHit ? hitFlash * 0.7 : 0).toFixed(3));
+    $('gate').setAttribute('opacity', open.toFixed(3));
+    // Dust.
+    for (const D of DUST) {
+      const land = postLand(D.p), dt = t - land;
+      if (dt < 0 || dt > 0.7) { D.el.setAttribute('width', 0); continue; }
+      const b = at(GATE_S, D.p.side);
+      const w = proj([b[0] + Math.cos(D.ang) * D.sp * dt, b[1] + Math.max(0, D.up * dt - 420 * dt * dt), b[2] + Math.sin(D.ang) * D.sp * dt]);
+      const sz = D.sz * K.F / w[2];
+      D.el.setAttribute('x', fx(w[0] - sz / 2)); D.el.setAttribute('y', fx(w[1] - sz));
+      D.el.setAttribute('width', fx(sz)); D.el.setAttribute('height', fx(sz)); D.el.setAttribute('opacity', (1 - dt / 0.7).toFixed(3));
+    }
+    // A short, decaying shake when the first posts land.
+    const sdt = t - postLand(POSTS[4]);
+    const shake = sdt > 0 && sdt < 0.45 ? 6 * Math.exp(-sdt * 10) : 0;
+    $('world').setAttribute('transform', shake ? 'translate(' + fx(shake * Math.sin(sdt * 62)) + ' ' + fx(shake * Math.cos(sdt * 51)) + ')' : '');
+
+    // ---- the gatekeeper and its mallet ----
+    const kw = proj(at(KS.s, KS.side)), kps = HERO * K.F / kw[2];
+    const k = drawBot(KEEP, t, kw, kps, open, KS.walking, { scaleY: KS.scaleY });
+    const hx = k.x + kps * 4.6, hy = k.y - kps * 4.6 * KS.scaleY;
+    const len = kps * 6.5, a = KS.ang * Math.PI / 180;
+    const mx = hx + Math.cos(a) * len, my = hy + Math.sin(a) * len;
+    malletHandle.setAttribute('x1', fx(hx)); malletHandle.setAttribute('y1', fx(hy)); malletHandle.setAttribute('x2', fx(mx)); malletHandle.setAttribute('y2', fx(my));
+    malletHandle.setAttribute('stroke-width', fx(kps * 0.8));
+    malletHead.setAttribute('x', fx(-kps * 1.4)); malletHead.setAttribute('y', fx(-kps * 1.0));
+    malletHead.setAttribute('width', fx(kps * 2.8)); malletHead.setAttribute('height', fx(kps * 2.0));
+    malletHead.setAttribute('transform', 'translate(' + fx(mx) + ' ' + fx(my) + ') rotate(' + fx(KS.ang + 90) + ')');
+    mallet.setAttribute('opacity', open.toFixed(3));
+
+    // ---- the horde ----
+    const order = [];
+    let carrierHead = null, carrierZ = 0;
+    HORDE.forEach(h => {
+      const st = hordeState(h, t);
+      const w = proj(at(st.s, h.side)), ps = MON * K.F / w[2];
+      const fr = st.moving ? Math.floor(t * h.cad + h.ph) % 2 : 0;
+      const bob = st.moving ? (fr ? -ps * 0.5 : 0) : Math.sin(t * 2.1 + h.sway) * ps * 0.2;
+      const y = w[1] + bob - st.hop * ps * 3;
+      const fill = st.flash > 0 ? mixHex(K.PURPLE, '#ffffff', st.flash * 0.7) : K.PURPLE;
+      K.drawSprite(h.S, 'zmutant', w[0], y, ps, fill, open, { phase: fr, cadence: 0, flip: h.flip, scaleY: st.squash, rot: st.moving ? Math.sin(t * h.cad * 3.14) * 3 : 0, outline: true });
+      order.push({ g: h.S.g, z: w[2] });
+      if (h === CARRY) { carrierHead = [w[0], y - ps * 12 * st.squash, ps]; carrierZ = w[2]; }
+    });
+    K.depthSort(order);
+
+    // ---- the post: carried up, refused at the gate, and pushed back down where it stays ----
+    const ENV_LIFT = 3.0;
+    const carried = t >= 2.9 && t < envHit;
+    let ex, ey, eps, erot = 0, envOp = eo(seg(t, 2.9, 3.2)) * open;
+    const rest = proj(at(-0.13, 380)), rps = MON * K.F / rest[2];
+    if (t < envHit) { ex = carrierHead[0]; ey = carrierHead[1] - carrierHead[2] * ENV_LIFT; eps = carrierHead[2]; }
+    else {
+      const p = seg(t, envHit, envHit + 0.75), pe = eo(p);
+      const from = [carrierHead[0], carrierHead[1] - carrierHead[2] * ENV_LIFT];
+      // the carrier's head position at the moment of contact, recomputed for a pure function of t
+      const cw = proj(at(GATE_S - 0.03, CARRY.side)), cps = MON * K.F / cw[2];
+      const f0 = [cw[0], cw[1] - cps * 12 - cps * ENV_LIFT];
+      ex = lerp(f0[0], rest[0], pe); eps = lerp(cps, rps, pe);
+      ey = lerp(f0[1], rest[1] - rps * 1.1, p) - Math.sin(Math.PI * p) * 120;
+      erot = lerp(0, 212, eo(p));
+      const bounce = Math.sin(Math.PI * seg(t, envHit + 0.75, envHit + 1.0)) * rps * 1.2; ey -= bounce;
+    }
+    const ew = eps * 4.2, eh = eps * 2.9;
+    envBody.setAttribute('x', fx(-ew / 2)); envBody.setAttribute('y', fx(-eh / 2)); envBody.setAttribute('width', fx(ew)); envBody.setAttribute('height', fx(eh));
+    envFlap.setAttribute('d', 'M' + fx(-ew / 2 + 2) + ' ' + fx(-eh / 2 + 2) + 'L0 ' + fx(eh * 0.12) + 'L' + fx(ew / 2 - 2) + ' ' + fx(-eh / 2 + 2));
+    env.setAttribute('transform', 'translate(' + fx(ex) + ' ' + fx(ey) + ') rotate(' + fx(erot % 360 > 180 ? (erot % 360) - 360 : erot % 360) + ')');
+    env.setAttribute('opacity', (t < 2.9 ? 0 : envOp).toFixed(3));
+    // the white flash at the point of contact
+    const fl = seg(t, envHit, envHit + 0.4);
+    const cw0 = proj(at(GATE_S - 0.03, CARRY.side)), cps0 = MON * K.F / cw0[2];
+    $('flash').setAttribute('cx', fx(cw0[0])); $('flash').setAttribute('cy', fx(cw0[1] - cps0 * 12 - cps0 * ENV_LIFT));
+    $('flash').setAttribute('rx', fx(cps0 * (6 + 22 * eo(fl)))); $('flash').setAttribute('ry', fx(cps0 * (6 + 22 * eo(fl))));
+    $('flash').setAttribute('opacity', (fl > 0 && fl < 1 ? 1 - fl : 0).toFixed(3));
+    // Pills: "the post" while it is carried, "refused" once it lies outside the gate.
+    K.drawLabel(L_post, ex, ey - eh * 0.6, eo(seg(t, 3.15, 3.45)) * (1 - seg(t, envHit, envHit + 0.25)), eo(seg(t, 3.35, 3.7)) * (1 - seg(t, envHit, envHit + 0.2)), K.GREY);
+    const refOut = 1 - seg(t, B1 + 0.1, B1 + 0.5);
+    K.drawLabel(L_ref, rest[0], rest[1] - rps * 2.2, eo(seg(t, envHit + 0.95, envHit + 1.25)) * refOut, eo(seg(t, envHit + 1.15, envHit + 1.55)) * refOut, K.GREY);
+
+    // ---- the rope team ----
+    const teamOrder = [];
+    const vIn = eo(seg(t, 0.2, 1.0)) * open;
+    // The writer steps up as it sends each version; the rope tightens when a version comes back and holds it.
+    let wStep = 0, tension = 0;
+    VTIMES.forEach((t0, i) => {
+      const go = eio(seg(t, t0 - 0.25, t0 + 0.15));
+      const back = i < 3 ? eio(seg(t, t0 + VTRAVEL + 0.25, t0 + VTRAVEL + 0.25 + VBACK)) : 0;
+      wStep += 0.014 * go * (1 - back);
+      tension = Math.max(tension, i < 3 ? Math.sin(Math.PI * seg(t, t0 + VTRAVEL + 0.15, t0 + VTRAVEL + 0.25 + VBACK + 0.2)) : 0);
+    });
+    const pairIn = eio(seg(t, 8.2, 9.8)), pairWalk = t > 8.2 && t < 9.8;
+    const Ww = proj(at(lerp(W0[0], W_POS[0] + wStep, pairIn), lerp(W0[1], W_POS[1] + wStep * 400, pairIn))), wps = HERO * K.F / Ww[2];
+    const wMoving = pairWalk || VTIMES.some(t0 => t > t0 - 0.25 && t < t0 + 0.15);
+    const Wd = drawBot(WRITER, t, Ww, wps, vIn, wMoving, { rot: -tension * 6 });
+    const Rw = proj(at(lerp(R0[0], R_POS[0], pairIn), lerp(R0[1], R_POS[1], pairIn))), rpsR = HERO * K.F / Rw[2];
+    const Rd = drawBot(REVIEWER, t, Rw, rpsR, vIn, pairWalk, { flip: true });
+    const Bw = proj(at(B_POS[0], B_POS[1])), bps = HERO * K.F / Bw[2];
+    const lift = eio(seg(t, 16.3, 16.5));
+    const dipB = Math.sin(Math.PI * seg(t, 16.25, 16.5)) * 0.08;
+    const Bd = drawBot(BEARER, t, Bw, bps, vIn, false, { scaleY: 1 - dipB + 0.06 * lampUp });
+    teamOrder.push({ g: WRITER.S.g, z: Ww[2] }, { g: REVIEWER.S.g, z: Rw[2] }, { g: BEARER.S.g, z: Bw[2] });
+
+    // the lantern: held at the bearer's side, lifted overhead in beat 3 (a dip, then up)
+    const sideH = [Bd.x + bps * 5.6, Bd.y - bps * 4.4], overH = [Bd.x + bps * 1.2, Bd.y - bps * 13.2];
+    const lh = [lerp(sideH[0], overH[0], lampUp), lerp(sideH[1], overH[1], lampUp) + Math.sin(Math.PI * seg(t, 16.25, 16.5)) * bps * 1.4];
+    K.drawLantern(lantern, lh[0], lh[1], bps * (1 + 0.5 * lampUp), lampOn, t);
+    lantern.g.setAttribute('opacity', vIn.toFixed(3)); lantern.pool.setAttribute('opacity', (lampOn * vIn * (0.55 + 0.45 * lampUp)).toFixed(3));
+
+    // the rope: writer's hand, reviewer's hand, then up to the merger at the top
+    const ropeOn = eo(seg(t, 9.4, 10.0)) * (1 - seg(t, B2 + 0.1, B2 + 0.6)) * vIn;
+    const wh = [Wd.x + wps * 5, Wd.y - wps * 4.5], rh = [Rd.x - rpsR * 5, Rd.y - rpsR * 4.5], mh = [Bd.x - bps * 5, Bd.y - bps * 4.5];
+    const sag = lerp(46, 8, tension);
+    const midA = [(wh[0] + rh[0]) / 2, Math.max(wh[1], rh[1]) + sag];
+    const midB = [(rh[0] + mh[0]) / 2 + 20, Math.max(rh[1], mh[1]) + 26];
+    $('rope').setAttribute('d', 'M' + fx(wh[0]) + ' ' + fx(wh[1]) + 'Q' + fx(midA[0]) + ' ' + fx(midA[1]) + ' ' + fx(rh[0]) + ' ' + fx(rh[1]) +
+      'Q' + fx(midB[0]) + ' ' + fx(midB[1]) + ' ' + fx(mh[0]) + ' ' + fx(mh[1]));
+    $('rope').setAttribute('opacity', ropeOn.toFixed(3));
+    $('rope').setAttribute('stroke-width', fx(Math.max(3, wps * 0.4)));
+    const quad = (p0, c, p1, u) => [(1 - u) * (1 - u) * p0[0] + 2 * (1 - u) * u * c[0] + u * u * p1[0], (1 - u) * (1 - u) * p0[1] + 2 * (1 - u) * u * c[1] + u * u * p1[1]];
+    // the versions travelling along the rope
+    blocks.forEach((el, i) => {
+      const t0 = VTIMES[i], go = seg(t, t0, t0 + VTRAVEL);
+      let u = 0, onB = false, op = 0;
+      if (t >= t0) {
+        op = 1;
+        if (i < 3) { const back = seg(t, t0 + VTRAVEL + 0.25, t0 + VTRAVEL + 0.25 + VBACK); u = eio(go) * (1 - eio(back)); if (back >= 1) op = 0; }
+        else { u = eio(go); const up = seg(t, 14.45, 14.95); if (up > 0) { onB = true; u = eio(up); } op = 1 - seg(t, 15.05, 15.35); }
+      }
+      let p = onB ? quad(rh, midB, mh, u) : quad(wh, midA, rh, u);
+      const sz = wps * 2.3;
+      if (i === 3 && t >= 14.95) p = [mh[0], mh[1]];
+      el.setAttribute('x', fx(p[0] - sz / 2)); el.setAttribute('y', fx(p[1] - sz * 1.1)); el.setAttribute('width', fx(sz)); el.setAttribute('height', fx(sz));
+      el.setAttribute('opacity', (op * vIn * (1 - seg(t, B2 + 0.1, B2 + 0.6) * (i < 3 ? 1 : 0))).toFixed(3));
+      if (i < 3) {   // a flagged version comes back carrying a red mark
+        const m = marks[i], flagged = t >= t0 + VTRAVEL + 0.1 && op > 0, ms = sz * 0.5;
+        m.setAttribute('x', fx(p[0] + sz * 0.05)); m.setAttribute('y', fx(p[1] - sz * 1.05));
+        m.setAttribute('width', fx(ms)); m.setAttribute('height', fx(ms)); m.setAttribute('opacity', (flagged ? vIn : 0).toFixed(3));
+      }
+    });
+    // red sparks at the reviewer for the three flagged versions
+    let sp = 0;
+    for (let i = 0; i < 3; i++) sp = Math.max(sp, (t >= VTIMES[i] + VTRAVEL ? 1 : 0) * (1 - seg(t, VTIMES[i] + VTRAVEL, VTIMES[i] + VTRAVEL + 0.5)));
+    sparks.forEach((el, j) => {
+      const dx = (j % 2 ? 1 : -1) * rpsR * (1.0 + 2.2 * (1 - sp)), dy = (j < 2 ? -1 : 1) * rpsR * (0.8 + 1.8 * (1 - sp));
+      const s = rpsR * 1.1;
+      el.setAttribute('x', fx(rh[0] + dx - s / 2)); el.setAttribute('y', fx(rh[1] - rpsR * 1.4 + dy - s / 2));
+      el.setAttribute('width', fx(s)); el.setAttribute('height', fx(s)); el.setAttribute('opacity', (sp > 0 && sp < 1 ? sp : 0).toFixed(3));
+    });
+    // the cream check for the fourth version
+    const ck = eo(seg(t, 14.2, 14.4)) * (1 - seg(t, 15.0, 15.4));
+    const cx0 = rh[0] + rpsR * 0.5, cy0 = rh[1] - rpsR * 3.6, cs = rpsR * 1.5;
+    check.setAttribute('d', 'M' + fx(cx0 - cs) + ' ' + fx(cy0) + 'L' + fx(cx0 - cs * 0.3) + ' ' + fx(cy0 + cs * 0.7) + 'L' + fx(cx0 + cs * 1.1) + ' ' + fx(cy0 - cs * 0.9));
+    check.setAttribute('opacity', (ck * vIn).toFixed(3));
+    // the merger plants a pennant once the checked version reaches it
+    const pen = eio(seg(t, 14.95, 15.3));
+    const pb = [Bd.x - bps * 7, Bd.foot], ph = bps * 16 * pen;
+    if (pen > 0.01) {
+      $('pole').setAttribute('x1', fx(pb[0])); $('pole').setAttribute('x2', fx(pb[0])); $('pole').setAttribute('y1', fx(pb[1])); $('pole').setAttribute('y2', fx(pb[1] - ph));
+      $('pole').setAttribute('stroke-width', fx(Math.max(3, bps * 0.45)));
+      const fh = bps * 5;
+      $('pennant').setAttribute('d', 'M' + fx(pb[0]) + ' ' + fx(pb[1] - ph) + 'l' + fx(fh * 1.3) + ' ' + fx(fh * 0.45) + 'l' + fx(-fh * 1.3) + ' ' + fx(fh * 0.45) + 'z');
+      $('flag').style.display = ''; $('flag').setAttribute('opacity', (vIn).toFixed(3));
+    } else $('flag').style.display = 'none';
+    const r2out = 1 - seg(t, B2 + 0.1, B2 + 0.5);
+    labelAt(L_wr, Wd.x, Wd.y - wps * 10.6, Wd.x - L_wr.width / 2 + 34, eo(seg(t, 9.8, 10.1)) * r2out, eo(seg(t, 10.0, 10.4)) * r2out, K.ORANGE);
+    labelAt(L_rv, Rd.x, Rd.y - rpsR * 10.6, Rd.x + L_rv.width / 2 - 34, eo(seg(t, 9.9, 10.2)) * r2out, eo(seg(t, 10.1, 10.5)) * r2out, K.ORANGE);
+    K.drawLabel(L_mg, Bd.x, Bd.y - bps * 10.6, eo(seg(t, 15.0, 15.3)) * r2out, eo(seg(t, 15.15, 15.5)) * r2out, CREAM);
+
+    // ---- beat 3: one stale hill, one pill ----
+    const wTop = proj([-950 + 30, 120, 520]);
+    const oldOut = 1 - seg(t, B3 + 0.1, B3 + 0.5);
+    K.drawLabel(L_old, wTop[0], wTop[1], eo(seg(t, 17.9, 18.3)) * oldOut, eo(seg(t, 18.1, 18.6)) * oldOut, K.GREY);
+
+    // ---- beat 4: the carrier waits at the arch for a signed yes it has not been given ----
+    const archOn = eo(seg(t, 24.6, 25.4));
+    const aBase = at(ARCH[0], ARCH[1]), AH = 150, AW = 75;
+    let ad = '';
+    const archPts = [];
+    for (let i = 0; i <= 24; i++) {
+      const u = i / 24, ang = Math.PI * u;
+      const sx = -Math.cos(ang) * AW, sy = AH * 0.62 + Math.sin(ang) * AH * 0.38;
+      archPts.push([sx, sy]);
+    }
+    const sideV = [1 / Math.hypot(1, 0.35), -0.35 / Math.hypot(1, 0.35)];
+    const archW = (dx, dy) => proj([aBase[0] + dx * sideV[0], aBase[1] + dy, aBase[2] + dx * sideV[1]]);
+    const pl = [archW(-AW, 0), archW(-AW, AH * 0.62)];
+    ad = 'M' + fx(pl[0][0]) + ' ' + fx(pl[0][1]);
+    archPts.forEach(q => { const w = archW(q[0], q[1]); ad += 'L' + fx(w[0]) + ' ' + fx(w[1]); });
+    const pr = archW(AW, 0); ad += 'L' + fx(pr[0]) + ' ' + fx(pr[1]);
+    const archZ = archW(0, 0)[2];
+    $('archPath').setAttribute('d', ad); $('archGlow').setAttribute('d', ad);
+    $('archPath').setAttribute('stroke-width', fx(10 * K.F / archZ)); $('archGlow').setAttribute('stroke-width', fx(10 * K.F / archZ));
+    $('archPath').setAttribute('pathLength', 100); $('archGlow').setAttribute('pathLength', 100);
+    $('archPath').setAttribute('stroke-dasharray', '100 100'); $('archGlow').setAttribute('stroke-dasharray', '100 100');
+    $('archPath').setAttribute('stroke-dashoffset', fx(100 - 100 * archOn)); $('archGlow').setAttribute('stroke-dashoffset', fx(100 - 100 * archOn));
+    $('arch').setAttribute('opacity', (archOn > 0 ? 1 : 0).toFixed(3));
+    // the dashed empty slot beside the arch, at the carrier's height
+    const sBase = at(SLOT[0], SLOT[1]);
+    const sw = (dx, dy) => proj([sBase[0] + dx * sideV[0], sBase[1] + dy, sBase[2] + dx * sideV[1]]);
+    const s1 = sw(-22, 50), s2 = sw(22, 50), s3 = sw(22, 112), s4 = sw(-22, 112);
+    $('slot').setAttribute('d', 'M' + fx(s1[0]) + ' ' + fx(s1[1]) + 'L' + fx(s2[0]) + ' ' + fx(s2[1]) + 'L' + fx(s3[0]) + ' ' + fx(s3[1]) + 'L' + fx(s4[0]) + ' ' + fx(s4[1]) + 'Z');
+    const slotOn = eo(seg(t, 25.2, 25.7));
+    $('slot').setAttribute('opacity', slotOn.toFixed(3));
+    // the carrier walks in with its box and stops beside the slot; it never passes
+    const cwk = eio(seg(t, 24.6, 27.2));
+    const cs0 = lerp(CAR_FROM[0], CAR_STOP[0], cwk), cside = lerp(CAR_FROM[1], CAR_STOP[1], cwk);
+    const settle = Math.sin(Math.PI * seg(t, 27.2, 27.45)) * 0.08;
+    const Cw = proj(at(cs0, cside)), cps = HERO * K.F / Cw[2];
+    const carIn = eo(seg(t, 24.5, 25.0)) * open;
+    const Cd = drawBot(CARRIER, t, Cw, cps, carIn, t > 24.6 && t < 27.2, { flip: true, scaleY: 1 - settle });
+    teamOrder.push({ g: CARRIER.S.g, z: Cw[2] });
+    const bw2 = cps * 3.4, bh2 = cps * 3.0;
+    const bxx = Cd.x - cps * 5.4 - bw2 * 0.5, byy = Cd.y - cps * 6.2;
+    boxBody.setAttribute('x', fx(bxx)); boxBody.setAttribute('y', fx(byy)); boxBody.setAttribute('width', fx(bw2)); boxBody.setAttribute('height', fx(bh2));
+    boxTape.setAttribute('x', fx(bxx + bw2 * 0.42)); boxTape.setAttribute('y', fx(byy)); boxTape.setAttribute('width', fx(bw2 * 0.16)); boxTape.setAttribute('height', fx(bh2));
+    box.setAttribute('opacity', carIn.toFixed(3));
+    const sTop = sw(0, 112);
+    const pillsOn = [eo(seg(t, 27.6, 27.9)), eo(seg(t, 27.8, 28.2))];
+    labelAt(L_slot, sTop[0], sTop[1], sTop[0] + L_slot.width / 2 - 34, pillsOn[0], pillsOn[1], K.GREY);
+    const cHead = [Cd.x, Cd.y - cps * 10.4];
+    labelAt(L_car, cHead[0], cHead[1], cHead[0] + L_car.width / 2 - 34, eo(seg(t, 28.4, 28.7)), eo(seg(t, 28.6, 29.0)), K.GREY);
+    K.depthSort(teamOrder);
+
+    // ---- captions ----
+    K.fade($('k1'), t, 0.9, B1); K.fade($('h1'), t, 2.7, B1); K.fade($('s1'), t, envHit + 1.4, B1);
+    K.fade($('k2'), t, B1 + 0.6, B2); K.fade($('h2'), t, B1 + 1.0, B2); K.fade($('s2'), t, 13.2, B2);
+    K.fade($('k3'), t, B2 + 0.6, B3); K.fade($('h3'), t, B2 + 1.0, B3); K.fade($('s3'), t, 18.4, B3);
+    K.fade($('h4'), t, B3 + 1.0, null); K.fade($('s4'), t, 29.2, null);
+    $('fade').setAttribute('opacity', (1 - open + ei(seg(t, HOLD + 0.2, HOLD + 0.9))).toFixed(3));
+  }
+  function mixHex(a, b, k) {
+    const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
+    return 'rgb(' + pa.map((v, i) => Math.round(lerp(v, pb[i], k))).join(',') + ')';
+  }
+  K.player(DUR, HOLD, render, 'fight');
+})();
+</script>
+</body>
+</html>

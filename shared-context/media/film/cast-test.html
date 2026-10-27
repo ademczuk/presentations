@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Cast test</title>
+<link rel="stylesheet" href="fonts.css">
+<style>html,body{margin:0;background:#0b0d12}svg{display:block;width:100vw;height:100vh}</style>
+<svg id="film" viewBox="0 0 1920 1080"><g id="cast"></g><g id="labels"></g></svg>
+<script src="filmkit.js"></script>
+<script>
+  const K = FilmKit;
+  const g = document.getElementById('cast'), L = document.getElementById('labels');
+  K.CAST_ORDER.forEach((id, i) => {
+    const x = 260 + i * 280, S = K.sprite(g, { glow: true });
+    K.drawCast(S, id, x, 640, 14, 1, { t: 0, cadence: 0 });
+    const lab = K.label(L, K.CAST[id].name, { lift: 60 });
+    K.drawLabel(lab, x, 640 - 14 * 11, 1, 1, K.CAST[id].color);
+  });
+  [['shambler', K.GREEN], ['mutant', K.RED], ['zmutant', K.PURPLE]].forEach(([k, c], i) => {
+    K.drawSprite(K.sprite(g, {}), k, 760 + i * 200, 960, 9, c, 1, { t: 0 });
+  });
+</script>
