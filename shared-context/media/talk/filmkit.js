@@ -31,6 +31,22 @@
     c.C = [c.tx - c.d * c.F[0], c.ty - c.d * c.F[1], c.tz - c.d * c.F[2]];
     return c;
   };
+  // A camera assembled from complete, timed keys.  Unlike K.camera's legacy
+  // drift/dolly view, a key camera is exactly still while it is held.
+  K.keyCamera = function (keys, t) {
+    let a = keys[0], b = keys[0], p = 0;
+    if (t >= keys[keys.length - 1].t) a = b = keys[keys.length - 1];
+    else if (t > keys[0].t) {
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (t >= keys[i].t && t <= keys[i + 1].t) {
+          a = keys[i]; b = keys[i + 1]; p = K.eio(K.seg(t, a.t, b.t)); break;
+        }
+      }
+    }
+    const v = {};
+    ['tx', 'ty', 'tz', 'd', 'yaw', 'pitch'].forEach(k => { v[k] = K.lerp(a[k], b[k], p); });
+    return K.camera(v, 0);
+  };
   K.proj = function (c, x, y, z, o) {
     const vx = x - c.C[0], vy = y - c.C[1], vz = z - c.C[2];
     const zc = vx * c.F[0] + vy * c.F[1] + vz * c.F[2];
@@ -80,7 +96,7 @@
   };
   const P = [0, 0, 0];
   // Draw every contour from camera c. tone(L) returns [r, g, b, alpha multiplier] for a line.
-  K.drawTerrain = function (T, c, alpha, tone) {
+  K.drawTerrain = function (T, c, alpha, tone, opts) {
     for (const L of T.lines) {
       const pts = L.pts, n = pts.length / 3;
       let d = '', pen = false, zs = 0, zn = 0;
@@ -95,8 +111,29 @@
       if (!zn) { L.el.setAttribute('stroke-opacity', 0); continue; }
       const da = Math.min(0.95, Math.max(0.16, 1.2 - (zs / zn - 700) / 3400)), tn = tone(L);
       L.el.setAttribute('stroke', 'rgb(' + tn[0] + ',' + tn[1] + ',' + tn[2] + ')');
-      L.el.setAttribute('stroke-opacity', (da * L.fade * 0.85 * tn[3] * alpha).toFixed(3));
+      // Only the loose foreground contours recede.  Mountain rings retain
+      // their readable silhouette even when the near-field fade is enabled.
+      const near = opts && opts.nearFade && !L.hill ? 0.25 + 0.75 * K.seg(zs / zn, 350, 900) : 1;
+      L.el.setAttribute('stroke-opacity', (da * L.fade * 0.85 * tn[3] * alpha * near).toFixed(3));
       L.el.setAttribute('stroke-width', 2);
+    }
+  };
+  K.skyMask = function (parent) {
+    const paths = {};
+    HILLS.forEach(H => { paths[H.id] = K.mk('path', { stroke: 'none' }, parent); });
+    return { paths };
+  };
+  K.drawSkyMask = function (M, T, c, hills, color) {
+    const want = hills || HILLS.map(H => H.id);
+    for (const id of want) {
+      const L = T.lines.find(line => line.hill === id && line.q === 0.05), el = M.paths[id];
+      if (!L || !el) continue;
+      const pts = L.pts, n = pts.length / 3; let d = '';
+      for (let i = 0; i < n; i++) {
+        const j = i * 3; K.proj(c, pts[j], pts[j + 1], pts[j + 2], P);
+        d += (i ? 'L' : 'M') + K.fx(P[0]) + ' ' + K.fx(P[1]);
+      }
+      el.setAttribute('d', d + 'Z'); el.setAttribute('fill', color);
     }
   };
   // The height of the main mountain's surface at world (x, z), so a figure can stand on its contours.
@@ -126,23 +163,136 @@
     zmutant: { body: ['001011010000', '011111111000', '011011011100', '111111111110', '011111111111', '001111111110', '011111111100', '001111111000', '000111110000', '000111100000'],
              legs: [['001100110000', '011001101100'], ['000110110000', '001101100110']] }
   };
-  K.sprite = function (parent) {
-    const g = K.mk('g', {}, parent), px = [];
-    // 12 wide by 13 tall covers every sprite in K.SPRITES (body up to 11 rows plus 2 leg rows).
-    for (let r = 0; r < 13; r++) for (let q = 0; q < 12; q++) px.push({ r, q, el: K.mk('rect', {}, g) });
-    return { g, px };
+  K.sprite = function (parent, opts) {
+    opts = opts || {};
+    const g = K.mk('g', {}, parent);
+    const glow = opts.glow ? K.mk('path', { filter: 'url(#og)', opacity: '.55' }, g) : null;
+    const path = K.mk('path', { 'shape-rendering': 'crispEdges' }, g);
+    return { g, path, glow, opts };
   };
-  // Draw sprite S of kind `kind` with its feet at screen (x, y), pixel size ps, walk frame fr.
+  function spritePath(rows, x, y, ps, flip, scaleY, dissolve, seed) {
+    const wd = rows[0].length, x0 = x - ps * wd / 2, y0 = y - ps * rows.length, sy = scaleY == null ? 1 : scaleY;
+    const r = K.rng(seed == null ? 1 : seed), pixels = [];
+    for (let row = 0; row < rows.length; row++) for (let col = 0; col < wd; col++) {
+      if (rows[row][col] === '1') pixels.push({ row, col, rank: r() });
+    }
+    let d = '';
+    for (const px of pixels) {
+      const lost = px.rank < dissolve;
+      // A deterministic dither lets the drifting fragment disappear as the
+      // dissolve advances while keeping the sprite to one SVG path.
+      if (lost && ((px.rank * 997 + dissolve * 13) % 1) < K.seg(dissolve, px.rank, Math.min(1, px.rank + .18))) continue;
+      const q = flip ? wd - 1 - px.col : px.col, drift = lost ? 6 + 8 * ((px.rank * 17) % 1) : 0;
+      const pxX = x0 + q * ps, rawY = y0 + px.row * ps - drift;
+      const pxY = y - (y - rawY) * sy, h = (ps + .6) * sy, w = ps + .6;
+      d += 'M' + K.fx(pxX) + ' ' + K.fx(pxY) + 'h' + w.toFixed(2) + 'v' + h.toFixed(2) + 'h-' + w.toFixed(2) + 'Z';
+    }
+    return d;
+  }
+  // `fr` remains the old numeric walk frame.  The object form adds motion
+  // controls without making a frame depend on any preceding render.
   K.drawSprite = function (S, kind, x, y, ps, fill, opacity, fr) {
     if (opacity <= 0.002 || ps <= 0.05) { S.g.style.display = 'none'; return; }
+    const o = typeof fr === 'number' || fr == null ? { t: 0, phase: fr || 0, cadence: 0, bob: false } : fr;
+    ps = Math.max(4.5, ps);
+    const frame = typeof fr === 'number' ? (fr ? 1 : 0) : Math.floor((o.t || 0) * (o.cadence || 0) + (o.phase || 0)) % 2;
+    const bob = o.bob ? (frame ? -ps * .5 : Math.sin((o.t || 0) * 2.4) * ps * .15) : 0;
+    const rows = K.SPRITES[kind].body.concat(K.SPRITES[kind].legs[frame ? 1 : 0]);
+    const d = spritePath(rows, x, y + bob, ps, !!o.flip, o.scaleY, K.clamp01(o.dissolve || 0), o.seed);
     S.g.style.display = ''; S.g.setAttribute('fill', fill); S.g.setAttribute('opacity', opacity.toFixed(3));
-    const def = K.SPRITES[kind], rows = def.body.concat(def.legs[fr ? 1 : 0]), wd = rows[0].length;
-    const x0 = x - ps * wd / 2, y0 = y - ps * rows.length;
-    for (const p of S.px) {
-      if (p.r >= rows.length || p.q >= wd || rows[p.r][p.q] !== '1') { p.el.setAttribute('width', 0); continue; }
-      p.el.setAttribute('x', K.fx(x0 + p.q * ps)); p.el.setAttribute('y', K.fx(y0 + p.r * ps));
-      p.el.setAttribute('width', (ps + 0.6).toFixed(2)); p.el.setAttribute('height', (ps + 0.6).toFixed(2));
+    S.g.setAttribute('transform', o.rot ? 'rotate(' + o.rot + ' ' + K.fx(x) + ' ' + K.fx(y) + ')' : '');
+    S.path.setAttribute('d', d);
+    if (o.outline || S.opts.outline) { S.path.setAttribute('stroke', '#0b0d12'); S.path.setAttribute('stroke-width', '1.5'); S.path.setAttribute('paint-order', 'stroke'); }
+    else S.path.setAttribute('stroke', 'none');
+    if (S.glow) S.glow.setAttribute('d', d);
+  };
+  K.depthSort = function (items) { items.slice().sort((a, b) => b.z - a.z).forEach(item => item.g.parentNode.appendChild(item.g)); };
+
+  // ---------- subject labels, using Altitude's pinned pill construction ----------
+  K.label = function (parent, text, opts) {
+    opts = opts || {};
+    const g = K.mk('g', {}, parent);
+    const lead = K.mk('line', { 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+    const pin = K.mk('ellipse', { rx: 7, ry: 4 }, g);
+    const halo = K.mk('rect', { rx: 16, fill: 'none', 'stroke-width': 6, filter: 'url(#halo)' }, g);
+    const box = K.mk('rect', { rx: 16, fill: '#252321', 'stroke-width': 2 }, g);
+    const label = K.mk('text', { class: 'sans', 'font-size': opts.size || 30, fill: '#f2ece4', 'text-anchor': 'middle' }, g);
+    label.textContent = text;
+    const L = { g, lead, pin, halo, box, text: label, h: opts.h || 56, lift: opts.lift || 90,
+                width: opts.width || Math.max(130, text.length * (opts.size || 30) * .58 + 48), measured: false };
+    const measure = () => {
+      if (L.measured) return;
+      try { const w = label.getComputedTextLength(); if (w > 0) { L.width = w + 48; L.measured = true; } } catch (e) { /* SVG text measurement is optional until fonts load. */ }
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure); else measure();
+    return L;
+  };
+  K.drawLabel = function (L, x, y, grow, show, color) {
+    grow = K.clamp01(grow); show = K.clamp01(show);
+    if (grow <= 0 && show <= 0) { L.g.style.display = 'none'; return; }
+    L.g.style.display = '';
+    const top = y - L.lift * grow, bx = x - L.width / 2, by = y - L.lift - L.h + (1 - show) * 14;
+    L.pin.setAttribute('cx', K.fx(x)); L.pin.setAttribute('cy', K.fx(y)); L.pin.setAttribute('fill', color);
+    L.pin.setAttribute('opacity', Math.min(1, grow * 3).toFixed(3));
+    L.lead.setAttribute('x1', K.fx(x)); L.lead.setAttribute('y1', K.fx(y)); L.lead.setAttribute('x2', K.fx(x)); L.lead.setAttribute('y2', K.fx(top));
+    L.lead.setAttribute('stroke', color); L.lead.setAttribute('opacity', grow.toFixed(3));
+    for (const R of [L.box, L.halo]) { R.setAttribute('x', K.fx(bx)); R.setAttribute('y', K.fx(by)); R.setAttribute('width', K.fx(L.width)); R.setAttribute('height', L.h); }
+    L.box.setAttribute('stroke', color); L.box.setAttribute('opacity', show.toFixed(3));
+    L.halo.setAttribute('stroke', color); L.halo.setAttribute('opacity', (show * .55).toFixed(3));
+    L.text.setAttribute('x', K.fx(x)); L.text.setAttribute('y', K.fx(by + L.h / 2 + 10.5)); L.text.setAttribute('opacity', show.toFixed(3));
+  };
+
+  // ---------- the hanging lantern and its light pool ----------
+  K.lantern = function (parent) {
+    const svg = parent.ownerSVGElement || parent, defs = svg.querySelector('defs') || svg.insertBefore(K.mk('defs', {}, null), svg.firstChild);
+    const id = 'filmkit-lantern-light';
+    if (!svg.querySelector('#' + id)) {
+      const grad = K.mk('radialGradient', { id, cx: '50%', cy: '50%', r: '50%' }, defs);
+      K.mk('stop', { offset: '0', 'stop-color': '#ffe7a3', 'stop-opacity': '.7' }, grad);
+      K.mk('stop', { offset: '.45', 'stop-color': '#ffd36b', 'stop-opacity': '.22' }, grad);
+      K.mk('stop', { offset: '1', 'stop-color': '#ffd36b', 'stop-opacity': '0' }, grad);
     }
+    const pool = K.mk('ellipse', { fill: 'url(#' + id + ')' }, parent);
+    const g = K.mk('g', {}, parent);
+    const handle = K.mk('path', { fill: 'none', stroke: '#c9b27a', 'stroke-width': 2 }, g);
+    const cap = K.mk('rect', { fill: '#c9b27a' }, g), body = K.mk('rect', { fill: '#ffe7a3' }, g);
+    return { g, pool, handle, cap, body };
+  };
+  K.drawLantern = function (L, handX, handY, ps, on, t) {
+    on = K.clamp01(on); ps = Math.max(4.5, ps);
+    const a = 1.5 * Math.sin(t * 2.1), rad = a * Math.PI / 180, lx = handX + Math.sin(rad) * ps * 1.2, ly = handY + Math.cos(rad) * ps * 1.2;
+    L.g.setAttribute('transform', 'rotate(' + a.toFixed(3) + ' ' + K.fx(handX) + ' ' + K.fx(handY) + ')');
+    L.body.setAttribute('x', K.fx(lx - ps * .9)); L.body.setAttribute('y', K.fx(ly - ps * 1.4));
+    L.body.setAttribute('width', K.fx(ps * 1.8)); L.body.setAttribute('height', K.fx(ps * 2.2)); L.body.setAttribute('opacity', (.35 + .65 * on).toFixed(3));
+    L.cap.setAttribute('x', K.fx(lx - ps * 1.2)); L.cap.setAttribute('y', K.fx(ly - ps * 2.1));
+    L.cap.setAttribute('width', K.fx(ps * 2.4)); L.cap.setAttribute('height', K.fx(ps * .7));
+    L.handle.setAttribute('d', 'M' + K.fx(lx - ps * .8) + ' ' + K.fx(ly - ps * 2.1) + 'Q' + K.fx(lx) + ' ' + K.fx(ly - ps * 3.6) + ' ' + K.fx(lx + ps * .8) + ' ' + K.fx(ly - ps * 2.1));
+    L.pool.setAttribute('cx', K.fx(lx)); L.pool.setAttribute('cy', K.fx(handY - ps * 1.2));
+    L.pool.setAttribute('rx', K.fx(ps * 58 * (.55 + .45 * on))); L.pool.setAttribute('ry', K.fx(ps * 26 * (.55 + .45 * on)));
+    L.pool.setAttribute('opacity', on.toFixed(3));
+  };
+
+  // ---------- a projected, dotted route through world-space points ----------
+  K.trail = function (parent) {
+    const dots = [];
+    for (let i = 0; i < 128; i++) dots.push(K.mk('circle', { r: 0, fill: '#d9d2c9' }, parent));
+    return { dots };
+  };
+  K.drawTrail = function (T, c, pts, upto) {
+    const world = pts.map(p => p.length === 2 ? [p[0], K.groundY(p[0], p[1]), p[1]] : p);
+    const lengths = [0];
+    for (let i = 1; i < world.length; i++) lengths.push(lengths[i - 1] + Math.hypot(world[i][0] - world[i - 1][0], world[i][1] - world[i - 1][1], world[i][2] - world[i - 1][2]));
+    const total = lengths[lengths.length - 1] || 1, visible = total * K.clamp01(upto);
+    let dot = 0;
+    for (let s = 0; s <= visible && dot < T.dots.length; s += 24, dot++) {
+      let i = 1; while (i < lengths.length && lengths[i] < s) i++;
+      const span = lengths[i] - lengths[i - 1] || 1, p = (s - lengths[i - 1]) / span, a = world[i - 1], b = world[i];
+      K.proj(c, K.lerp(a[0], b[0], p), K.lerp(a[1], b[1], p), K.lerp(a[2], b[2], p), P);
+      const el = T.dots[dot];
+      if (P[2] < 60) { el.setAttribute('r', 0); continue; }
+      el.setAttribute('cx', K.fx(P[0])); el.setAttribute('cy', K.fx(P[1])); el.setAttribute('r', Math.max(1.6, 2600 / P[2]).toFixed(2));
+    }
+    for (; dot < T.dots.length; dot++) T.dots[dot].setAttribute('r', 0);
   };
 
   // ---------- stars ----------
