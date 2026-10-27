@@ -92,9 +92,9 @@
   // a full second before the hold, so the held frame never shows a camera in motion.
   const DUR = 13, HOLD = 11.4;
   const KEYS = [
-    { t: 0.0, tx: 300, ty: 170, tz: 560, d: 3000, yaw: -0.20, pitch: 1.05 },   // the map from above
-    { t: 4.4, tx: 330, ty: 250, tz: 420, d: 1550, yaw: -0.30, pitch: 0.30 },   // craned down to the hero
-    { t: 10.4, tx: 330, ty: 250, tz: 420, d: 1400, yaw: -0.30, pitch: 0.30 }]; // a slow push in, then still
+    { t: 0.0, tx: 40, ty: 120, tz: 330, d: 3000, yaw: 0.08, pitch: 1.05 },     // the map from above
+    { t: 4.4, tx: -240, ty: 225, tz: -110, d: 1550, yaw: -0.02, pitch: 0.30 }, // craned down to the hero, at Altitude's task point
+    { t: 10.4, tx: -240, ty: 225, tz: -110, d: 1400, yaw: -0.02, pitch: 0.30 }]; // a slow push in, then still
 
   // ---- timing of the beat ----
   const WALK0 = 2.2, WALK1 = 3.6;          // the walk in
@@ -110,14 +110,14 @@
   const mask = K.skyMask($('skyMask'));
   const T = K.terrain($('terrain'));
 
-  // The main mountain's rings, lowest first.  The hero stands between ring 0 and ring 1 (height 42 of 540),
+  // The outcome hill's rings, lowest first.  The hero stands at Altitude's task point at the hill's foot,
   // so the light climbs: ring 1, ring 0, then 2, 3, 4, 5, and stops.  Six rings, no more.
-  const mRings = T.lines.filter(L => L.hill === 'm').sort((a, b) => a.q - b.q);
+  const mRings = T.lines.filter(L => L.hill === 'o').sort((a, b) => a.q - b.q);   // the outcome hill behind the task
   const HERO_RING = 0.75, LIT = 6;
   const lit = mRings.map((L, i) => ({ L, i, rank: Math.abs(i - HERO_RING) }))
     .sort((a, b) => a.rank - b.rank).slice(0, LIT).map((o, n) => Object.assign(o, { n }));
   // Each lit ring is stroked with its own radial gradient centered on the lantern, warm near it and moonlit
-  // far from it, so the light also stops in space: the far side of the mountain stays cold.
+  // far from it, so the light also stops in space: the far side of the hill stays cold.
   lit.forEach(o => {
     const g = K.mk('radialGradient', { id: 'warm' + o.n, gradientUnits: 'userSpaceOnUse' }, $('warmDefs'));
     o.grad = g;
@@ -132,7 +132,7 @@
   const HERO_PS = 11.5;                         // world pixel size: about 90 to 100 px tall at the hold
   // The team: three dim orange bots on other slopes, beyond the reach of the light.  Seeds drawn once here.
   const rr = K.rng(1118);
-  const TEAM_AT = [[-130, 10], [-800, 470], [1050, 900]].map(([x, z], i) => ({
+  const TEAM_AT = [[300, 420], [-800, 470], [1050, 900]].map(([x, z], i) => ({
     x, z, y: K.groundY(x, z), S: K.sprite($('actors'), {}), phase: rr() * 6.3, delay: i * 0.35 }));
 
   const P = [0, 0, 0], H = [0, 0, 0];
@@ -165,7 +165,7 @@
     const ease = wp * wp * (3 - 2 * wp) * 0.35 + wp * 0.65;
     // From the flat ground onto the foot of the mountain (the PLAN's 210 to 330, started a little further out
     // so the walk covers more than one body width on screen).
-    const FX = K.lerp(170, 330, ease), FZ = K.lerp(280, 360, ease), FY = K.groundY(FX, FZ);
+    const FX = K.lerp(-413, -253, ease), FZ = K.lerp(-257, -177, ease), FY = K.groundY(FX, FZ);   // onto Altitude's task point
     K.proj(c, FX, FY, FZ, P);
     const hx = P[0], hy = P[1], hz = P[2], ps = Math.max(4.5, HERO_PS * K.F / hz);
     const cad = walking ? 4 : 0, frame = walking ? Math.floor(t * cad) % 2 : 0;

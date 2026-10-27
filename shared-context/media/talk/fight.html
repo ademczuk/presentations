@@ -124,8 +124,18 @@
   const CREAM = '#ffe7a3', GOLD = '#ffd36b', WOOD = '#c9b27a';
 
   // ---------- world layout: a path up the main mountain's camera-facing slope (s = 0 foot, s = 1 top) ----------
+  // Laid out as a slope (s, side), then placed in Altitude's world: s = PIV_S sits on Altitude's task point and
+  // the path runs from the task over the outcome hill toward the summit, as in the horde scene.
   const FOOT = [160, 330], TOPP = [470, 840];
-  const at = (s, side) => { const x = lerp(FOOT[0], TOPP[0], s) + side, z = lerp(FOOT[1], TOPP[1], s) - side * 0.35; return [x, K.groundY(x, z), z]; };
+  const TASK = [-253, -177], PIV_S = 0.47, HO = K.HILLS.find(H => H.id === 'o');
+  const PIV = [lerp(FOOT[0], TOPP[0], PIV_S), lerp(FOOT[1], TOPP[1], PIV_S)];
+  const ROT = Math.atan2(HO.x - TASK[0], HO.z - TASK[1]) - Math.atan2(TOPP[0] - FOOT[0], TOPP[1] - FOOT[1]);
+  const CR = Math.cos(ROT), SR = Math.sin(ROT);
+  const place = (x, z) => { const vx = x - PIV[0], vz = z - PIV[1]; return [TASK[0] + vx * CR + vz * SR, TASK[1] - vx * SR + vz * CR]; };
+  const at = (s, side) => { const q = place(lerp(FOOT[0], TOPP[0], s) + side, lerp(FOOT[1], TOPP[1], s) - side * 0.35); return [q[0], K.groundY(q[0], q[1]), q[1]]; };
+  // A camera key written for the slope layout, moved with it: the target is placed, its height kept above the
+  // ground it now stands on, and the yaw turned by the same angle.
+  const moveKey = v => { const q = place(v.tx, v.tz); return Object.assign({}, v, { tx: q[0], tz: q[1], ty: v.ty - K.groundY(v.tx, v.tz) + K.groundY(q[0], q[1]), yaw: v.yaw + ROT }); };
   const P = [0, 0, 0];
   const proj = w => { K.proj(cam, w[0], w[1], w[2], P); return [P[0], P[1], P[2]]; };
   const HERO = 11, MON = 8.8;         // world pixel size: the hero draws 1.25x the monsters
@@ -139,7 +149,7 @@
   const K2 = { tx: 315, ty: 280, tz: 640, d: 760, yaw: -0.1, pitch: 0.36 };
   const K3 = { tx: -200, ty: 180, tz: 640, d: 1900, yaw: -0.22, pitch: 0.33 };
   const K4 = { tx: 395, ty: 170, tz: 510, d: 1350, yaw: -0.45, pitch: 0.34 };
-  const key = (t, v) => Object.assign({ t }, v);
+  const key = (t, v) => Object.assign({ t }, moveKey(v));
   const KEYS = [key(0, K1), key(6.6, K1b), key(B1, K1b), key(9.8, K2), key(B2, K2), key(17.8, K3), key(B3, K3), key(26.2, K4), key(33, K4)];
   let cam = K.keyCamera(KEYS, 0);
 
