@@ -37,7 +37,7 @@
         .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
         .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
         #h1 { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
-        #sub, #when, #big, #caveat, #labels text { paint-order:stroke;stroke:#0b0d12;stroke-width:8px;stroke-linejoin:round }
+        #sub, #when, #big, #caveat, #sources, #labels text { paint-order:stroke;stroke:#0b0d12;stroke-width:8px;stroke-linejoin:round }
       </style>
       <defs>
         <radialGradient id="sky" gradientUnits="userSpaceOnUse" cx=".5" cy=".3" r=".75" gradientTransform="matrix(1920 0 0 1080 0 0)">
@@ -62,18 +62,24 @@
       <g id="labels" class="sans" text-anchor="middle" fill="#ffd88a" font-size="22"></g>
       <g id="cursor">
         <circle id="cursorHalo" r="64" fill="url(#cursorGrad)"/>
-        <circle id="cursorMid" r="15" fill="#ffd36b" opacity=".32" filter="url(#og)"/>
-        <circle id="cursorCore" r="5.5" fill="#fff3cf"/>
+        <circle id="cursorMid" r="18" fill="#ffd36b" opacity=".38" filter="url(#og)"/>
+        <circle id="cursorCore" r="7" fill="#fff3cf"/>
       </g>
-      <circle id="targetRing" r="15" fill="none" stroke="#ff6a1f" stroke-width="3"/>
+      <circle id="targetRing" r="23" fill="none" stroke="#ff6a1f" stroke-width="4" filter="url(#og)"/>
+      <g id="context" class="sans" text-anchor="middle">
+        <text x="960" y="846" font-size="22" font-weight="600" fill="#c9d2df">context</text>
+        <rect x="660" y="865" width="600" height="26" rx="13" fill="#0b0d12" stroke="#8290a5" stroke-width="2"/>
+        <rect id="contextFill" x="666" y="871" width="0" height="14" rx="7" fill="#ff6a1f"/>
+      </g>
       <g text-anchor="middle" fill="#f2ece4">
         <text id="h1" class="serif" x="960" y="142" font-size="68"></text>
         <text id="sub" class="sans" x="960" y="210" font-size="30" font-weight="600" fill="#c9d2df"></text>
         <text id="when" class="sans" x="960" y="210" font-size="27" font-weight="600" fill="#b7c1d1"></text>
-        <text id="big" class="serif" x="960" y="920" font-size="58" fill="#ffd88a"></text>
-        <text id="caveat" class="sans" x="960" y="1000" font-size="25" font-weight="600" fill="#c9d2df"></text>
+        <text id="big" class="serif" x="960" y="890" font-size="58" fill="#ffd88a"></text>
+        <text id="caveat" class="sans" x="960" y="960" font-size="30" font-weight="600" fill="#c9d2df"></text>
       </g>
       <text id="illustration" class="sans" x="42" y="1032" font-size="20" font-weight="600" fill="#8d949e">illustration</text>
+      <text id="sources" class="sans" x="960" y="1050" text-anchor="middle" font-size="20" font-weight="600" fill="#9aa4b2">Sources: atlassian.com/blog (15 Jul 2026), arxiv.org/abs/2603.27277, microsoft.com/research (2 Jul 2024), honcho.dev</text>
       <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
     </svg>
   </div>
@@ -88,7 +94,7 @@
 <script>
 (function () {
   const K = FilmKit, $ = K.$;
-  // beats: 0-5 search without edges | 5-10 follow graph edges | 10-16 Atlassian | 16-22 Codebase-Memory | 22-28 Microsoft | 28-34 Honcho and all sources
+  // beats: 0-5 search without edges | 5-10 follow graph edges | 10-16 Atlassian | 16-22 Codebase-Memory | 22-28 Microsoft | 28-32 Honcho | 32-34 all sources
   const DUR = 36, HOLD = 34;
   const SOURCES = [
     { who: 'Atlassian, Teamwork Graph', big: '44% more accurate, 48% fewer tokens', when: 'July 2026, agents with and without graph context', caveat: 'Their internal benchmark.', x: 410, y: 370, rx: 260, ry: 105, n: 48, seed: 810 },
@@ -120,33 +126,27 @@
     const labelY = k < 2 ? 520 : 830;
     const label = K.mk('text', { x: s.x, y: labelY }, $('labels'));
     label.textContent = s.who;
-    return { points, edges, label };
+    const figure = K.mk('text', { x: s.x, y: labelY + 36, 'font-size': 26 }, $('labels'));
+    figure.textContent = s.big;
+    const own = k === 3 ? K.mk('text', { x: s.x, y: labelY + 68, 'font-size': 20, fill: '#c9d2df' }, $('labels')) : null;
+    if (own) own.textContent = 'Their own figure.';
+    return { points, edges, label, figure, own };
   });
 
   const ref = (k, i) => clusters[k].points[i];
   const searchRefs = [[0, 3], [0, 18], [1, 4], [1, 31], [2, 7], [0, 42], [3, 12], [2, 30], [1, 45], [3, 50], [2, 20], [0, 27], [0, 0]];
   const searchRoute = searchRefs.map(r => ref(r[0], r[1]));
 
-  function graphPath() {
-    const adj = clusters[0].points.map(() => []);
-    clusters[0].edges.forEach(e => { adj[e.a].push(e.b); adj[e.b].push(e.a); });
-    const prev = new Array(adj.length).fill(-1), dist = new Array(adj.length).fill(-1), queue = [0];
-    prev[0] = 0; dist[0] = 0;
-    for (let q = 0; q < queue.length; q++) {
-      const a = queue[q];
-      adj[a].forEach(b => {
-        if (prev[b] !== -1) return;
-        prev[b] = a; dist[b] = dist[a] + 1; queue.push(b);
-      });
-    }
-    let target = 0;
-    for (let i = 1; i < adj.length; i++) if (dist[i] > dist[target]) target = i;
-    const ids = [];
-    for (let at = target; at !== 0; at = prev[at]) ids.push(at);
-    ids.push(0);
-    return ids.reverse().map(i => clusters[0].points[i]);
-  }
-  const linkedRoute = graphPath(), target = linkedRoute[linkedRoute.length - 1];
+  const linkedRoute = [[190, 390], [320, 340], [455, 410], [590, 350], [725, 425], [860, 360], [960, 410], [1060, 340], [1195, 420], [1330, 350], [1470, 405], [1630, 360]].map((xy, i, all) => {
+    const x = xy[0], y = xy[1], r = i === all.length - 1 ? 4.6 : 3.4;
+    return { x, y, r, el: K.mk('circle', { cx: x, cy: y, r: r }, $('nodes')) };
+  });
+  const linkedEdges = [];
+  linkedRoute.slice(1).forEach((p, i) => {
+    const q = linkedRoute[i];
+    linkedEdges.push(K.mk('line', { x1: q.x, y1: q.y, x2: p.x, y2: p.y, 'stroke-width': 3.2 }, $('edges')));
+  });
+  const target = linkedRoute[linkedRoute.length - 1];
   $('targetRing').setAttribute('cx', K.fx(target.x));
   $('targetRing').setAttribute('cy', K.fx(target.y));
 
@@ -176,6 +176,9 @@
     const graph = K.eo(K.seg(t, 5.25, 6.35));
     const dim = K.eo(K.seg(t, 10.2, 11.2));
     const searchP = K.seg(t, 0.35, 4.35);
+    const routeP = K.seg(t, 6.25, 9.15);
+    const travel = K.clamp01(routeP) * (linkedRoute.length - 1);
+    const summaryAlpha = K.eo(K.seg(t, 32.25, 33.1));
     const visited = new Set(searchRefs.slice(0, Math.min(searchRefs.length, Math.floor(searchP * (searchRefs.length - 1)) + 1)).map(r => r.join(':')));
     const memory = 1 - K.eo(K.seg(t, 5.3, 6.4));
 
@@ -183,7 +186,7 @@
       const focus = focusAt(k, t);
       c.edges.forEach(e => {
         e.el.setAttribute('stroke', focus > 0.15 ? '#e8b96a' : '#8290a5');
-        e.el.setAttribute('opacity', (graph * (0.18 + focus * 0.5)).toFixed(3));
+        e.el.setAttribute('opacity', (graph * (0.46 - dim * 0.2 + focus * (0.4 + dim * 0.2))).toFixed(3));
       });
       c.points.forEach((p, i) => {
         const hot = visited.has(k + ':' + i) ? memory : 0;
@@ -191,7 +194,9 @@
         p.el.setAttribute('fill', focus > 0.15 || hot > 0.15 ? '#ffd88a' : '#aab6c8');
         p.el.setAttribute('opacity', (0.62 - dim * 0.32 + focus * (0.38 + dim * 0.32) + hot * 0.3).toFixed(3));
       });
-      c.label.setAttribute('opacity', K.eo(K.seg(t, 32.25, 33.1)).toFixed(3));
+      c.label.setAttribute('opacity', summaryAlpha.toFixed(3));
+      c.figure.setAttribute('opacity', summaryAlpha.toFixed(3));
+      if (c.own) c.own.setAttribute('opacity', summaryAlpha.toFixed(3));
     });
 
     let cursorPos, cursorAlpha;
@@ -199,12 +204,26 @@
       cursorPos = routePosition(searchRoute, searchP);
       cursorAlpha = 1;
     } else {
-      cursorPos = routePosition(linkedRoute, K.seg(t, 6.25, 9.15));
+      cursorPos = routePosition(linkedRoute, routeP);
       cursorAlpha = 1 - K.eo(K.seg(t, 10.15, 10.75));
     }
+    linkedEdges.forEach((el, i) => {
+      const lit = K.eo(K.seg(travel, i + 0.05, i + 0.85));
+      el.setAttribute('stroke', lit > 0.01 ? '#ff6a1f' : '#8290a5');
+      el.setAttribute('opacity', (graph * cursorAlpha * (0.42 + lit * 0.58)).toFixed(3));
+    });
+    linkedRoute.forEach((p, i) => {
+      const hot = graph * K.eo(K.seg(travel, i, i + 0.45));
+      p.el.setAttribute('r', (p.r + hot * 1.2).toFixed(2));
+      p.el.setAttribute('fill', hot > 0.15 ? '#ffd88a' : '#aab6c8');
+      p.el.setAttribute('opacity', (cursorAlpha * (0.66 + graph * 0.12 + hot * 0.22)).toFixed(3));
+    });
     $('cursor').setAttribute('transform', 'translate(' + K.fx(cursorPos[0]) + ' ' + K.fx(cursorPos[1]) + ')');
     $('cursor').setAttribute('opacity', cursorAlpha.toFixed(3));
     $('targetRing').setAttribute('opacity', (K.eo(K.seg(t, 5.45, 6.1)) * cursorAlpha).toFixed(3));
+    const contextLevel = 0.08 + 0.84 * (beat === 0 ? K.eo(searchP) : memory);
+    $('contextFill').setAttribute('width', K.fx(588 * contextLevel));
+    $('context').setAttribute('opacity', (K.eo(K.seg(t, 0.2, 0.8)) * (1 - K.eo(K.seg(t, 10.1, 10.75)))).toFixed(3));
 
     let h1 = '', sub = '', when = '', big = '', caveat = '';
     if (beat === 0) {
@@ -218,6 +237,7 @@
       h1 = s.who; when = s.when; big = s.big; caveat = s.caveat;
     } else {
       h1 = 'Measured elsewhere.';
+      sub = 'Four sources, four different methods.';
     }
     const captionLocal = final ? t - 32 : local;
     const caption = K.eo(K.seg(captionLocal, 0.15, 0.75));
@@ -227,6 +247,7 @@
     setText('big', big, K.eo(K.seg(captionLocal, 0.35, 1.05)));
     setText('caveat', caveat, K.eo(K.seg(captionLocal, 0.65, 1.25)));
     $('illustration').setAttribute('opacity', (t <= 10 ? K.eo(K.seg(t, 0.2, 0.8)) : 0).toFixed(3));
+    $('sources').setAttribute('opacity', t >= 10 ? '1' : '0');
     $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 1.1)) + K.ei(K.seg(t, 34.6, 35.9))).toFixed(3));
   }
   K.player(DUR, HOLD, render, 'evidence');
