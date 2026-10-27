@@ -73,6 +73,10 @@
     { t: 15.0, tx: 200, ty: 250, tz: 440, d: 2750, yaw: -0.36, pitch: 0.36 },
     { t: 19.2, tx: 210, ty: 250, tz: 460, d: 2620, yaw: -0.40, pitch: 0.37 }];
   function altitudeParams(t) {
+    // Match Altitude's three deck-hold poses exactly so this scene still opens on its final frame.
+    if (t >= 8.55 && t <= 8.8) t = 8.55;
+    else if (t >= 11.05 && t <= 11.3) t = 11.05;
+    else if (t >= 17.95 && t <= 18.2) t = 17.95;
     let a = K[0], b = K[0], p = 0;
     if (t > K[0].t && t < K[K.length - 1].t) {
       for (let i = 0; i < K.length - 1; i++) if (t >= K[i].t && t <= K[i + 1].t) { a = K[i]; b = K[i + 1]; const s = seg(t, a.t, b.t); p = i === 3 ? (s + eio(s)) / 2 : eio(s); break; }
@@ -245,7 +249,7 @@
   addLabel('shared', 'the shared goal', 150);
   PEOPLE.filter(P => P.role).forEach(P => addLabel('r_' + P.hill, P.role, 70));
   function measure() { for (const k in labels) { const L = labels[k]; if (!L.wr) L.w = Math.round(30 * L.text.textContent.length * 0.55 + 48); try { const n = L.text.getComputedTextLength(); if (n > 0) { L.w = n + 48; L.wr = 1; } } catch (e) {} } if (typeof CHIPS !== 'undefined') CHIPS.forEach(C => { try { const n = C.tx.getComputedTextLength(); if (n > 0) C.w = n + 44; } catch (e) {} }); }
-  addEventListener('resize', () => { measure(); try { render(now); } catch (e) {} });
+  addEventListener('resize', () => { measure(); dirty = true; try { show(); } catch (e) {} });
 
   // ---------- links between maps, guesses toward the summit, arcs to the shared goal ----------
   const peaks = PEOPLE.map(P => P.hill);
@@ -398,7 +402,7 @@
       const L = labels[k]; proj(c, pt[0], pt[1], pt[2], P3);
       if (P3[2] < 60 || (grow <= 0 && show <= 0)) { L.g.style.display = 'none'; return; }
       L.g.style.display = '';
-      const x = P3[0], y = P3[1], len = L.len, col = 'rgb(' + mix(aimK).join(',') + ')';
+      const x = P3[0] + (k === 'r_q1' ? 120 : 0), y = P3[1], len = L.len, col = 'rgb(' + mix(aimK).join(',') + ')';
       L.pin.setAttribute('cx', fx(x)); L.pin.setAttribute('cy', fx(y)); L.pin.setAttribute('opacity', Math.min(1, grow * 3)); L.pin.setAttribute('fill', col);
       L.lead.setAttribute('x1', fx(x)); L.lead.setAttribute('x2', fx(x)); L.lead.setAttribute('y1', fx(y)); L.lead.setAttribute('y2', fx(y - len * grow)); L.lead.setAttribute('stroke', col);
       const bx = x - L.w / 2, by = y - len - L.h + (1 - show) * 14;
@@ -430,25 +434,26 @@
   // ---------- player: plays once and holds (deck), or loops (standalone); ?t freezes ----------
   const Q = new URLSearchParams(location.search), FROZEN = Q.has('t'), DECK = Q.has('deck');
   const WAIT = Q.has('wait');
-  let now = FROZEN ? +Q.get('t') : 0, playing = !FROZEN && !WAIT, last = null;
-  addEventListener('message', e => { if (e.data === 'play') { measure(); now = 0; playing = true; last = null; } if (e.data === 'end') { now = DUR; playing = false; render(now); } });
+  let now = FROZEN ? +Q.get('t') : 0, playing = !FROZEN && !WAIT, last = null, dirty = true;
+  function show() { render(now); dirty = false; }
+  addEventListener('message', e => { if (e.data === 'play') { measure(); now = 0; playing = true; last = null; dirty = true; } if (e.data === 'end') { now = DUR; playing = false; dirty = true; show(); } });
   window.DURATION = DUR; window.render = render;
-  window.seek = t => { now = t; playing = false; render(now); };
-  window.play = () => { if (now >= DUR) now = 0; playing = true; last = null; };
-  window.pause = () => { playing = false; };
+  window.seek = t => { now = t; playing = false; dirty = true; show(); };
+  window.play = () => { if (now >= DUR) now = 0; playing = true; last = null; dirty = true; };
+  window.pause = () => { playing = false; dirty = true; };
   function tick(ts) {
-    if (playing) { if (last !== null) now += (ts - last) / 1000; if (now >= DUR) { if (DECK) { now = DUR; playing = false; } else now = 0; } }
-    last = ts; render(now);
+    if (playing) { if (last !== null) now += (ts - last) / 1000; if (now >= DUR) { if (DECK) { now = DUR; playing = false; } else now = 0; } dirty = true; }
+    last = ts; if (playing || dirty) show();
     if (!DECK && !FROZEN) $('hud').textContent = now.toFixed(1) + ' / ' + DUR + ' s   space pause   left/right seek';
     if (!FROZEN) requestAnimationFrame(tick);
   }
   document.addEventListener('keydown', e => {
-    if (e.code === 'Space') { e.preventDefault(); playing = !playing; last = null; }
-    if (e.code === 'ArrowRight') { now = Math.min(DUR, now + 1); render(now); }
-    if (e.code === 'ArrowLeft') { now = Math.max(0, now - 1); render(now); }
+    if (e.code === 'Space') { e.preventDefault(); playing = !playing; last = null; dirty = true; }
+    if (e.code === 'ArrowRight') { now = Math.min(DUR, now + 1); dirty = true; show(); }
+    if (e.code === 'ArrowLeft') { now = Math.max(0, now - 1); dirty = true; show(); }
   });
-  measure(); render(now);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); render(now); });
+  measure(); show();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); dirty = true; show(); });
   if (!FROZEN) requestAnimationFrame(tick);
 })();
 </script>
