@@ -102,8 +102,8 @@
   //   ?deck&from=25&to=32    C2 the horde, defects
   // Every frame is a pure function of t. All seeds are drawn once here, at init.
   const DUR = 33, HOLD = 32;
-  const H3_VERSIONS = null; // set on the day from the ledger
-  if (H3_VERSIONS) $('h3line').textContent = 'One change, ' + H3_VERSIONS + ' versions, a new real defect in each.';
+  const H3_VERSIONS = null; // re-take this count from the incident ledger on the day
+  if (H3_VERSIONS) $('h3line').textContent = 'One change, ' + H3_VERSIONS + ' versions. A real defect found in every one.';
   const P = [0, 0, 0];
   const r = K.rng(77);
 
@@ -204,8 +204,8 @@
   const soft = (raw, cap) => { const knee = cap - 0.12; return raw < knee ? raw : cap - 0.12 * Math.exp(-(raw - knee) / 0.12); };
   function hordeS(h, t) { return soft(h.s0 + h.sp * Math.max(0, t - 18.5) + 0.06 * K.eo(K.seg(t, 21, 24)), h.cap); }
   // Two purple bodies run ahead and each builds the same fix, one after the other, side by side.
-  const BUILD = [{ side: 214, wside: 262, from: 18.6, arrive: 20.7, b0: 20.9, b1: 21.9, seed: 801, col: 'rgb(166,112,250)' },
-                 { side: 372, wside: 326, from: 19.3, arrive: 21.9, b0: 22.4, b1: 23.4, seed: 802, col: 'rgb(170,118,252)' }];
+  const BUILD = [{ side: 214, wside: 174, from: 18.6, arrive: 20.7, b0: 20.9, b1: 21.9, seed: 801, col: 'rgb(166,112,250)' },
+                 { side: 372, wside: 430, from: 19.3, arrive: 21.9, b0: 22.4, b1: 23.4, seed: 802, col: 'rgb(170,118,252)' }];
   const BUILD_S = 0.37;
   const WRENCH = ['0000110110', '0000110110', '0000111110', '0000111100', '0001111000', '0011100000', '0111000000', '1110000000', '1100000000'];
   const WPIX = [];
@@ -213,8 +213,9 @@
   WPIX.sort((a, b) => (b.row - b.q) - (a.row - a.q));   // built from the handle up to the jaw
 
   // ---------- the team: the lantern bearer, and three more who turn when the horde comes ----------
-  const MATES = [{ id: 'codex', ds: 0.07, side: -150, ds2: -0.004, side2: -96, ph: 0.4 }, { id: 'kimi', ds: 0.10, side: 30, ds2: 0.05, side2: 20, ph: 1.3 },
-                 { id: 'grok', ds: 0.06, side: 160, ds2: -0.004, side2: 98, ph: 0.8 }];
+  const MATES = [{ id: 'codex', ds: 0.07, side: -150, ds2: -0.004, side2: -96, ph: 0.4, label: true }, { id: 'kimi', ds: 0.10, side: 30, ds2: 0.05, side2: 20, ph: 1.3, label: true },
+                 { id: 'grok', ds: 0.06, side: 160, ds2: -0.004, side2: 98, ph: 0.8, label: true }, { id: 'antigravity', ds: 0.13, side: -280, ds2: 0.02, side2: -185, ph: 1.9, label: false },
+                 { id: 'local', ds: 0.14, side: 285, ds2: 0.02, side2: 190, ph: 2.4, label: false }];
 
   // ---------- build the scene graph ----------
   const stars = K.stars($('stars'), 150, 41, 560);
@@ -239,6 +240,7 @@
   const limitL = K.label($('labels'), 'shared limit', { lift: 78 });
   const countL = K.label($('labels'), '384 started, 341 died', { size: 40, h: 70, lift: 150 });
   const stopL = K.label($('labels'), 'status: stopped', { lift: 92 });
+  const buildL = K.label($('labels'), 'built twice', { size: 24, h: 46, lift: 62 });
   // Altitude's own landmark, so the audience knows where on the map this is: back at the task.
   const taskL = K.label($('labels'), 'the task', { lift: 120 });
   MATES.forEach(m => { m.nameL = K.label($('labels'), K.CAST[m.id].name, { size: 24, h: 46, lift: 66 }); });
@@ -322,7 +324,7 @@
                                  'M' + K.fx(x) + ' ' + K.fx(y0 + ps * 3.4) + 'h' + K.fx(ps) + 'v' + K.fx(ps) + 'h-' + K.fx(ps) + 'Z');
       } else m.bang.setAttribute('d', 'M0 0');
       const named = K.eo(K.seg(t, ALERT, ALERT + 0.25)) * (1 - K.ei(K.seg(t, ALERT + 1.5, ALERT + 1.9)));
-      if (q) K.drawLabel(m.nameL, q.x, q.y, named, named, K.CAST[m.id].color);
+      if (q && m.label) K.drawLabel(m.nameL, q.x, q.y, named, named, K.CAST[m.id].color);
       else K.drawLabel(m.nameL, 0, 0, 0, 0, K.CAST[m.id].color);
     });
 
@@ -388,8 +390,8 @@
     if (t >= 10.4 && Z1) {
       const fall = K.ei(K.seg(t, 11.2, 11.55)), bounce = Math.sin(Math.PI * K.seg(t, 11.55, 11.8)) * 10;
       const head = ground[1] - 12.2 * Math.max(4.5, MPS * K.F / ground[2]);
-      const ax = ground[0], ay = K.lerp(head, ground[1] + 6, fall);
-      stopL.lift = K.lerp(64, 8, fall) + bounce;
+      const ax = ground[0] + 116, ay = K.lerp(head, ground[1] + 42, fall);
+      stopL.lift = K.lerp(48, -34, fall) + bounce;
       const fadeOut = K.ei(K.seg(t, 19.0, 19.6));
       K.drawLabel(stopL, ax, ay, 1 - fadeOut, 1 - fadeOut, K.GREY);
       const sc = K.lerp(1.4, 1.0, K.eo(K.seg(t, 10.4, 10.58)));
@@ -426,6 +428,7 @@
       const s = hordeS(h, t), side = h.side0 * K.lerp(1, 0.55, K.clamp01((s + 0.6) / 0.95));
       drawAt(c, h.S, h.kind, at(s, side), h.ps, h.col, vis, { t, phase: h.phase, cadence: h.cadence, bob: true, flip: h.side0 > 0, seed: h.seed });
     });
+    const wrenchPins = [];
     BUILD.forEach((b, i) => {
       const vis = K.eo(K.seg(t, b.from, b.from + 0.4));
       if (vis <= 0) { b.S.g.style.display = 'none'; b.W.setAttribute('d', 'M0 0'); return; }
@@ -438,13 +441,23 @@
       drawAt(c, b.S, 'zmutant', at(s, side), MPS, b.col, vis, Object.assign(o, { seed: b.seed }));
       const built = Math.floor(WPIX.length * K.seg(t, b.b0, b.b1));
       if (built > 0) {
-        const q = project(c, at(BUILD_S - 0.004 + 0.004 * Math.max(0, t - 25), b.wside)), ps = MPS * 1.4 * K.F / q[2];
+        const q = project(c, at(BUILD_S - 0.004 + 0.004 * Math.max(0, t - 25), b.wside)), ps = MPS * 2.1 * K.F / q[2];
         b.W.setAttribute('d', pixPath(WPIX, q[0] - 5 * ps, q[1] - 9 * ps, ps, built));
         items.push({ g: b.W, z: q[2] });
+        wrenchPins.push(q);
       } else b.W.setAttribute('d', 'M0 0');
     });
 
     K.depthSort(items);
+    if (t >= ALERT) {
+      cast.appendChild(hero.g); cast.appendChild(lamp.g);
+      MATES.forEach(m => cast.appendChild(m.S.g));
+    }
+    if (wrenchPins.length === 2) {
+      const wx = (wrenchPins[0][0] + wrenchPins[1][0]) / 2, wy = Math.min(wrenchPins[0][1], wrenchPins[1][1]) + 24;
+      const bv = K.eo(K.seg(t, 23.4, 23.8));
+      K.drawLabel(buildL, wx, wy, bv, bv, K.PURPLE);
+    } else K.drawLabel(buildL, 0, 0, 0, 0, K.PURPLE);
 
     // ---- captions ----
     K.fade($('capA'), t, 1.2, 9.0);
