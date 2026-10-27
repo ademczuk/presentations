@@ -39,6 +39,10 @@
   #help.on { display:grid }
   #help div { background:#131824; border:1px solid var(--line); border-radius:10px; padding:24px 28px; font:600 15px/1.9 Manrope, Arial, sans-serif; color:var(--ink); max-width:min(560px, calc(100vw - 32px)) }
   #help kbd { font:700 13px Manrope, Arial, sans-serif; border:1px solid var(--line); border-radius:6px; padding:2px 8px; margin-right:8px; background:#0b0d12 }
+  #qr { position:absolute; right:3.2%; bottom:5%; width:15cqh; display:none; text-align:center; font:600 1.7cqh/1.3 Manrope, Arial, sans-serif; color:#a6a098 }
+  #qr.on { display:block }
+  #qr img { width:100%; border-radius:1cqh; display:block; margin-bottom:1cqh }
+  #stage { container-type:size }
   #blank { position:fixed; inset:0; background:#000; display:none; z-index:4 }
   #blank.on { display:block }
   .skip { position:absolute; left:-9999px }
@@ -57,6 +61,7 @@
     <div class="by">Andrew Demczuk</div>
     <div class="ev">Agentic AI in Practice, AI Factory Austria, 18 November 2026</div>
   </section>
+  <div id="qr"><img src="media/film/qr-film.svg" alt="QR code for this film">this film</div>
   <section class="card live" id="card-live" aria-label="Live">
     <div><h1><span class="dot"></span>Our company graph, live</h1><p>The repositories we index, with meeting notes and decisions alongside.</p></div>
   </section>
@@ -147,6 +152,7 @@
   }
   function hud() {
     var p = PAGES[idx];
+    $('qr').classList.toggle('on', idx === PAGES.length - 1);
     $('hud').textContent = (idx + 1) + ' / ' + PAGES.length + '   ' + p.name;
     $('notes').innerHTML = '<span class="nm">' + p.name + '</span>' + p.notes;
     if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
