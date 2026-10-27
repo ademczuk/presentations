@@ -187,6 +187,17 @@
   K.CAST_ORDER = ['claude', 'codex', 'kimi', 'antigravity', 'grok', 'local'];
   // Draw a cast member: K.drawCast(S, 'kimi', x, y, ps, opacity, fr) is K.drawSprite with that model's head and color.
   K.drawCast = function (S, id, x, y, ps, opacity, fr) { const m = K.CAST[id]; K.drawSprite(S, m.kind, x, y, ps, m.color, opacity, fr); };
+  // ---- CODEX-A additions ----
+  K.castBack = function (id) {
+    const kind = K.CAST[id].kind, back = kind + 'Back';
+    if (!K.SPRITES[back]) {
+      const body = K.SPRITES[kind].body.slice();
+      const face = body.findIndex(row => row === '0110110110' || row === '0100000010');
+      if (face >= 0) body[face] = '0111111110';
+      K.SPRITES[back] = { body, legs: K.SPRITES[kind].legs };
+    }
+    return back;
+  };
 
   K.sprite = function (parent, opts) {
     opts = opts || {};

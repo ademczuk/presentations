@@ -122,9 +122,6 @@
   const LINE = 0.24;                            // the shared limit
   const ALERT = 22.2;                           // the team sees the horde
 
-  // A back view of the climber (the eyes filled in), for the team before it turns round.
-  K.SPRITES.climberBack = { body: K.SPRITES.climber.body.map((row, i) => i === 3 ? '0111111110' : row), legs: K.SPRITES.climber.legs };
-
   // ---------- the camera: complete keys, one exactly at every ?from= time, each move settled 0.8 s before a hold ----------
   const cam = (t, tg, d, pitch, yaw, lift) => ({ t, tx: tg[0], ty: tg[1] + (lift || 0), tz: tg[2], d, yaw: (yaw == null ? -0.30 : yaw) + ROT, pitch });
 
@@ -216,8 +213,8 @@
   WPIX.sort((a, b) => (b.row - b.q) - (a.row - a.q));   // built from the handle up to the jaw
 
   // ---------- the team: the lantern bearer, and three more who turn when the horde comes ----------
-  const MATES = [{ ds: 0.07, side: -150, ds2: -0.004, side2: -96, ph: 0.4 }, { ds: 0.10, side: 30, ds2: 0.05, side2: 20, ph: 1.3 },
-                 { ds: 0.06, side: 160, ds2: -0.004, side2: 98, ph: 0.8 }];
+  const MATES = [{ id: 'codex', ds: 0.07, side: -150, ds2: -0.004, side2: -96, ph: 0.4 }, { id: 'kimi', ds: 0.10, side: 30, ds2: 0.05, side2: 20, ph: 1.3 },
+                 { id: 'grok', ds: 0.06, side: 160, ds2: -0.004, side2: 98, ph: 0.8 }];
 
   // ---------- build the scene graph ----------
   const stars = K.stars($('stars'), 150, 41, 560);
@@ -244,6 +241,7 @@
   const stopL = K.label($('labels'), 'status: stopped', { lift: 92 });
   // Altitude's own landmark, so the audience knows where on the map this is: back at the task.
   const taskL = K.label($('labels'), 'the task', { lift: 120 });
+  MATES.forEach(m => { m.nameL = K.label($('labels'), K.CAST[m.id].name, { size: 24, h: 46, lift: 66 }); });
 
   // Camera keys, built from the world so the zombie beat tracks the zombie with fixed keys only.
   const zAt = (t, f) => { const p = f(t); return at(p.s, p.side); };
@@ -315,7 +313,7 @@
       const turned = t >= ALERT + 0.2;
       const hop = Math.sin(Math.PI * K.seg(t, ALERT + 0.15, ALERT + 0.45)) * 2.4;
       const moving = close > 0 && close < 1;
-      const q = drawAt(c, m.S, turned ? 'climber' : 'climberBack', w, HPS * 0.95, K.ORANGE, vis,
+      const q = drawAt(c, m.S, turned ? K.CAST[m.id].kind : K.castBack(m.id), w, HPS * 0.95, K.CAST[m.id].color, vis,
         { t, phase: m.ph, cadence: moving ? 4 : 2.2, bob: true, scaleY: t > ALERT + 0.05 && t < ALERT + 0.18 ? 0.8 : 1 }, -hop);
       const bang = K.seg(t, ALERT, ALERT + 0.12) * (1 - K.seg(t, ALERT + 0.6, ALERT + 0.75));
       if (q && bang > 0) {
@@ -323,6 +321,9 @@
         m.bang.setAttribute('d', 'M' + K.fx(x) + ' ' + K.fx(y0) + 'h' + K.fx(ps) + 'v' + K.fx(ps * 2.6) + 'h-' + K.fx(ps) + 'Z' +
                                  'M' + K.fx(x) + ' ' + K.fx(y0 + ps * 3.4) + 'h' + K.fx(ps) + 'v' + K.fx(ps) + 'h-' + K.fx(ps) + 'Z');
       } else m.bang.setAttribute('d', 'M0 0');
+      const named = K.eo(K.seg(t, ALERT, ALERT + 0.25)) * (1 - K.ei(K.seg(t, ALERT + 1.5, ALERT + 1.9)));
+      if (q) K.drawLabel(m.nameL, q.x, q.y, named, named, K.CAST[m.id].color);
+      else K.drawLabel(m.nameL, 0, 0, 0, 0, K.CAST[m.id].color);
     });
 
     // ---- beat A: fission, the shared limit, deaths on contact ----
