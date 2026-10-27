@@ -314,11 +314,11 @@
   };
 
   window.Talk = {
-    altitude: framePage(function () { return CONFIG.altitude; }, '<div class="scene-fallback">Ask for the outcome, not the task.</div>', 20500),
+    altitude: framePage(function () { return CONFIG.altitude; }, '<div class="scene-fallback">Ask for the goal, not just the task.</div>', 20500),
     // Altitude in three stretches (22 Oct): each page plays one and holds; pages 2 and 3 hard-cut in on the held frame
     altitudeTask: framePage(function () { return CONFIG.altitude + '?to=11.6'; }, '<div class="scene-fallback">A task is often just your best guess.</div>', 11300),
-    altitudeOutcome: framePage(function () { return CONFIG.altitude + '?from=11.6&to=14.1'; }, '<div class="scene-fallback">Ask for the outcome.</div>', 2300),
-    altitudeGoal: framePage(function () { return CONFIG.altitude + '?from=14.1'; }, '<div class="scene-fallback">Better still: the goal beyond the goal.</div>', 6600),
+    altitudeOutcome: framePage(function () { return CONFIG.altitude + '?from=11.6&to=14.1'; }, '<div class="scene-fallback">Ask for the goal.</div>', 2300),
+    altitudeGoal: framePage(function () { return CONFIG.altitude + '?from=14.1'; }, '<div class="scene-fallback">Better still: the company objective.</div>', 6600),
     together: framePage(function () { return CONFIG.together; }, '<div class="scene-fallback">Shared context: one team, one shared picture.</div>', 23500),
     lexifina: lexifina,
     firstGraph: graphFilm({

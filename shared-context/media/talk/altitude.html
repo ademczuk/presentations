@@ -64,8 +64,8 @@
       </g>
       <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
         <text id="h1" x="960" y="142">A task is often just your best guess</text>
-        <text id="h2" x="960" y="142">Ask for the outcome</text>
-        <text id="h3" x="960" y="142">Better still: the goal beyond the goal</text>
+        <text id="h2" x="960" y="142">Ask for the goal</text>
+        <text id="h3" x="960" y="142">Better still: the company objective</text>
       </g>
       <rect id="fadeB" width="1920" height="1080" fill="#0e0d0c"/>
       <g id="title">
@@ -211,7 +211,7 @@
 
   // labels
   const labelsG = $('labels'), labels = {};
-  [['task', 'the task', 86], ['out', 'the outcome', 120], ['goal', 'the goal beyond the goal', 112]].forEach(([k, txt, len]) => {
+  [['task', 'the task', 86], ['out', 'the goal', 120], ['goal', 'the company objective', 112]].forEach(([k, txt, len]) => {
     const g = mk('g', {}, labelsG);
     const lead = mk('line', { 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
     const pin = mk('ellipse', { rx: 7, ry: 4 }, g);

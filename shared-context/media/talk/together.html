@@ -38,7 +38,7 @@
   <g id="labels"></g>
   <g id="chips"></g>
   <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
-    <text id="h0" x="960" y="142">Better still: the goal beyond the goal</text>
+    <text id="h0" x="960" y="142">Better still: the company objective</text>
     <text id="h1" x="960" y="142">Everyone works from their own map</text>
     <text id="h2" x="960" y="142">Different work. One goal.</text>
     <text id="h3" x="960" y="142">Share what each one learns</text>
@@ -229,7 +229,7 @@
     text.textContent = txt;
     labels[k] = { g, lead, pin, halo, box, text, len, w: 220, h: 56 };
   };
-  addLabel('task', 'the task', 86); addLabel('out', 'the outcome', 120); addLabel('goal', 'the goal beyond the goal', 112);
+  addLabel('task', 'the task', 86); addLabel('out', 'the goal', 120); addLabel('goal', 'the company objective', 112);
   addLabel('shared', 'the shared goal', 150);
   PEOPLE.forEach(P => addLabel('r_' + P.hill, P.role, 70));
   function measure() { for (const k in labels) { const L = labels[k]; if (!L.wr) L.w = Math.round(30 * L.text.textContent.length * 0.55 + 48); try { const n = L.text.getComputedTextLength(); if (n > 0) { L.w = n + 48; L.wr = 1; } } catch (e) {} } if (typeof CHIPS !== 'undefined') CHIPS.forEach(C => { try { const n = C.tx.getComputedTextLength(); if (n > 0) C.w = n + 44; } catch (e) {} }); }
