@@ -32,11 +32,11 @@
 <body>
 <main>
   <div class="frame">
-    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Horde: red mutants, green zombies and a purple horde climb the contour-map mountain after the orange Claude figure, in three beats: mutant processes, zombie threads and the horde">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Horde: red mutant processes, green zombie threads and a purple horde follow the orange Claude figure up its dotted trail on the contour-map mountain, in four holds">
       <style>
         .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
         .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
-        .cap text, .tag { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+        .cap text { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
         .kicker { letter-spacing:6px }
       </style>
       <defs>
@@ -48,42 +48,46 @@
           <feGaussianBlur stdDeviation="4" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
       </defs>
       <rect width="1920" height="1080" fill="#0b0d12"/>
       <rect width="1920" height="1080" fill="url(#sky)"/>
       <g id="stars"></g>
+      <g id="skyMask"></g>
       <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
-      <g id="monsters"></g>
-      <g id="team" filter="url(#og)"></g>
-      <g id="tags" class="sans" font-size="26" text-anchor="middle"></g>
+      <g id="pool"></g>
+      <g id="ground"><path id="limit" fill="none" stroke="#c9ced6" stroke-width="3" stroke-dasharray="16 11" stroke-linecap="round"/></g>
+      <g id="trail" opacity=".9"></g>
+      <g id="cast"></g>
+      <g id="marks"></g>
+      <g id="labels"></g>
       <g id="capA" class="cap" text-anchor="middle">
-        <text class="sans kicker" x="960" y="92" font-size="26" fill="#8d949e">MUTANT PROCESSES</text>
-        <text class="serif" x="960" y="168" font-size="60" fill="#f2ece4">One run of agents started 384 helpers.</text>
-        <text class="serif" x="960" y="240" font-size="60" fill="#f2ece4">341 died on a shared limit before finishing,</text>
-        <text class="serif" x="960" y="312" font-size="60" fill="#f2ece4">and the part that mattered never ran.</text>
+        <text class="sans kicker" x="960" y="76" font-size="26" fill="#ff4b4b">MUTANT PROCESSES</text>
+        <text class="serif" x="960" y="142" font-size="66" fill="#f2ece4">384 helpers started. 341 died before finishing.</text>
+        <text class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">The part that mattered never ran.</text>
       </g>
       <g id="capB" class="cap" text-anchor="middle">
-        <text class="sans kicker" x="960" y="92" font-size="26" fill="#8d949e">ZOMBIE THREADS</text>
-        <text class="serif" x="960" y="168" font-size="60" fill="#f2ece4">"Stopped," said the tool.</text>
-        <text class="serif" x="960" y="240" font-size="60" fill="#f2ece4">The process was still running 947 minutes later,</text>
-        <text class="serif" x="960" y="312" font-size="60" fill="#f2ece4">and two copies were writing the same file.</text>
+        <text class="sans kicker" x="960" y="76" font-size="26" fill="#3ddc84">ZOMBIE THREADS</text>
+        <text class="serif" x="960" y="142" font-size="66" fill="#f2ece4">"Stopped," said the tool. It kept running.</text>
+        <text class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">Two copies were writing the same file.</text>
       </g>
-      <g id="capC" class="cap" text-anchor="middle">
-        <text class="sans kicker" x="960" y="92" font-size="26" fill="#8d949e">THE HORDE</text>
-        <text class="serif" x="960" y="168" font-size="56" fill="#f2ece4">Two agents built the same fix, 25 minutes apart.</text>
-        <text class="serif" x="960" y="240" font-size="56" fill="#f2ece4">One change, version after version in a single day,</text>
-        <text class="serif" x="960" y="312" font-size="56" fill="#f2ece4">and a second reviewer found a new real defect in every one.</text>
+      <g id="capC1" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="76" font-size="26" fill="#a56bff">THE HORDE</text>
+        <text class="serif" x="960" y="142" font-size="66" fill="#f2ece4">The same fix, built twice, 25 minutes apart.</text>
+        <text class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">Each had searched, in the wrong place.</text>
       </g>
-      <g id="tally" class="sans" font-size="34" fill="#c9ced6" text-anchor="end">
-        <text id="tally1" x="1840" y="1000"></text>
+      <g id="capC2" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="76" font-size="26" fill="#a56bff">THE HORDE</text>
+        <text id="h3line" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One change. A new real defect in every version.</text>
+        <text class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">Our own reviewers had approved two of them.</text>
       </g>
       <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
     </svg>
   </div>
   <div class="bar">
     <button id="play" type="button">Pause</button>
-    <input id="scrub" type="range" min="0" max="31" step="0.01" value="0" aria-label="Playback position">
-    <span id="time">0.0 / 31.0 s</span>
+    <input id="scrub" type="range" min="0" max="33" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 33.0 s</span>
     <button id="save" type="button">Save frame as SVG</button>
   </div>
 </main>
@@ -91,105 +95,351 @@
 <script>
 (function () {
   const K = FilmKit, $ = K.$;
-  // Three beats. The deck stops on each: ?from=0&to=9, ?from=9&to=18.5, ?from=18.5&to=30.
-  const DUR = 31, HOLD = 30, A0 = 0, A1 = 9, B1 = 18.5, C1 = 30;
-  const VIEW = { tx: 330, ty: 170, tz: 600, d: 2350, yaw: -0.28, pitch: 0.27, dolly: 6, drift: 0.002 };
-  const stars = K.stars($('stars'), 150, 41, 520);
-  const T = K.terrain($('terrain'));
-  // A path up the main mountain's camera-facing slope: s = 0 at its foot, s = 1 near the top.
-  const FOOT = [160, 330], TOP = [470, 840];
-  const at = (s, side) => { const x = K.lerp(FOOT[0], TOP[0], s) + side, z = K.lerp(FOOT[1], TOP[1], s) - side * 0.35; return [x, K.groundY(x, z), z]; };
+  // Scene 3 of the 18 Nov night film: something follows them up. Four holds; the deck stops on each:
+  //   ?deck&from=0&to=9      A  mutant processes
+  //   ?deck&from=9&to=18.5   B  zombie threads
+  //   ?deck&from=18.5&to=25  C1 the horde, coordination
+  //   ?deck&from=25&to=32    C2 the horde, defects
+  // Every frame is a pure function of t. All seeds are drawn once here, at init.
+  const DUR = 33, HOLD = 32;
+  const H3_VERSIONS = null; // set on the day from the ledger
+  if (H3_VERSIONS) $('h3line').textContent = 'One change, ' + H3_VERSIONS + ' versions, a new real defect in each.';
   const P = [0, 0, 0];
   const r = K.rng(77);
 
-  // Mutants: one splits to 32 on screen (standing for 384); 28 of them die (341 of 384 is 89%), 4 finish.
-  const MUT = [];
-  for (let i = 0; i < 32; i++) MUT.push({ s: 0.02 + r() * 0.16, side: (r() - 0.5) * 520, born: 1.4 + Math.floor(Math.log2(i + 1)) * 0.75 + r() * 0.2,
-                                          dies: i % 8 !== 3, dieAt: 5.3 + r() * 1.6, S: K.sprite($('monsters')) });
-  // Zombies: one walks up after it was told to stop; a copy joins it.
-  const ZOM = [{ side: -30, S: K.sprite($('monsters')), from: 9.6 }, { side: 60, S: K.sprite($('monsters')), from: 13.6 }];
-  // The horde: 36 climbers, blobs and zombies mixed, coming up from the foot.
-  const HORDE = [];
-  for (let i = 0; i < 36; i++) HORDE.push({ s0: -0.05 - r() * 0.3, side: (r() - 0.5) * 1100, cap: 0.26 + r() * 0.18, sp: 0.018 + r() * 0.016, kind: i % 3 ? 'blob' : 'zombie',
-                                            from: 18.9 + r() * 4.5, S: K.sprite($('monsters')) });
-  // The team: one green figure up the slope in beats A and B; three in beat C.
-  const TEAM = [{ s: 0.5, side: 0 }, { s: 0.56, side: -110 }, { s: 0.6, side: 120 }].map(m => Object.assign(m, { S: K.sprite($('team')) }));
-  const stopTag = K.mk('text', { class: 'tag', fill: '#c9ced6' }, $('tags'));
-  const fileTag = K.mk('text', { class: 'tag', fill: '#c9ced6' }, $('tags'));
+  // The route up the main mountain's camera-facing slope: s = 0 at its foot, s = 1 near the top.
+  const FOOT = [160, 330], TOP = [470, 840];
+  const at = (s, side) => { const x = K.lerp(FOOT[0], TOP[0], s) + side, z = K.lerp(FOOT[1], TOP[1], s) - side * 0.35; return [x, K.groundY(x, z), z]; };
+  const MPS = 6.4, HPS = MPS * 1.25;           // monster and hero pixel size, world units
+  const heroS = t => 0.35 + 0.25 * K.clamp01(t / DUR);
+  const LINE = 0.24;                            // the shared limit
+  const ALERT = 22.2;                           // the team sees the horde
 
-  function sprite(S, kind, w, ps, fill, op, fr) { K.drawSprite(S, kind, w[0], w[1], ps, fill, op, fr); }
-  function place(c, wp) { K.proj(c, wp[0], wp[1], wp[2], P); return [P[0], P[1], P[2]]; }
+  // A back view of the climber (the eyes filled in), for the team before it turns round.
+  K.SPRITES.climberBack = { body: K.SPRITES.climber.body.map((row, i) => i === 3 ? '0111111110' : row), legs: K.SPRITES.climber.legs };
+
+  // ---------- the camera: complete keys, one exactly at every ?from= time, each move settled 0.8 s before a hold ----------
+  const cam = (t, tg, d, pitch, yaw, lift) => ({ t, tx: tg[0], ty: tg[1] + (lift || 0), tz: tg[2], d, yaw: yaw == null ? -0.30 : yaw, pitch });
+
+  // ---------- beat A: the mutants. One red splits on a 0.72 s cadence: 1, 2, 4, 8, 16, 32 ----------
+  const TB = g => 1.0 + 0.72 * g;
+  const FINAL = [];
+  for (let k = 0; k < 32; k++) {
+    const col = k >> 2, row = k & 3;
+    FINAL.push({ side: -385 + 110 * col + (row % 2 ? 28 : -28) + (r() - 0.5) * 16, off: 0.075 - 0.062 * row + (r() - 0.5) * 0.012 });
+  }
+  const NODES = [];
+  for (let g = 0; g <= 5; g++) for (let k = 0; k < (1 << g); k++) {
+    const span = 1 << (5 - g); let side = 0, off = 0;
+    for (let j = k * span; j < (k + 1) * span; j++) { side += FINAL[j].side; off += FINAL[j].off; }
+    NODES.push({ g, k, side: side / span, off: off / span, tb: TB(g), parent: g ? (1 << (g - 1)) - 1 + (k >> 1) : -1,
+                 phase: r() * 2, cadence: 3.8 + r() * 0.9, seed: 100 + NODES.length });
+  }
+  const GEN5 = NODES.filter(n => n.g === 5), SURV = [7, 14, 19, 26];
+  const bySide = GEN5.slice().sort((a, b) => a.side - b.side);
+  let dieRank = 0;
+  bySide.forEach((n, i) => {
+    n.dies = SURV.indexOf(n.k) < 0;
+    if (n.dies) { n.dieAt = 5.4 + 2.0 * dieRank / 27; dieRank++; }
+    else { n.haltAt = 5.6 + 1.8 * i / 31; n.haltS = LINE - 0.2 + (r() - 0.5) * 0.012; }
+  });
+  const survivors = bySide.filter(n => !n.dies);
+  survivors.forEach((n, i) => { n.lane = [-160, -72, 74, 150][i]; n.climb = 0.0115 + 0.0012 * i; });
+  const baseS = t => 0.02 + 0.06 * K.seg(t, 1.0, 6.0);
+  function mutPos(n, t) {
+    const tt = n.dies ? Math.min(t, n.dieAt) : t;
+    const par = n.parent >= 0 ? NODES[n.parent] : n, u = K.eo(K.seg(tt, n.tb, n.tb + 0.4));
+    let side = K.lerp(par.side, n.side, u), s = baseS(tt) + K.lerp(par.off, n.off, u);
+    if (n.g === 5) {
+      if (n.dies) s = K.lerp(s, LINE - 0.007, K.eio(K.seg(tt, n.dieAt - 1.5, n.dieAt)));
+      else {
+        s = K.lerp(s, n.haltS, K.eio(K.seg(t, n.haltAt - 1.5, n.haltAt)));
+        const c = K.eio(K.seg(t, 9.8, 12.6));
+        side = K.lerp(side, n.lane, c); s += 0.16 * K.seg(t, 9.8, 13.8) + n.climb * Math.max(0, t - 13.8);
+      }
+    }
+    return { s, side, dx: n.side - par.side };
+  }
+
+  // ---------- beat B: the zombie thread, told to stop, and its copy ----------
+  const Z1_136 = 0.042 * 2.4 + 0.004 * Math.sin(2 * Math.PI * 1.3 * 2.4);
+  const PAGE = { s: 0.142, side: 8 };
+  function z1(t) {
+    let s, side = 12;
+    if (t < 10.4) s = -0.02 + 0.025 * Math.max(0, t - 9.6);
+    else if (t < 11.2) s = 0;
+    else if (t < 13.6) { const u = t - 11.2; s = 0.042 * u + 0.004 * Math.sin(2 * Math.PI * 1.3 * u); }
+    else { const a = K.eio(K.seg(t, 13.6, 14.6)); s = K.lerp(Z1_136, PAGE.s - 0.016, a); side = K.lerp(12, PAGE.side - 52, a); }
+    if (t > 18.8) { s += 0.025 * (t - 18.8); side = K.lerp(PAGE.side - 52, -34, K.eio(K.seg(t, 18.8, 20.6))); }
+    return { s, side };
+  }
+  function z2(t) {
+    let s, side;
+    const peel = K.eo(K.seg(t, 13.6, 14.1));
+    s = Z1_136; side = 12 + 62 * peel;
+    const a = K.eio(K.seg(t, 14.1, 14.9));
+    s = K.lerp(s, PAGE.s - 0.012, a); side = K.lerp(side, PAGE.side + 54, a);
+    if (t > 18.9) { s += 0.024 * (t - 18.9); side = K.lerp(PAGE.side + 54, 36, K.eio(K.seg(t, 18.9, 20.7))); }
+    return { s, side };
+  }
+  const ZOM = [{ f: z1, from: 9.6, ph: 0.3, seed: 501 }, { f: z2, from: 13.6, ph: 0.75, seed: 502 }];
+
+  // ---------- beat C: the horde, spawned in depth below the foot, climbing as a front ----------
+  const KINDS = ['zmutant', 'shambler', 'mutant'];
+  const C0 = [0x9a, 0x5f, 0xf5], C1 = [0xb0, 0x7f, 0xff];
+  const HORDE = [];
+  for (let i = 0; i < 100; i++) {
+    const depth = Math.pow(r(), 0.8);
+    const s0 = -0.05 - depth * 1.55 - (i % 4 === 0 ? 0.5 : 0);   // the deepest rows start below the frame, near the camera and large; a late wave keeps coming
+    const j = r(), col = 'rgb(' + [0, 1, 2].map(q => Math.round(K.lerp(C0[q], C1[q], j))).join(',') + ')';
+    HORDE.push({ s0, side0: (r() - 0.5) * 2 * (170 + 380 * depth), sp: 0.028 + 0.05 * depth + r() * 0.012,
+                 cap: 0.35 - 0.36 * depth + (r() - 0.5) * 0.05,
+                 kind: KINDS[i % 3], col, ps: MPS * (0.86 + r() * 0.24), phase: r() * 2, cadence: 2.0 + r() * 1.4,
+                 from: 18.6 + r() * 0.9, seed: 700 + i });
+  }
+  const soft = (raw, cap) => { const knee = cap - 0.12; return raw < knee ? raw : cap - 0.12 * Math.exp(-(raw - knee) / 0.12); };
+  function hordeS(h, t) { return soft(h.s0 + h.sp * Math.max(0, t - 18.5) + 0.06 * K.eo(K.seg(t, 21, 24)), h.cap); }
+  // Two purple bodies run ahead and each builds the same fix, one after the other, side by side.
+  const BUILD = [{ side: 214, wside: 262, from: 18.6, arrive: 20.7, b0: 20.9, b1: 21.9, seed: 801, col: 'rgb(166,112,250)' },
+                 { side: 372, wside: 326, from: 19.3, arrive: 21.9, b0: 22.4, b1: 23.4, seed: 802, col: 'rgb(170,118,252)' }];
+  const BUILD_S = 0.37;
+  const WRENCH = ['0000110110', '0000110110', '0000111110', '0000111100', '0001111000', '0011100000', '0111000000', '1110000000', '1100000000'];
+  const WPIX = [];
+  for (let row = 0; row < 9; row++) for (let q = 0; q < 10; q++) if (WRENCH[row][q] === '1') WPIX.push({ row, q });
+  WPIX.sort((a, b) => (b.row - b.q) - (a.row - a.q));   // built from the handle up to the jaw
+
+  // ---------- the team: the lantern bearer, and three more who turn when the horde comes ----------
+  const MATES = [{ ds: 0.07, side: -150, ds2: -0.004, side2: -96, ph: 0.4 }, { ds: 0.10, side: 30, ds2: 0.05, side2: 20, ph: 1.3 },
+                 { ds: 0.06, side: 160, ds2: -0.004, side2: 98, ph: 0.8 }];
+
+  // ---------- build the scene graph ----------
+  const stars = K.stars($('stars'), 150, 41, 560);
+  const T = K.terrain($('terrain'));
+  const mask = K.skyMask($('skyMask'));
+  const trail = K.trail($('trail'));
+  const cast = $('cast'), items = [];
+  const sp = (opts) => K.sprite(cast, opts);
+  NODES.forEach(n => { n.S = sp({ outline: true }); });
+  ZOM.forEach(z => { z.S = sp({ outline: true }); });
+  HORDE.forEach(h => { h.S = sp({ outline: true }); });
+  BUILD.forEach(b => { b.S = sp({ outline: true }); b.W = K.mk('path', { 'shape-rendering': 'crispEdges', fill: '#ece6ff', stroke: '#0b0d12', 'stroke-width': 1.5, 'paint-order': 'stroke' }, cast); });
+  const hero = sp({ glow: true });
+  MATES.forEach(m => { m.S = sp({ glow: true }); m.bang = K.mk('path', { fill: '#ffffff' }, $('marks')); });
+  const lamp = K.lantern(cast); $('pool').appendChild(lamp.pool);
+  const page = K.mk('g', {}, cast);
+  const pageBody = K.mk('path', { fill: '#eef0f4', stroke: '#0b0d12', 'stroke-width': 1.5 }, page);
+  const pageFold = K.mk('path', { fill: '#b9bfca' }, page);
+  const SCRIB = [];
+  for (let i = 0; i < 6; i++) SCRIB.push({ L: K.mk('path', { fill: 'none', stroke: K.GREEN, 'stroke-width': 3, 'stroke-linejoin': 'round' }, page),
+                                           R: K.mk('path', { fill: 'none', stroke: '#1fa863', 'stroke-width': 3, 'stroke-linejoin': 'round' }, page) });
+  const limitL = K.label($('labels'), 'shared limit', { lift: 78 });
+  const countL = K.label($('labels'), '384 started, 341 died', { size: 40, h: 70, lift: 150 });
+  const stopL = K.label($('labels'), 'status: stopped', { lift: 92 });
+
+  // Camera keys, built from the world so the zombie beat tracks the zombie with fixed keys only.
+  const zAt = (t, f) => { const p = f(t); return at(p.s, p.side); };
+  const KEYS = [
+    cam(0, at(0.07, 0), 900, 0.6, 0.30, 30),
+    cam(1.0, at(0.07, 0), 900, 0.6, 0.30, 30),
+    cam(5.8, at(0.2, 0), 1150, 0.72, 0.33, 0),
+    cam(9.0, at(0.2, 0), 1150, 0.72, 0.33, 0),
+    cam(10.6, zAt(10.6, z1), 900, 0.42, 0.36, 60),
+    cam(13.6, zAt(13.6, z1), 900, 0.42, 0.36, 60),
+    cam(16.2, at(PAGE.s + 0.02, PAGE.side), 940, 0.44, 0.36, 60),
+    cam(18.5, at(PAGE.s + 0.02, PAGE.side), 940, 0.44, 0.36, 60),
+    cam(21.4, at(0.24, 0), 1400, 0.40, 0.31, 40),
+    cam(25.0, at(0.24, 0), 1400, 0.40, 0.31, 40),
+    cam(27.6, at(0.27, 0), 1240, 0.40, 0.31, 40),
+    cam(33, at(0.27, 0), 1240, 0.40, 0.31, 40)];
+
+  function project(c, w) { K.proj(c, w[0], w[1], w[2], P); return [P[0], P[1], P[2]]; }
+  function drawAt(c, S, kind, w, wps, fill, op, o, extraY) {
+    const q = project(c, w); if (q[2] < 60) { S.g.style.display = 'none'; return null; }
+    const ps = wps * K.F / q[2];
+    K.drawSprite(S, kind, q[0], q[1] + (extraY ? extraY * ps : 0), ps, fill, op, o);
+    items.push({ g: S.g, z: q[2] });
+    return { x: q[0], y: q[1], ps: Math.max(4.5, ps), z: q[2] };
+  }
+  function pixPath(pix, x0, y0, ps, n) {
+    let d = '';
+    for (let i = 0; i < n; i++) { const p = pix[i]; d += 'M' + K.fx(x0 + p.q * ps) + ' ' + K.fx(y0 + p.row * ps) + 'h' + (ps + 0.6).toFixed(2) + 'v' + (ps + 0.6).toFixed(2) + 'h-' + (ps + 0.6).toFixed(2) + 'Z'; }
+    return d || 'M0 0';
+  }
+  function bigLabelText(L, x, y, show) {
+    const by = y - L.lift - L.h + (1 - show) * 14;
+    L.text.setAttribute('y', K.fx(by + L.h / 2 + 14));
+  }
+  function drawPolyLine(c, pts) {
+    let d = '';
+    pts.forEach((w, i) => { const q = project(c, w); d += (i ? 'L' : 'M') + K.fx(q[0]) + ' ' + K.fx(q[1]); });
+    return d;
+  }
 
   function render(t) {
-    const c = K.camera(VIEW, t);
-    const open = K.eo(K.seg(t, 0, 1.2));
-    K.drawStars(stars, t, open);
-    K.drawTerrain(T, c, open, () => [118, 132, 160, 1]);
-    const walk = Math.floor(t * 4) % 2;
+    const c = K.keyCamera(KEYS, t);
+    items.length = 0;
+    K.drawStars(stars, t, 1);
+    K.drawSkyMask(mask, T, c, ['m', 'w', 'f'], '#121722');
+    K.drawTerrain(T, c, 1, L => L.hill === 'm' ? [140, 152, 178, 1] : [112, 126, 154, 1], { nearFade: true });
 
-    // ---- the team (green) ----
-    TEAM.forEach((m, i) => {
-      const vis = i === 0 ? open : K.eo(K.seg(t, B1 + 0.3 + i * 0.4, B1 + 1.1 + i * 0.4));
-      const s = m.s + (t > B1 ? 0.004 * (t - B1) : 0);
-      const q = place(c, at(s, m.side));
-      sprite(m.S, 'climber', q, 8.5 * K.F / q[2], K.ORANGE, vis, walk);
-    });
-
-    // ---- beat A: mutants split, then most die ----
-    let alive = 0, born = 0;
-    MUT.forEach(m => {
-      const b = K.seg(t, m.born, m.born + 0.35);
-      if (b > 0) born++;
-      const dead = m.dies ? K.seg(t, m.dieAt, m.dieAt + 0.7) : 0;
-      if (b > 0 && dead < 1) alive++;
-      const out = K.ei(K.seg(t, A1, A1 + 0.6));
-      const w = place(c, at(m.s, m.side * K.eo(b)));
-      w[1] += dead * 18;
-      const fill = dead > 0 ? '#6b2a2a' : K.RED;
-      sprite(m.S, 'blob', w, 7 * K.F / w[2] * (0.6 + 0.4 * K.eo(b)), fill, K.eo(b) * (1 - 0.75 * dead) * (1 - out), dead > 0 ? 0 : walk);
-    });
-    // ---- beat B: zombies keep walking after "stopped" ----
-    ZOM.forEach((z, i) => {
-      const vis = K.eo(K.seg(t, z.from, z.from + 0.6)) * (1 - K.ei(K.seg(t, B1, B1 + 0.6)));
-      const s = 0.04 + 0.022 * Math.max(0, t - z.from);
-      const w = place(c, at(s, z.side));
-      sprite(z.S, 'zombie', w, 8 * K.F / w[2], K.GREEN, vis, walk);
-      if (i === 0) {
-        stopTag.textContent = 'status: stopped';
-        stopTag.setAttribute('x', K.fx(w[0])); stopTag.setAttribute('y', K.fx(w[1] - 8 * K.F / w[2] * 11));
-        stopTag.setAttribute('opacity', (vis * K.eo(K.seg(t, 10.6, 11.2))).toFixed(3));
-      }
-      if (i === 1) {
-        fileTag.textContent = 'same file';
-        const w0 = place(c, at(0.04 + 0.022 * Math.max(0, t - ZOM[0].from), ZOM[0].side));
-        fileTag.setAttribute('x', K.fx((w0[0] + w[0]) / 2)); fileTag.setAttribute('y', K.fx(Math.max(w0[1], w[1]) + 46));
-        fileTag.setAttribute('opacity', (vis * K.eo(K.seg(t, 14.6, 15.2))).toFixed(3));
-      }
-    });
-    // ---- beat C: the horde climbs ----
-    HORDE.forEach(h => {
-      const vis = K.eo(K.seg(t, h.from, h.from + 0.8));
-      const s = Math.min(h.cap, h.s0 + h.sp * Math.max(0, t - h.from) + 0.2 * K.eo(K.seg(t, h.from, C1)));
-      const w = place(c, at(Math.max(0, s), h.side));
-      sprite(h.S, h.kind, w, 7.5 * K.F / w[2], K.PURPLE, vis, walk);
-    });
-
-    // ---- the tally, bottom right ----
-    let tally = '';
-    if (t >= 1.4 && t < A1 + 0.3) {
-      const started = Math.round(384 * K.eo(K.seg(t, 1.4, 5.0)));
-      const died = Math.round(341 * K.eo(K.seg(t, 5.3, 7.4)));
-      tally = started + ' started' + (died ? ', ' + died + ' died' : '');
-    } else if (t >= 10.6 && t < B1 + 0.3) {
-      tally = Math.round(947 * K.eo(K.seg(t, 10.6, 16.5))) + ' minutes after "stopped"';
+    // ---- the hero and its trail ----
+    const sH = heroS(t), hw = at(sH, 0);
+    const route = [];
+    for (let s = -0.6; s < sH - 0.025; s += 0.02) route.push(at(s, 0));
+    route.push(at(sH - 0.025, 0));
+    K.drawTrail(trail, c, route, 1);
+    const H = drawAt(c, hero, 'climber', hw, HPS, K.ORANGE, 1, { t, phase: 0.2, cadence: 2.2, bob: true });
+    if (H) {
+      K.drawLantern(lamp, H.x + H.ps * 5.6, H.y - H.ps * 2.2, H.ps, 1, t);
+      lamp.pool.setAttribute('opacity', '0.35');
+      items.push({ g: lamp.g, z: H.z - 1 });
     }
-    $('tally1').textContent = tally;
-    $('tally').setAttribute('opacity', (tally ? 1 : 0) * open);
 
-    K.fade($('capA'), t, A0 + 1.6, A1);
-    K.fade($('capB'), t, A1 + 0.6, B1);
-    K.fade($('capC'), t, B1 + 0.6, null);
-    $('fade').setAttribute('opacity', (1 - open + K.ei(K.seg(t, C1 + 0.2, C1 + 0.9))).toFixed(3));
+    // ---- the team: in the dark ahead, then they turn and close ranks ----
+    MATES.forEach((m, i) => {
+      const vis = K.eo(K.seg(t, 18.9 + i * 0.3, 19.7 + i * 0.3));
+      if (vis <= 0) { m.S.g.style.display = 'none'; m.bang.setAttribute('d', 'M0 0'); return; }
+      const close = K.eio(K.seg(t, ALERT + 0.45, ALERT + 1.7));
+      const w = at(sH + K.lerp(m.ds, m.ds2, close), K.lerp(m.side, m.side2, close));
+      const turned = t >= ALERT + 0.2;
+      const hop = Math.sin(Math.PI * K.seg(t, ALERT + 0.15, ALERT + 0.45)) * 2.4;
+      const moving = close > 0 && close < 1;
+      const q = drawAt(c, m.S, turned ? 'climber' : 'climberBack', w, HPS * 0.95, K.ORANGE, vis,
+        { t, phase: m.ph, cadence: moving ? 4 : 2.2, bob: true, scaleY: t > ALERT + 0.05 && t < ALERT + 0.18 ? 0.8 : 1 }, -hop);
+      const bang = K.seg(t, ALERT, ALERT + 0.12) * (1 - K.seg(t, ALERT + 0.6, ALERT + 0.75));
+      if (q && bang > 0) {
+        const ps = q.ps * (0.8 + 0.4 * K.eo(K.seg(t, ALERT, ALERT + 0.12))), x = q.x - ps / 2, y0 = q.y - 10 * q.ps - hop * q.ps - ps * 5.2;
+        m.bang.setAttribute('d', 'M' + K.fx(x) + ' ' + K.fx(y0) + 'h' + K.fx(ps) + 'v' + K.fx(ps * 2.6) + 'h-' + K.fx(ps) + 'Z' +
+                                 'M' + K.fx(x) + ' ' + K.fx(y0 + ps * 3.4) + 'h' + K.fx(ps) + 'v' + K.fx(ps) + 'h-' + K.fx(ps) + 'Z');
+      } else m.bang.setAttribute('d', 'M0 0');
+    });
+
+    // ---- beat A: fission, the shared limit, deaths on contact ----
+    let cx = 0, cy = 0, cn = 0;
+    NODES.forEach(n => {
+      const next = n.g < 5 ? TB(n.g + 1) : Infinity;
+      const gone = n.dies ? t > n.dieAt + 0.95 : false;
+      if (t < n.tb || t >= next || gone) { n.S.g.style.display = 'none'; return; }
+      const p = mutPos(n, t), w = at(p.s, p.side);
+      const u = K.seg(t, n.tb, n.tb + 0.45);
+      let sy = 1 + 0.3 * Math.sin(u * Math.PI * 2) * (1 - u);
+      if (n.g === 0) sy *= K.eo(K.seg(t, n.tb, n.tb + 0.25));
+      if (n.g < 5) sy *= 1 - 0.28 * K.seg(t, next - 0.16, next);
+      let fill = t < n.tb + 0.05 && n.g > 0 ? '#ffffff' : K.RED, o;
+      if (n.dies && t >= n.dieAt) {
+        const fz = Math.floor(n.dieAt * n.cadence + n.phase);
+        if (t >= n.dieAt + 0.15 && t < n.dieAt + 0.22) fill = '#ffffff';
+        o = { t: 0, phase: fz, cadence: 0, bob: false, seed: n.seed, dissolve: K.seg(t, n.dieAt + 0.22, n.dieAt + 0.95) };
+      } else {
+        const halted = !n.dies && n.g === 5 && t > n.haltAt && t < 9.8;
+        o = { t, phase: halted ? 0 : n.phase, cadence: halted ? 0 : n.cadence, bob: true, flip: p.dx < 0, scaleY: sy, seed: n.seed };
+      }
+      const q = drawAt(c, n.S, 'mutant', w, MPS, fill, 1, o);
+      if (q && n.g === 5 && t < 9.8) { cx += q.x; cy += q.y; cn++; }
+    });
+    // the dashed line of the shared limit, drawn outward from the trail
+    const lineOn = K.eo(K.seg(t, 4.8, 5.4)), lineOff = K.ei(K.seg(t, 9.3, 9.9));
+    if (lineOn > 0 && lineOff < 1) {
+      const pts = []; const half = 640 * lineOn;
+      for (let s = -half; s <= half + 0.1; s += Math.max(8, half / 24)) pts.push(at(LINE, s));
+      $('limit').setAttribute('d', drawPolyLine(c, pts)); $('limit').setAttribute('opacity', (0.85 * (1 - lineOff)).toFixed(3));
+      const lp = project(c, at(LINE, 470));
+      K.drawLabel(limitL, lp[0], lp[1], K.eo(K.seg(t, 5.0, 5.35)) * (1 - lineOff), K.eo(K.seg(t, 5.25, 5.7)) * (1 - lineOff), K.GREY);
+    } else { $('limit').setAttribute('opacity', 0); K.drawLabel(limitL, 0, 0, 0, 0, K.GREY); }
+    const cp = project(c, at(LINE, -300)), cOut = K.ei(K.seg(t, 9.3, 9.8));
+    const cg = K.eo(K.seg(t, 7.6, 7.95)) * (1 - cOut), cs = K.eo(K.seg(t, 7.85, 8.3)) * (1 - cOut);
+    K.drawLabel(countL, cp[0], cp[1], cg, cs, K.RED);
+    if (cg > 0) bigLabelText(countL, cp[0], cp[1], cs);
+
+    // ---- beat B: the zombie thread and its copy, and the page they both write ----
+    let Z1 = null;
+    ZOM.forEach((z, i) => {
+      if (t < z.from) { z.S.g.style.display = 'none'; return; }
+      const p = z.f(t), w = at(p.s, p.side);
+      let o, extra = 0, op = 1;
+      const writing = t > (i ? 14.9 : 14.6) && t < (i ? 18.9 : 18.8);
+      if (i === 0 && t < 10.4) o = { t, phase: z.ph, cadence: 1.6, bob: true };
+      else if (i === 0 && t < 11.2) o = { t: 0, phase: 0, cadence: 0, bob: false, scaleY: 1 - 0.2 * (1 - K.eo(K.seg(t, 10.4, 10.7))) };
+      else if (writing) o = { t: 0, phase: 0, cadence: 0, bob: false, flip: i === 1, rot: (i ? -1 : 1) * (3 + 2.2 * Math.sin(t * 17 + i)) };
+      else {
+        const u = t - 11.2, w8 = Math.abs(Math.sin(Math.PI * 2.6 * (t + z.ph)));
+        const stiff = i === 0 ? K.seg(t, 11.2, 11.9) : 1;
+        o = { t: u, phase: 0, cadence: 2.6, bob: false, flip: i === 1, rot: stiff * 4 * Math.sin(Math.PI * 2.6 * (t + z.ph)) };
+        extra = -stiff * 1.1 * Math.pow(w8, 3) - 0.3 * (1 - stiff) * w8;
+      }
+      if (i === 1) op = 0.5 + 0.5 * K.eo(K.seg(t, 13.6, 14.3));
+      const q = drawAt(c, z.S, 'shambler', w, MPS, K.GREEN, op * K.eo(K.seg(t, z.from, z.from + 0.3)), Object.assign(o, { seed: z.seed }), extra);
+      if (i === 0) Z1 = q;
+    });
+    // the "status: stopped" pill: slams onto the zombie, then falls and stays where it landed
+    const ground = project(c, zAt(11.2, z1));
+    if (t >= 10.4 && Z1) {
+      const fall = K.ei(K.seg(t, 11.2, 11.55)), bounce = Math.sin(Math.PI * K.seg(t, 11.55, 11.8)) * 10;
+      const head = ground[1] - 12.2 * Math.max(4.5, MPS * K.F / ground[2]);
+      const ax = ground[0], ay = K.lerp(head, ground[1] + 6, fall);
+      stopL.lift = K.lerp(64, 8, fall) + bounce;
+      const fadeOut = K.ei(K.seg(t, 19.0, 19.6));
+      K.drawLabel(stopL, ax, ay, 1 - fadeOut, 1 - fadeOut, K.GREY);
+      const sc = K.lerp(1.4, 1.0, K.eo(K.seg(t, 10.4, 10.58)));
+      const tilt = -7 * K.eo(K.seg(t, 11.3, 11.6));
+      const by = ay - stopL.lift - stopL.h / 2;
+      stopL.g.setAttribute('transform', 'translate(' + K.fx(ax) + ' ' + K.fx(by) + ') rotate(' + tilt.toFixed(2) + ') scale(' + sc.toFixed(3) + ') translate(' + K.fx(-ax) + ' ' + K.fx(-by) + ')');
+    } else { K.drawLabel(stopL, 0, 0, 0, 0, K.GREY); stopL.g.removeAttribute('transform'); }
+    // the page both copies write, from both sides
+    const pageOn = K.eo(K.seg(t, 13.9, 14.4)) * (1 - K.ei(K.seg(t, 20.6, 21.6)));
+    if (pageOn > 0) {
+      const q = project(c, at(PAGE.s, PAGE.side)), ps = MPS * K.F / q[2], w = 10 * ps, h = 12.5 * ps, f = 3 * ps;
+      const x0 = q[0] - w / 2, y0 = q[1] - h - (1 - pageOn) * 18;
+      pageBody.setAttribute('d', 'M' + K.fx(x0) + ' ' + K.fx(y0) + 'h' + K.fx(w - f) + 'l' + K.fx(f) + ' ' + K.fx(f) + 'v' + K.fx(h - f) + 'h' + K.fx(-w) + 'Z');
+      pageFold.setAttribute('d', 'M' + K.fx(x0 + w - f) + ' ' + K.fx(y0) + 'v' + K.fx(f) + 'h' + K.fx(f) + 'Z');
+      page.setAttribute('opacity', pageOn.toFixed(3));
+      SCRIB.forEach((L, i) => {
+        const yy = y0 + (3.6 + i * 1.55) * ps, x1 = x0 + ps * 0.9, x2 = x0 + w - ps * 0.9, span = (x2 - x1) * 0.66;
+        const pl = K.seg(t, 14.7 + i * 0.66, 15.25 + i * 0.66), pr = K.seg(t, 15.0 + i * 0.66, 15.55 + i * 0.66);
+        const zig = (from, dir, p) => {
+          let d = 'M' + K.fx(from) + ' ' + K.fx(yy); const n = Math.max(1, Math.round(10 * p));
+          for (let j = 1; j <= n; j++) d += 'L' + K.fx(from + dir * span * p * j / n) + ' ' + K.fx(yy + (j % 2 ? -0.45 : 0.45) * ps);
+          return p > 0 ? d : 'M0 0';
+        };
+        L.L.setAttribute('d', zig(x1, 1, pl)); L.R.setAttribute('d', zig(x2, -1, pr));
+        L.L.setAttribute('stroke-width', Math.max(2, ps * 0.42).toFixed(2)); L.R.setAttribute('stroke-width', Math.max(2, ps * 0.42).toFixed(2));
+      });
+      items.push({ g: page, z: q[2] });
+    } else page.setAttribute('opacity', 0);
+
+    // ---- beat C: the horde, and the same fix built twice ----
+    HORDE.forEach(h => {
+      const vis = K.eo(K.seg(t, h.from, h.from + 0.6));
+      if (vis <= 0) { h.S.g.style.display = 'none'; return; }
+      const s = hordeS(h, t), side = h.side0 * K.lerp(1, 0.55, K.clamp01((s + 0.6) / 0.95));
+      drawAt(c, h.S, h.kind, at(s, side), h.ps, h.col, vis, { t, phase: h.phase, cadence: h.cadence, bob: true, flip: h.side0 > 0, seed: h.seed });
+    });
+    BUILD.forEach((b, i) => {
+      const vis = K.eo(K.seg(t, b.from, b.from + 0.4));
+      if (vis <= 0) { b.S.g.style.display = 'none'; b.W.setAttribute('d', 'M0 0'); return; }
+      const a = K.eio(K.seg(t, b.from, b.arrive));
+      const s = K.lerp(-0.02, BUILD_S, a) + 0.004 * Math.max(0, t - 25);
+      const side = K.lerp(i ? 90 : 60, b.side, a);
+      const building = t > b.b0 && t < b.b1;
+      const o = building ? { t, phase: 0, cadence: 0, bob: false, flip: i === 1, rot: (i ? -1 : 1) * (4 + 4 * Math.sin(t * 22)) }
+                         : { t, phase: i * 0.6, cadence: a < 1 ? 4.6 : 0, bob: true, flip: i === 1 };
+      drawAt(c, b.S, 'zmutant', at(s, side), MPS, b.col, vis, Object.assign(o, { seed: b.seed }));
+      const built = Math.floor(WPIX.length * K.seg(t, b.b0, b.b1));
+      if (built > 0) {
+        const q = project(c, at(BUILD_S - 0.004 + 0.004 * Math.max(0, t - 25), b.wside)), ps = MPS * 1.4 * K.F / q[2];
+        b.W.setAttribute('d', pixPath(WPIX, q[0] - 5 * ps, q[1] - 9 * ps, ps, built));
+        items.push({ g: b.W, z: q[2] });
+      } else b.W.setAttribute('d', 'M0 0');
+    });
+
+    K.depthSort(items);
+
+    // ---- captions ----
+    K.fade($('capA'), t, 1.2, 9.0);
+    K.fade($('capB'), t, 9.6, 18.5);
+    K.fade($('capC1'), t, 19.1, 25.0);
+    K.fade($('capC2'), t, 25.6, null);
+    $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 0.9)) + K.ei(K.seg(t, HOLD + 0.2, HOLD + 0.9))).toFixed(3));
   }
   K.player(DUR, HOLD, render, 'horde');
 })();
