@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Evidence: a searching light follows a graph through four constellations of measured results">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        #h1 { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+        #sub, #when, #big, #caveat, #labels text { paint-order:stroke;stroke:#0b0d12;stroke-width:8px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <radialGradient id="sky" gradientUnits="userSpaceOnUse" cx=".5" cy=".3" r=".75" gradientTransform="matrix(1920 0 0 1080 0 0)">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <radialGradient id="cursorGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff3cf" stop-opacity=".95"/>
+          <stop offset=".25" stop-color="#ffd36b" stop-opacity=".5"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="edges" fill="none" stroke-linecap="round"></g>
+      <g id="nodes"></g>
+      <g id="labels" class="sans" text-anchor="middle" fill="#ffd88a" font-size="22"></g>
+      <g id="cursor">
+        <circle id="cursorHalo" r="64" fill="url(#cursorGrad)"/>
+        <circle id="cursorMid" r="15" fill="#ffd36b" opacity=".32" filter="url(#og)"/>
+        <circle id="cursorCore" r="5.5" fill="#fff3cf"/>
+      </g>
+      <circle id="targetRing" r="15" fill="none" stroke="#ff6a1f" stroke-width="3"/>
+      <g text-anchor="middle" fill="#f2ece4">
+        <text id="h1" class="serif" x="960" y="142" font-size="68"></text>
+        <text id="sub" class="sans" x="960" y="210" font-size="30" font-weight="600" fill="#c9d2df"></text>
+        <text id="when" class="sans" x="960" y="210" font-size="27" font-weight="600" fill="#b7c1d1"></text>
+        <text id="big" class="serif" x="960" y="920" font-size="58" fill="#ffd88a"></text>
+        <text id="caveat" class="sans" x="960" y="1000" font-size="25" font-weight="600" fill="#c9d2df"></text>
+      </g>
+      <text id="illustration" class="sans" x="42" y="1032" font-size="20" font-weight="600" fill="#8d949e">illustration</text>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="36" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 36.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$;
+  // beats: 0-5 search without edges | 5-10 follow graph edges | 10-16 Atlassian | 16-22 Codebase-Memory | 22-28 Microsoft | 28-34 Honcho and all sources
+  const DUR = 36, HOLD = 34;
+  const SOURCES = [
+    { who: 'Atlassian, Teamwork Graph', big: '44% more accurate, 48% fewer tokens', when: 'July 2026, agents with and without graph context', caveat: 'Their internal benchmark.', x: 410, y: 370, rx: 260, ry: 105, n: 48, seed: 810 },
+    { who: 'Codebase-Memory, arXiv paper', big: 'About 10x fewer tokens, 2.1x fewer tool calls', when: 'March 2026, 31 real repositories', caveat: 'The honest trade-off: answer quality 83% against 92% for an agent that reads the files.', x: 1500, y: 370, rx: 260, ry: 105, n: 52, seed: 811 },
+    { who: 'Microsoft GraphRAG', big: 'About 2 to 3% of the tokens', when: '2024, questions about a whole corpus', caveat: 'Top-level summaries, which also won about 70 to 80% of judged comparisons with plain retrieval.', x: 410, y: 680, rx: 270, ry: 100, n: 56, seed: 812 },
+    { who: 'Honcho, Plastic Labs', big: '60 to 90% token savings', when: 'memory that serves curated context', caveat: 'Their own figure.', x: 1500, y: 680, rx: 270, ry: 100, n: 60, seed: 813 }
+  ];
+  const STARTS = [10, 16, 22, 28];
+  const background = K.stars($('stars'), 170, 41, 1030);
+
+  const clusters = SOURCES.map((s, k) => {
+    const rr = K.rng(s.seed), points = [], edges = [], edgeKeys = new Set();
+    for (let i = 0; i < s.n; i++) {
+      const a = rr() * Math.PI * 2, d = Math.sqrt(rr());
+      const x = s.x + Math.cos(a) * s.rx * d, y = s.y + Math.sin(a) * s.ry * d;
+      points.push({ x, y, r: 1.8 + rr() * 2.2, el: K.mk('circle', { cx: K.fx(x), cy: K.fx(y) }, $('nodes')) });
+    }
+    points.forEach((p, i) => {
+      const nearest = points.map((q, j) => ({ j, d: Math.hypot(p.x - q.x, p.y - q.y) }))
+        .filter(o => o.j !== i).sort((a, b) => a.d - b.d).slice(0, 2);
+      nearest.forEach(o => {
+        const a = Math.min(i, o.j), b = Math.max(i, o.j), key = a + ':' + b;
+        if (edgeKeys.has(key)) return;
+        edgeKeys.add(key);
+        const q = points[o.j];
+        edges.push({ a, b, el: K.mk('line', { x1: K.fx(p.x), y1: K.fx(p.y), x2: K.fx(q.x), y2: K.fx(q.y), 'stroke-width': 1.6 }, $('edges')) });
+      });
+    });
+    const labelY = k < 2 ? 520 : 830;
+    const label = K.mk('text', { x: s.x, y: labelY }, $('labels'));
+    label.textContent = s.who;
+    return { points, edges, label };
+  });
+
+  const ref = (k, i) => clusters[k].points[i];
+  const searchRefs = [[0, 3], [0, 18], [1, 4], [1, 31], [2, 7], [0, 42], [3, 12], [2, 30], [1, 45], [3, 50], [2, 20], [0, 27], [0, 0]];
+  const searchRoute = searchRefs.map(r => ref(r[0], r[1]));
+
+  function graphPath() {
+    const adj = clusters[0].points.map(() => []);
+    clusters[0].edges.forEach(e => { adj[e.a].push(e.b); adj[e.b].push(e.a); });
+    const prev = new Array(adj.length).fill(-1), dist = new Array(adj.length).fill(-1), queue = [0];
+    prev[0] = 0; dist[0] = 0;
+    for (let q = 0; q < queue.length; q++) {
+      const a = queue[q];
+      adj[a].forEach(b => {
+        if (prev[b] !== -1) return;
+        prev[b] = a; dist[b] = dist[a] + 1; queue.push(b);
+      });
+    }
+    let target = 0;
+    for (let i = 1; i < adj.length; i++) if (dist[i] > dist[target]) target = i;
+    const ids = [];
+    for (let at = target; at !== 0; at = prev[at]) ids.push(at);
+    ids.push(0);
+    return ids.reverse().map(i => clusters[0].points[i]);
+  }
+  const linkedRoute = graphPath(), target = linkedRoute[linkedRoute.length - 1];
+  $('targetRing').setAttribute('cx', K.fx(target.x));
+  $('targetRing').setAttribute('cy', K.fx(target.y));
+
+  function routePosition(route, p) {
+    const q = K.clamp01(p) * (route.length - 1);
+    const i = Math.min(route.length - 2, Math.floor(q)), f = K.eio(q - i);
+    return [K.lerp(route[i].x, route[i + 1].x, f), K.lerp(route[i].y, route[i + 1].y, f)];
+  }
+
+  function focusAt(k, t) {
+    const on = K.eo(K.seg(t, STARTS[k] + 0.2, STARTS[k] + 1.2));
+    const off = k < 3 ? K.eo(K.seg(t, STARTS[k + 1] + 0.2, STARTS[k + 1] + 1.2)) : 0;
+    return Math.max(on * (1 - off), K.eo(K.seg(t, 32.0, 33.0)));
+  }
+
+  function setText(id, value, opacity) {
+    const el = $(id);
+    el.textContent = value;
+    el.setAttribute('opacity', (value ? opacity : 0).toFixed(3));
+  }
+
+  function render(t) {
+    K.drawStars(background, 0, 0.48);
+    const beat = t <= 5 ? 0 : t <= 10 ? 1 : t <= 16 ? 2 : t <= 22 ? 3 : t <= 28 ? 4 : 5;
+    const local = t - [0, 5, 10, 16, 22, 28][beat];
+    const final = t > 32;
+    const graph = K.eo(K.seg(t, 5.25, 6.35));
+    const dim = K.eo(K.seg(t, 10.2, 11.2));
+    const searchP = K.seg(t, 0.35, 4.35);
+    const visited = new Set(searchRefs.slice(0, Math.min(searchRefs.length, Math.floor(searchP * (searchRefs.length - 1)) + 1)).map(r => r.join(':')));
+    const memory = 1 - K.eo(K.seg(t, 5.3, 6.4));
+
+    clusters.forEach((c, k) => {
+      const focus = focusAt(k, t);
+      c.edges.forEach(e => {
+        e.el.setAttribute('stroke', focus > 0.15 ? '#e8b96a' : '#8290a5');
+        e.el.setAttribute('opacity', (graph * (0.18 + focus * 0.5)).toFixed(3));
+      });
+      c.points.forEach((p, i) => {
+        const hot = visited.has(k + ':' + i) ? memory : 0;
+        p.el.setAttribute('r', (p.r + hot * 1.5 + focus * 0.7).toFixed(2));
+        p.el.setAttribute('fill', focus > 0.15 || hot > 0.15 ? '#ffd88a' : '#aab6c8');
+        p.el.setAttribute('opacity', (0.62 - dim * 0.32 + focus * (0.38 + dim * 0.32) + hot * 0.3).toFixed(3));
+      });
+      c.label.setAttribute('opacity', K.eo(K.seg(t, 32.25, 33.1)).toFixed(3));
+    });
+
+    let cursorPos, cursorAlpha;
+    if (beat === 0) {
+      cursorPos = routePosition(searchRoute, searchP);
+      cursorAlpha = 1;
+    } else {
+      cursorPos = routePosition(linkedRoute, K.seg(t, 6.25, 9.15));
+      cursorAlpha = 1 - K.eo(K.seg(t, 10.15, 10.75));
+    }
+    $('cursor').setAttribute('transform', 'translate(' + K.fx(cursorPos[0]) + ' ' + K.fx(cursorPos[1]) + ')');
+    $('cursor').setAttribute('opacity', cursorAlpha.toFixed(3));
+    $('targetRing').setAttribute('opacity', (K.eo(K.seg(t, 5.45, 6.1)) * cursorAlpha).toFixed(3));
+
+    let h1 = '', sub = '', when = '', big = '', caveat = '';
+    if (beat === 0) {
+      h1 = 'Without a map, an agent searches.';
+      sub = 'It reads file after file and fills its context.';
+    } else if (beat === 1) {
+      h1 = 'With a graph, it follows the links.';
+      sub = 'Each definition a node, each reference an edge.';
+    } else if (!final) {
+      const s = SOURCES[beat - 2];
+      h1 = s.who; when = s.when; big = s.big; caveat = s.caveat;
+    } else {
+      h1 = 'Measured elsewhere.';
+    }
+    const captionLocal = final ? t - 32 : local;
+    const caption = K.eo(K.seg(captionLocal, 0.15, 0.75));
+    setText('h1', h1, caption);
+    setText('sub', sub, caption);
+    setText('when', when, caption);
+    setText('big', big, K.eo(K.seg(captionLocal, 0.35, 1.05)));
+    setText('caveat', caveat, K.eo(K.seg(captionLocal, 0.65, 1.25)));
+    $('illustration').setAttribute('opacity', (t <= 10 ? K.eo(K.seg(t, 0.2, 0.8)) : 0).toFixed(3));
+    $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 1.1)) + K.ei(K.seg(t, 34.6, 35.9))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'evidence');
+})();
+</script>
+</body>
+</html>
