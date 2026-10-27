@@ -175,9 +175,17 @@
     add('botAnti', ['0011111100', '0000000000'].concat(body.slice(1)));
     add('botGrok', body.slice(0, 3).concat(['0100000010'], body.slice(4)));
     add('botLocal', plain);
+    // Claude is the Claude Code mascot (Andrew, 28 Oct): a wide coral body with two square eyes, arms straight out
+    // across the middle and four short legs. It replaces the old climber, so every scene that draws 'climber'
+    // (the hero with the lantern) now draws the mascot; the other bots above keep the old climber's body.
+    K.SPRITES.climber = {
+      body: ['001111111100', '001101101100', '111111111111', '111111111111', '001111111100'],
+      legs: [['001010010100', '001010010100'], ['000101101000', '001010010100']]
+    };
   })();
+  K.CLAUDE = '#d97757';   // the mascot's coral
   K.CAST = {
-    claude: { name: 'Claude', color: K.ORANGE, kind: 'climber' },
+    claude: { name: 'Claude', color: K.CLAUDE, kind: 'climber', scale: 1.3 },   // the mascot is 7 pixels tall, the bots 10
     codex: { name: 'Codex', color: '#e9eef6', kind: 'botCodex' },
     kimi: { name: 'Kimi', color: '#5b8cff', kind: 'botKimi' },
     antigravity: { name: 'Antigravity', color: '#ffd23f', kind: 'botAnti' },
@@ -186,7 +194,7 @@
   };
   K.CAST_ORDER = ['claude', 'codex', 'kimi', 'antigravity', 'grok', 'local'];
   // Draw a cast member: K.drawCast(S, 'kimi', x, y, ps, opacity, fr) is K.drawSprite with that model's head and color.
-  K.drawCast = function (S, id, x, y, ps, opacity, fr) { const m = K.CAST[id]; K.drawSprite(S, m.kind, x, y, ps, m.color, opacity, fr); };
+  K.drawCast = function (S, id, x, y, ps, opacity, fr) { const m = K.CAST[id]; K.drawSprite(S, m.kind, x, y, ps * (m.scale || 1), m.color, opacity, fr); };
 
   K.sprite = function (parent, opts) {
     opts = opts || {};
