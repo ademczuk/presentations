@@ -295,14 +295,14 @@
     for (let s = -0.6; s < sH - 0.025; s += 0.02) route.push(at(s, 0));
     route.push(at(sH - 0.025, 0));
     K.drawTrail(trail, c, route, 1);
-    const H = drawAt(c, hero, 'climber', hw, HPS, K.ORANGE, 1, { t, phase: 0.2, cadence: 2.2, bob: true });
+    const H = drawAt(c, hero, 'climber', hw, HPS, K.CLAUDE, 1, { t, phase: 0.2, cadence: 2.2, bob: true });
     if (H) {
       K.drawLantern(lamp, H.x + H.ps * 5.6, H.y - H.ps * 2.2, H.ps, 1, t);
       lamp.pool.setAttribute('opacity', '0.35');
       items.push({ g: lamp.g, z: H.z - 1 });
       const tk = K.eo(K.seg(t, 0.3, 0.8)) * (1 - K.ei(K.seg(t, 3.6, 4.2)));
-      K.drawLabel(taskL, H.x, H.y - H.ps * 6, tk, tk, K.ORANGE);
-    } else K.drawLabel(taskL, 0, 0, 0, 0, K.ORANGE);
+      K.drawLabel(taskL, H.x, H.y - H.ps * 6, tk, tk, K.CLAUDE);
+    } else K.drawLabel(taskL, 0, 0, 0, 0, K.CLAUDE);
 
     // ---- the team: in the dark ahead, then they turn and close ranks ----
     MATES.forEach((m, i) => {

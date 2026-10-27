@@ -177,7 +177,7 @@
     const sq = K.seg(t, WALK1, WALK1 + 0.14), un = K.seg(t, WALK1 + 0.14, WALK1 + 0.42);
     const scaleY = 1 - 0.08 * K.eo(sq) + 0.08 * K.eo(un) + 0.025 * Math.sin(Math.PI * un);
     const appear = K.eo(K.seg(t, 1.7, 2.3));
-    K.drawSprite(hero, 'climber', hx, hy, ps, K.ORANGE, appear, { t, cadence: cad, bob: true, scaleY });
+    K.drawSprite(hero, 'climber', hx, hy, ps, K.CLAUDE, appear, { t, cadence: cad, bob: true, scaleY });
 
     // The lantern hangs from the right end of the arm row (row 5 of 10), riding the same bob and squash
     // the kit applied to the sprite.  It comes up a little as the hero gets ready to light it.

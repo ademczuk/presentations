@@ -203,7 +203,9 @@
   const BODY = ['0000110000', '0011111100', '0111111110', '0110110110', '0111111110', '1111111111', '0111111110', '0011111100'];
   const LEGS = [['0110000110', '0110000110'], ['0011001100', '0001001000']];
   const CAST = {
-    claude: { color: '#ff6a1f', body: BODY },
+    // Claude is the Claude Code mascot, as in altitude.html and filmkit.js: 12 wide, its own legs, drawn 1.3x
+    claude: { color: '#d97757', body: ['001111111100', '001101101100', '111111111111', '111111111111', '001111111100'],
+              legs: [['001010010100', '001010010100'], ['000101101000', '001010010100']], scale: 1.3 },
     codex: { color: '#e9eef6', body: ['0110000110'].concat(BODY.slice(1)) },
     kimi: { color: '#5b8cff', body: ['0000000110', '0000000011', '0000000011', '0000000110', '0000000000'].concat(BODY.slice(1)) },
     antigravity: { color: '#ffd23f', body: ['0011111100', '0000000000'].concat(BODY.slice(1)) },
@@ -223,7 +225,7 @@
     P.path = curve(pts, 12);
     P.g = mk('g', {}, $('walkers'));
     P.g.setAttribute('fill', CAST[P.cast].color);
-    P.pix = []; for (let r = 0; r < 14; r++) for (let q = 0; q < 10; q++) P.pix.push({ r, q, el: mk('rect', {}, P.g) });
+    P.pix = []; for (let r = 0; r < 14; r++) for (let q = 0; q < 12; q++) P.pix.push({ r, q, el: mk('rect', {}, P.g) });
     P.dots = []; for (let s = 0; s < P.path.total; s += 24) P.dots.push({ s, el: mk('circle', { r: 0 }, $('dots')) });
   });
 
@@ -320,8 +322,8 @@
       const wg = along(P.path, sNow); proj(c, wg[0], 0, wg[1], P3);
       if (wv > 0 && P3[2] > 60) {
         P.g.style.display = ''; P.g.setAttribute('opacity', wv.toFixed(3));
-        const ps = 6.5 * F / P3[2] * grow, walking = !isYou && t > P.walk && t < P.walk + 3.2, fr = walking ? Math.floor(t * 4) % 2 : 0, rows = CAST[P.cast].body.concat(LEGS[fr]);
-        const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4 + PEOPLE.indexOf(P)) * ps * 0.15, x0 = P3[0] - ps * 5, y0 = P3[1] - ps * rows.length + bob;
+        const ps = 6.5 * F / P3[2] * grow * (CAST[P.cast].scale || 1), walking = !isYou && t > P.walk && t < P.walk + 3.2, fr = walking ? Math.floor(t * 4) % 2 : 0, rows = CAST[P.cast].body.concat((CAST[P.cast].legs || LEGS)[fr]);
+        const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4 + PEOPLE.indexOf(P)) * ps * 0.15, x0 = P3[0] - ps * rows[0].length / 2, y0 = P3[1] - ps * rows.length + bob;
         for (const px of P.pix) {
           if (!rows[px.r] || rows[px.r][px.q] !== '1') { px.el.setAttribute('width', 0); continue; }
           px.el.setAttribute('x', fx(x0 + px.q * ps)); px.el.setAttribute('y', fx(y0 + px.r * ps));
