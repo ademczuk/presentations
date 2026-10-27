@@ -54,7 +54,9 @@
       <g id="stars"></g>
       <line x1="120" y1="760" x2="1800" y2="760" stroke="#263044" stroke-width="2"/>
       <path id="rope" fill="none" stroke="#f2ece4" stroke-width="3" stroke-dasharray="4 14" stroke-linecap="round" opacity=".7"/>
+      <g id="poolLayer"></g>
       <g id="actors"></g>
+      <g id="lampLayer" filter="url(#og)"></g>
       <g id="labels"></g>
       <g class="serif" text-anchor="middle" fill="#f2ece4">
         <text id="h1" x="960" y="160" font-size="68">One team, many models.</text>
@@ -82,8 +84,11 @@
     id, i, x: X0 + i * SPACING, at: 0.5 + i * 0.45,
     S: K.sprite($('actors'), { glow: true }), L: K.label($('labels'), K.CAST[id].name, { lift: 46, size: 28, h: 52 }) }));
   const ROPE = 3.6, ALERT = 5.2;
+  // Claude carries the lantern here too, as in every other scene; its pool stays soft on this flat stage.
+  const lamp = K.lantern($('lampLayer'));
+  $('poolLayer').appendChild(lamp.pool);
   const MON = [['shambler', K.GREEN, 'zombie threads'], ['mutant', K.RED, 'mutant processes'], ['zmutant', K.PURPLE, 'the horde']]
-    .map(([kind, color, name], i) => ({ kind, color, i, x: 1260 + i * 230, at: ALERT + i * 0.4,
+    .map(([kind, color, name], i) => ({ kind, color, i, x: 1215 + i * 268, at: ALERT + i * 0.4, lift: 0,
       S: K.sprite($('actors'), {}), L: K.label($('labels'), name, { lift: 40, size: 26, h: 50 }) }));
   const ropeD = 'M' + team.map(m => (m.x) + ' ' + (GROUND - PS * 6)).join(' L');
   $('rope').setAttribute('d', ropeD);
@@ -98,6 +103,9 @@
       K.drawCast(m.S, m.id, x, GROUND, PS, k, { t, cadence: walking ? 6 : 0, phase: 0, bob: true });
       K.drawLabel(m.L, x, GROUND - PS * 13 - (m.i % 2) * 64, K.seg(t, m.at + 0.5, m.at + 1.0), K.seg(t, m.at + 0.5, m.at + 1.0), K.CAST[m.id].color);
     });
+    { const m = team[0], k = K.eo(K.seg(t, m.at, m.at + 0.9)), ps = PS * K.CAST.claude.scale;
+      K.drawLantern(lamp, m.x - (1 - k) * 220 + ps * 6.6, GROUND - ps * 3.6, PS * 0.9, k, t);
+      lamp.pool.setAttribute('opacity', (0.35 * k).toFixed(3)); }
     const r = K.eio(K.seg(t, ROPE, ROPE + 1.2));
     $('rope').setAttribute('stroke-dashoffset', '0');
     $('rope').setAttribute('clip-path', '');
@@ -106,7 +114,7 @@
     MON.forEach(m => {
       const k = K.eo(K.seg(t, m.at, m.at + 1.0));
       K.drawSprite(m.S, m.kind, m.x + (1 - k) * 260, GROUND, PS * 0.9, m.color, k, { t, cadence: k < 1 ? 5 : 1.2, phase: 0.3, bob: true, flip: true });
-      K.drawLabel(m.L, m.x + (1 - k) * 260, GROUND - PS * 12 - (m.i % 2) * 64, K.seg(t, m.at + 0.5, m.at + 1.0), K.seg(t, m.at + 0.5, m.at + 1.0), m.color);
+      K.drawLabel(m.L, m.x + (1 - k) * 260, GROUND - PS * 12 - m.lift, K.seg(t, m.at + 0.5, m.at + 1.0), K.seg(t, m.at + 0.5, m.at + 1.0), m.color);
     });
     K.fade($('h1'), t, 0.4, null);
     K.fade($('s1'), t, ROPE + 0.4, null);

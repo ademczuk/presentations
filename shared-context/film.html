@@ -32,16 +32,16 @@
   @media (prefers-reduced-motion: reduce) { .dot { animation:none } }
   #hud { position:fixed; right:14px; bottom:10px; font:600 12px/1 Manrope, Arial, sans-serif; color:#6f7685; letter-spacing:.06em; opacity:.0; transition:opacity .4s; pointer-events:none }
   body:hover #hud, #hud.show { opacity:1 }
-  #notes { position:fixed; left:0; right:0; bottom:0; padding:16px 22px 18px; background:rgba(8,10,14,.92); border-top:1px solid var(--line); font:600 17px/1.5 Manrope, Arial, sans-serif; color:#d9d2c9; display:none; max-height:40vh; overflow:auto }
+  #notes { position:fixed; left:0; right:0; top:0; padding:14px 22px 16px; background:rgba(8,10,14,.92); border-bottom:1px solid var(--line); font:600 17px/1.5 Manrope, Arial, sans-serif; color:#d9d2c9; display:none; max-height:18vh; overflow:auto }
   #notes.on { display:block }
   #notes .nm { color:var(--accent); font-weight:700; margin-right:10px }
   #help { position:fixed; inset:0; display:none; place-content:center; background:rgba(6,7,10,.86); z-index:5 }
   #help.on { display:grid }
   #help div { background:#131824; border:1px solid var(--line); border-radius:10px; padding:24px 28px; font:600 15px/1.9 Manrope, Arial, sans-serif; color:var(--ink); max-width:min(560px, calc(100vw - 32px)) }
   #help kbd { font:700 13px Manrope, Arial, sans-serif; border:1px solid var(--line); border-radius:6px; padding:2px 8px; margin-right:8px; background:#0b0d12 }
-  #qr { position:absolute; right:3.2%; bottom:5%; width:15cqh; display:none; text-align:center; font:600 1.7cqh/1.3 Manrope, Arial, sans-serif; color:#a6a098 }
+  #qr { position:absolute; right:3.2%; bottom:5%; width:15cqh; display:none; text-align:center; font:700 1.7cqh/1.3 Manrope, Arial, sans-serif; color:#0b0d12; background:#f2ece4; border-radius:1cqh; padding:0 0 .8cqh }
   #qr.on { display:block }
-  #qr img { width:100%; border-radius:1cqh; display:block; margin-bottom:1cqh }
+  #qr img { width:100%; border-radius:1cqh; display:block; margin-bottom:.2cqh }
   #stage { container-type:size }
   #blank { position:fixed; inset:0; background:#000; display:none; z-index:4 }
   #blank.on { display:block }
@@ -95,20 +95,21 @@
     { name: '3 Built twice', src: 'horde.html', from: 18.5, to: 25, notes: 'Two agents built the same fix, 25 minutes apart; each had searched, in the wrong place.' },
     { name: '3 Every version', src: 'horde.html', from: 25, to: 32, notes: 'One change, and a second reviewer found a real defect in every version. Say the count on the day.' },
     { name: '4 A gate', src: 'fight.html', from: 0, to: 8, notes: 'Tools that refuse, not warn. A gate on the send path: the message is refused, not flagged.' },
-    { name: '4 A rope', src: 'fight.html', from: 8, to: 16, notes: 'One writer, a different reviewer, and they are different models. One named merger, pinned to the reviewed version.' },
+    { name: '4 A rope', src: 'fight.html', from: 8, to: 16, notes: 'One writer, a different reviewer: in the film, two different models. One named merger, and the merge pinned to the exact version that was reviewed.' },
     { name: '4 A lamp', src: 'fight.html', from: 16, to: 24, notes: 'A map that says how old it is. One index was 67 commits behind the code it described.' },
     { name: '4 Waiting for a yes', src: 'fight.html', from: 24, to: 32, notes: 'A carrier that will not pass a build on without the reviewer&#39;s signed yes for that exact build. Live since 27 October, nothing carried yet.' },
     { name: '5 Together', src: 'together.html', notes: 'Checks like these make each step dependable. The team still needs one shared picture of where it is going. Everyone works from their own map; different work, one goal; then what each one learns travels to the others.' },
     { name: '6 Look up', src: 'stars.html', notes: 'Pan up from the summit. The stars connect: the map we share is a graph of decisions, code, people and questions.' },
     { name: '7 A decision, recorded once', src: 'sky.html', from: 0, to: 9, notes: 'Illustration: a decision saved once; later a colleague&#39;s Claude finds it instead of asking again.' },
-    { name: '7 A code question', src: 'sky.html', from: 9, to: 19, notes: 'Measured: one real project&#39;s code graph, 7,133 nodes, 15,589 edges, 37 repositories, a snapshot from 11 Oct 2026.' },
+    { name: '7 The code graph', src: 'sky.html', from: 9, to: 19, notes: 'Measured: one real project&#39;s code graph, 7,133 nodes, 15,589 edges, 37 repositories, a snapshot from 11 Oct 2026.' },
     { name: '7 The person who decides', src: 'sky.html', from: 19, notes: 'Illustration: a question routed to the person who decides, past the people who do not.' },
     { name: '8 Without a map', src: 'evidence.html', from: 0, to: 5, notes: 'Without a graph the agent searches, reads file after file and fills its context.' },
     { name: '8 With a graph', src: 'evidence.html', from: 5, to: 10, notes: 'The structure was already there: each definition a node, each reference an edge.' },
     { name: '8 Atlassian', src: 'evidence.html', from: 10, to: 16, notes: 'Their internal benchmark. Say so.' },
-    { name: '8 Codebase-Memory', src: 'evidence.html', from: 16, to: 22, notes: 'The honest one: far fewer tokens, slightly lower answer quality than an agent that reads the files.' },
+    { name: '8 Codebase-Memory', src: 'evidence.html', from: 16, to: 22, notes: 'The honest one: about 10x fewer tokens, and answer quality 83% against 92% for an agent that reads the files.' },
     { name: '8 GraphRAG', src: 'evidence.html', from: 22, to: 28, notes: 'Questions about a whole corpus.' },
-    { name: '8 Honcho', src: 'evidence.html', from: 28, notes: 'Their own figure. Four sources, four different methods.' },
+    { name: '8 Honcho', src: 'evidence.html', from: 28, to: 32, notes: 'Their own figure.' },
+    { name: '8 Measured elsewhere', src: 'evidence.html', from: 32, notes: 'Four sources, four different methods. The links are at the bottom of the frame.' },
     { name: '9 The horde never goes away', src: 'limits.html', from: 0, to: 6, notes: 'Honest limits. Some always wait at the edge of the light.' },
     { name: '9 How fresh is the map', src: 'limits.html', from: 6, to: 12, notes: 'Check how fresh the map is before you trust it.' },
     { name: '9 People still decide', src: 'limits.html', from: 12, notes: 'Agents run the routine; people own the decisions.' },
@@ -190,7 +191,9 @@
   document.addEventListener('keydown', function (e) {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     var k = e.key;
-    if ($('help').classList.contains('on') && k !== '?' ) { help(false); if (k === 'Escape') return; }
+    if ($('help').classList.contains('on') && k !== '?') { help(false); e.preventDefault(); return; }
+    // any key but B un-blanks the black screen first, as in a slide deck, without moving on
+    if ($('blank').classList.contains('on') && k !== 'b' && k !== 'B' && k !== '.') { $('blank').classList.remove('on'); e.preventDefault(); return; }
     if (k === 'ArrowRight' || k === ' ' || k === 'PageDown' || k === 'Enter') { e.preventDefault(); next(); }
     else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }
     else if (k === 'Home') { e.preventDefault(); go(0, true); }
@@ -200,10 +203,13 @@
     else if (k === 'b' || k === 'B' || k === '.') { $('blank').classList.toggle('on'); }
     else if (k === '?') { help(); }
   });
-  $('stage').addEventListener('click', function (e) {
-    var r = $('stage').getBoundingClientRect();
-    if (e.clientX - r.left > r.width / 2) next(); else prev();
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#notes, #help, .skip')) return;
+    if ($('blank').classList.contains('on')) { $('blank').classList.remove('on'); return; }
+    if (e.clientX > innerWidth / 2) next(); else prev();
   });
+  $('help').addEventListener('click', function () { help(false); });
+  window.addEventListener('hashchange', function () { var n = parseInt(location.hash.slice(1), 10); if (n > 0 && n - 1 !== idx) go(n - 1, n > 1); });
   // keep keyboard focus here, not inside a film
   window.addEventListener('blur', function () { setTimeout(function () { try { window.focus(); } catch (e) {} }, 0); });
 

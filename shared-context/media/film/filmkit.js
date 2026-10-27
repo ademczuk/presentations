@@ -368,14 +368,15 @@
     const $ = K.$, QS = new URLSearchParams(location.search), FROM = +(QS.get('from') || 0);
     const DECK = document.documentElement.classList.contains('deck'), HOLD = QS.has('to') ? +QS.get('to') : holdDefault;
     const WAIT = /[?&]wait/.test(location.search);
-    let now = FROM, playing = (DECK && !WAIT) || (!DECK && !matchMedia('(prefers-reduced-motion: reduce)').matches), last = null;
-    addEventListener('message', e => { if (e.data === 'play') { now = FROM; playing = true; last = null; } if (e.data === 'end') { now = DECK ? HOLD : DUR; playing = false; show(); } });
+    let now = FROM, playing = (DECK && !WAIT) || (!DECK && !matchMedia('(prefers-reduced-motion: reduce)').matches), last = null, dirty = true;
+    addEventListener('message', e => { if (e.data === 'play') { now = FROM; playing = true; last = null; dirty = true; } if (e.data === 'end') { now = DECK ? HOLD : DUR; playing = false; show(); } });
     const playBtn = $('play'), scrub = $('scrub'), time = $('time');
     scrub.max = DUR;
     function show() { render(now); scrub.value = now; time.textContent = now.toFixed(1) + ' / ' + DUR.toFixed(1) + ' s'; playBtn.textContent = playing ? 'Pause' : 'Play'; }
     function tick(ts) {
-      if (playing) { if (last !== null) now += (ts - last) / 1000; if (DECK && now >= HOLD) { now = HOLD; playing = false; } else if (now >= DUR) { now = DUR; playing = false; } }
-      last = ts; show(); requestAnimationFrame(tick);
+      if (playing) { if (last !== null) now += (ts - last) / 1000; if (DECK && now >= HOLD) { now = HOLD; playing = false; dirty = true; } else if (now >= DUR) { now = DUR; playing = false; dirty = true; } }
+      // A held frame is not re-rendered every frame: only while playing, or once after something changed.
+      last = ts; if (playing || dirty) { show(); dirty = false; } requestAnimationFrame(tick);
     }
     playBtn.addEventListener('click', () => { if (!playing && now >= DUR) now = 0; playing = !playing; last = null; show(); });
     scrub.addEventListener('input', () => { now = +scrub.value; show(); });
@@ -398,7 +399,7 @@
     window.DURATION = DECK ? HOLD : DUR; window.render = render; window.seek = seek;
     window.play = () => { if (now >= window.DURATION) now = 0; playing = true; last = null; }; window.pause = () => { playing = false; };
     show();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(show);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { dirty = true; });
     requestAnimationFrame(tick);
   };
 })();
