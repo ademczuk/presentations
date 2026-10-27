@@ -53,7 +53,7 @@
       <rect width="1920" height="1080" fill="url(#bgGlow)" opacity=".55"/>
       <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
       <g id="dots" fill="#d9d2c9"></g>
-      <g id="walker" fill="#ff6a1f" filter="url(#og)"></g>
+      <g id="walker" fill="#d97757" filter="url(#og)"></g>
       <path id="arc" fill="none" stroke="#ff6a1f" stroke-width="5" stroke-dasharray="20 15" stroke-linecap="round" filter="url(#og)"/>
       <circle id="arcHead" r="6" fill="#ff6a1f"/>
       <g id="labels"></g>
@@ -113,8 +113,9 @@
     { id: 'f', x: -350, z: 2100, h: 260, r: 620, n: 14, seed: 5, fade: 0.55 }];
   const TASK = [-253, 0, -177], OUT = [-120, 150, 0], TOP = [520, 560, 900];
   const PATH = [[-900, -700], [-760, -610], [-640, -560], [-560, -450], [-470, -380], [-380, -330], [-310, -262], [-292, -205]];
-  const BODY = ['0000110000', '0011111100', '0111111110', '0110110110', '0111111110', '1111111111', '0111111110', '0011111100'];
-  const LEGS = [['0110000110', '0110000110'], ['0011001100', '0001001000']];
+  // The climber is Claude: the Claude Code mascot (coral body, two square eyes, arms out, four legs), as in filmkit.js.
+  const BODY = ['001111111100', '001101101100', '111111111111', '111111111111', '001111111100'];
+  const LEGS = [['001010010100', '001010010100'], ['000101101000', '001010010100']];
   const MAIN = [217, 210, 201], ACC = [255, 106, 31];
   const mix = k => [0, 1, 2].map(i => Math.round(lerp(MAIN[i], ACC[i], k)));
 
@@ -207,7 +208,7 @@
   const dots = [];
   for (let s = 0; s < walkPath.total; s += 24) dots.push({ s, el: mk('circle', { r: 2 }, $('dots')) });
   const pix = [];
-  for (let r = 0; r < 10; r++) for (let q = 0; q < 10; q++) pix.push({ r, q, el: mk('rect', {}, $('walker')) });
+  for (let r = 0; r < 7; r++) for (let q = 0; q < 12; q++) pix.push({ r, q, el: mk('rect', {}, $('walker')) });
 
   // labels
   const labelsG = $('labels'), labels = {};
@@ -279,8 +280,8 @@
     const walker = $('walker');
     if (wv > 0 && P[2] > 60) {
       walker.style.display = ''; walker.setAttribute('opacity', wv.toFixed(3));
-      const ps = 6.5 * F / P[2], fr = t > 6.0 && t < 9.0 ? Math.floor(t * 4) % 2 : 0, rows = BODY.concat(LEGS[fr]);
-      const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4) * ps * 0.15, x0 = P[0] - ps * 5, y0 = P[1] - ps * rows.length + bob;
+      const ps = 8.5 * F / P[2], fr = t > 6.0 && t < 9.0 ? Math.floor(t * 4) % 2 : 0, rows = BODY.concat(LEGS[fr]);
+      const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4) * ps * 0.15, x0 = P[0] - ps * 6, y0 = P[1] - ps * rows.length + bob;
       for (const px of pix) {
         if (rows[px.r][px.q] !== '1') { px.el.setAttribute('width', 0); continue; }
         px.el.setAttribute('x', fx(x0 + px.q * ps)); px.el.setAttribute('y', fx(y0 + px.r * ps));
