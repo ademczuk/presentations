@@ -130,10 +130,13 @@
   $('poolLayer').appendChild(lantern.pool);   // the light pool sits under the contours, the lamp over the hero
   lantern.pool.setAttribute('fill', 'url(#poolGrad)');   // a little stronger than the kit's, so the pool reads
   const HERO_PS = 11.5;                         // world pixel size: about 90 to 100 px tall at the hold
-  // The team: three dim orange bots on other slopes, beyond the reach of the light.  Seeds drawn once here.
+  // The team: five dim members on other slopes, beyond the reach of the light. Seeds drawn once here.
   const rr = K.rng(1118);
-  const TEAM_AT = [[300, 420], [-800, 470], [1050, 900]].map(([x, z], i) => ({
-    x, z, y: K.groundY(x, z), S: K.sprite($('actors'), {}), phase: rr() * 6.3, delay: i * 0.35 }));
+  const TEAM_AT = [
+    [300, 420, 'codex'], [-800, 470, 'kimi'], [1050, 900, 'grok'],
+    [-1170, 820, 'antigravity'], [760, 160, 'local']
+  ].map(([x, z, id], i) => ({
+    x, z, id, y: K.groundY(x, z), S: K.sprite($('actors'), {}), phase: rr() * 6.3, delay: i * 0.35 }));
 
   const P = [0, 0, 0], H = [0, 0, 0];
 
@@ -225,7 +228,7 @@
     TEAM_AT.forEach(m => {
       K.proj(c, m.x, m.y, m.z, P);
       const a = 0.24 * K.eo(K.seg(t, TEAM + m.delay, TEAM + m.delay + 0.9));
-      K.drawSprite(m.S, 'climber', P[0], P[1], Math.max(4.5, HERO_PS * K.F / P[2]), K.ORANGE, a, { t: t + m.phase, cadence: 0, bob: true });
+      K.drawCast(m.S, m.id, P[0], P[1], Math.max(4.5, HERO_PS * K.F / P[2]), a, { t: t + m.phase, cadence: 0, bob: true });
       order.push({ g: m.S.g, z: P[2] });
     });
     K.depthSort(order);
