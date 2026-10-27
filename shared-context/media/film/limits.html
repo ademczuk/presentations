@@ -73,10 +73,12 @@
           <circle cx="20" cy="-126" r="6" fill="#ff6a1f"/>
         </g>
         <g id="gate" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse id="gateShadowLeft" fill="#05070a" opacity=".55"/>
+          <ellipse id="gateShadowRight" fill="#05070a" opacity=".55"/>
           <path id="gateGlow" stroke="#ff6a1f" stroke-width="13" filter="url(#og)" opacity=".5"/>
           <path id="gatePosts" stroke="#f2ece4" stroke-width="8"/>
-          <line id="gateBarGlow" stroke="#ff6a1f" stroke-width="15" filter="url(#og)" opacity=".55"/>
-          <line id="gateBar" stroke="#f2ece4" stroke-width="9"/>
+          <path id="gateLeafGlow" stroke="#ff6a1f" stroke-width="13" filter="url(#og)" opacity=".5"/>
+          <path id="gateLeaf" stroke="#f2ece4" stroke-width="8"/>
         </g>
         <g id="team"></g>
         <g id="personLayer"></g>
@@ -84,12 +86,14 @@
       </g>
       <g id="lampLayer" filter="url(#og)"><circle id="lampHalo" fill="url(#haloGrad)"/></g>
       <g id="labels"></g>
+      <ellipse cx="960" cy="194" rx="700" ry="68" fill="#0b0d12" opacity=".76" filter="url(#halo)"/>
       <g class="cap" text-anchor="middle">
         <text id="h1" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">The horde never fully goes away.</text>
         <text id="s1" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">Some always wait at the edge of the light.</text>
         <text id="h2" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">Check how fresh the map is.</text>
         <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">One index was 67 commits behind the code it described.</text>
         <text id="h3" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">People still decide.</text>
+        <text id="s3" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">Agents run the routine; people own the decisions.</text>
       </g>
       <text id="illustration" class="sans" style="font-weight:600" x="42" y="1032" font-size="24" fill="#8d949e">illustration</text>
       <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
@@ -141,16 +145,18 @@
   lantern.pool.setAttribute('fill', 'url(#poolGrad)');
 
   const TEAM_AT = {
-    claude: [0.47, -40], codex: [0.44, -190], kimi: [0.43, 130],
-    antigravity: [0.55, -240], grok: [0.55, 200], local: [0.36, 20]
+    claude: [0.46, -100], codex: [0.46, -560], kimi: [0.46, 250],
+    antigravity: [0.46, -330], grok: [0.46, 400], local: [0.46, 100]
   };
-  const TEAM = K.CAST_ORDER.map((id, i) => {
+  const TEAM = K.CAST_ORDER.map(id => {
     const w = TEAM_AT[id];
-    return { id, s: w[0], side: w[1], S: K.sprite($('team'), { glow: true }), L: K.label($('labels'), K.CAST[id].name, { lift: 84, size: 26, h: 50 }), t0: 0.9 + i * 0.68 };
+    return { id, s: w[0], side: w[1], S: K.sprite($('team'), { glow: true }) };
   });
   const CLAUDE = TEAM[0];
   const person = K.sprite($('personLayer'), { glow: true });
-  const L_old = K.label($('labels'), '67 commits behind', { lift: 76, size: 28, h: 54 });
+  const personArm = K.mk('path', { fill: 'none', stroke: '#f2ece4', 'stroke-linecap': 'square' }, person.g);
+  const personHand = K.mk('rect', { fill: '#f2ece4' }, person.g);
+  const L_old = K.label($('labels'), 'stale index', { lift: 76, size: 28, h: 54 });
 
   const rr = K.rng(9009);
   const MON_AT = [
@@ -179,14 +185,11 @@
     const gateOpen = eio(seg(t, 14.9, 16.7));
     const order = [];
 
-    // Each defender is named once, then the label leaves. No name pills remain at a hold.
     let claudeDraw = null;
     TEAM.forEach(m => {
       const w = proj(at(m.s, m.side)), ps = HERO * K.F / w[2];
       K.drawCast(m.S, m.id, w[0], w[1], ps, open, { phase: 0, flip: m.side > 40 });
       order.push({ g: m.S.g, z: w[2] });
-      const out = seg(t, m.t0 + 0.62, m.t0 + 0.88);
-      K.drawLabel(m.L, w[0], w[1] - ps * 10.5, eio(seg(t, m.t0, m.t0 + 0.22)) * (1 - out), eo(seg(t, m.t0 + 0.12, m.t0 + 0.36)) * (1 - out), K.CAST[m.id].color);
       if (m === CLAUDE) claudeDraw = { x: w[0], y: w[1], ps, z: w[2] };
     });
 
@@ -204,34 +207,54 @@
     lantern.pool.setAttribute('ry', fx(claudeDraw.ps * 18 * (1 - 0.07 * dim)));
     lantern.pool.setAttribute('opacity', (open * 0.95 * (1 - 0.3 * dim)).toFixed(3));
 
-    // The map is a small sign beside the team, with the measured staleness in the kit's label style.
-    const mp = proj(at(0.54, -345)), mw = [mp[0] - 120, mp[1] - 10, mp[2]];
+    // The sign warns about a stale index; the measured incident stays in the caption.
+    const mp = proj(at(0.55, -480)), mw = [mp[0] - 120, mp[1] - 10, mp[2]];
     const ms = Math.max(0.7, Math.min(1.2, 1050 / mw[2]));
     $('mapSign').setAttribute('transform', 'translate(' + fx(mw[0]) + ' ' + fx(mw[1]) + ') scale(' + ms.toFixed(3) + ')');
     $('mapSign').setAttribute('opacity', (mapIn * (1 - 0.35 * mapOut)).toFixed(3));
     order.push({ g: $('mapSign'), z: mw[2] });
     K.drawLabel(L_old, mw[0], mw[1] - 154 * ms, eio(seg(t, 6.55, 6.95)) * (1 - mapOut), eo(seg(t, 6.85, 7.3)) * (1 - mapOut), K.GREY);
 
-    // The person waits beyond the gate. Two small bobs finish before the gate swings upward.
-    const nod = Math.sin(Math.PI * seg(t, 13.55, 14.05)) + Math.sin(Math.PI * seg(t, 14.15, 14.65));
-    const pw = proj(at(0.67, 205)), pps = HERO * K.F / pw[2];
-    K.drawSprite(person, 'person', pw[0], pw[1] + nod * pps * 0.55, pps, '#f2ece4', gateIn, { phase: 0, flip: true });
-    order.push({ g: person.g, z: pw[2] });
-
-    const gl = at(0.64, -145), gr = at(0.64, 145);
+    const gl = at(0.70, 380), gr = at(0.70, 700);
     const glb = proj(gl), grb = proj(gr), glt = above(gl, 145), grt = above(gr, 145);
     const posts = 'M' + fx(glb[0]) + ' ' + fx(glb[1]) + 'L' + fx(glt[0]) + ' ' + fx(glt[1]) + 'M' + fx(grb[0]) + ' ' + fx(grb[1]) + 'L' + fx(grt[0]) + ' ' + fx(grt[1]);
     $('gatePosts').setAttribute('d', posts);
     $('gateGlow').setAttribute('d', posts);
-    const ba = above(gl, 76), bb = above(gr, 76);
-    const dx = bb[0] - ba[0], dy = bb[1] - ba[1], ang = -Math.PI * 0.5 * gateOpen;
-    const bx = ba[0] + dx * Math.cos(ang) - dy * Math.sin(ang), by = ba[1] + dx * Math.sin(ang) + dy * Math.cos(ang);
-    for (const el of [$('gateBar'), $('gateBarGlow')]) {
-      el.setAttribute('x1', fx(ba[0])); el.setAttribute('y1', fx(ba[1]));
-      el.setAttribute('x2', fx(bx)); el.setAttribute('y2', fx(by));
+    for (const [id, p] of [['gateShadowLeft', glb], ['gateShadowRight', grb]]) {
+      $(id).setAttribute('cx', fx(p[0])); $(id).setAttribute('cy', fx(p[1] + 4));
+      $(id).setAttribute('rx', 34); $(id).setAttribute('ry', 10);
     }
+
+    const gx = gr[0] - gl[0], gz = gr[2] - gl[2], glen = Math.hypot(gx, gz);
+    const gateAngle = -Math.PI * 0.36 * gateOpen;
+    const lx = gl[0] + gx * Math.cos(gateAngle) + gz * Math.sin(gateAngle);
+    const lz = gl[2] - gx * Math.sin(gateAngle) + gz * Math.cos(gateAngle);
+    const latch = [lx, K.groundY(lx, lz), lz];
+    let leaf = '';
+    for (const h of [34, 76, 118]) {
+      const a = above(gl, h), b = above(latch, h);
+      leaf += 'M' + fx(a[0]) + ' ' + fx(a[1]) + 'L' + fx(b[0]) + ' ' + fx(b[1]);
+    }
+    const latchLow = above(latch, 26), latchHigh = above(latch, 126);
+    leaf += 'M' + fx(latchLow[0]) + ' ' + fx(latchLow[1]) + 'L' + fx(latchHigh[0]) + ' ' + fx(latchHigh[1]);
+    $('gateLeaf').setAttribute('d', leaf);
+    $('gateLeafGlow').setAttribute('d', leaf);
     $('gate').setAttribute('opacity', gateIn.toFixed(3));
     order.push({ g: $('gate'), z: (glb[2] + grb[2]) / 2 });
+
+    // The person nods, then walks the latch through the gate's swing with one hand on it.
+    const nod = Math.sin(Math.PI * seg(t, 13.55, 14.05)) + Math.sin(Math.PI * seg(t, 14.15, 14.65));
+    const px = lx + gx / glen * 105, pz = lz + gz / glen * 105;
+    const pw = proj([px, K.groundY(px, pz), pz]), pps = HERO * K.F / pw[2];
+    const personY = pw[1] + nod * pps * 0.55;
+    K.drawSprite(person, 'person', pw[0], personY, pps, '#f2ece4', gateIn, { phase: 0, flip: true });
+    const hand = above(latch, 76), shoulderX = pw[0] - pps * 1.4, shoulderY = personY - pps * 6.2;
+    const elbowX = lerp(shoulderX, hand[0], 0.52), elbowY = Math.min(shoulderY, hand[1]) - pps * 0.6;
+    personArm.setAttribute('d', 'M' + fx(shoulderX) + ' ' + fx(shoulderY) + 'L' + fx(elbowX) + ' ' + fx(elbowY) + 'L' + fx(hand[0]) + ' ' + fx(hand[1]));
+    personArm.setAttribute('stroke-width', fx(Math.max(3, pps * 1.1)));
+    personHand.setAttribute('x', fx(hand[0] - pps * 0.65)); personHand.setAttribute('y', fx(hand[1] - pps * 0.65));
+    personHand.setAttribute('width', fx(pps * 1.3)); personHand.setAttribute('height', fx(pps * 1.3));
+    order.push({ g: person.g, z: pw[2] });
 
     // The fringe wanders within each beat and returns to rest before every hold. Nobody is destroyed.
     const bt = t < B1 ? t : t < B2 ? t - B1 : t - B2;
@@ -244,13 +267,16 @@
       order.push({ g: m.S.g, z: w[2] });
     });
     K.depthSort(order);
+    $('actors').appendChild(CLAUDE.S.g);
 
     K.fade($('h1'), t, 0.45, B1);
     K.fade($('s1'), t, 1.05, B1);
     K.fade($('h2'), t, 6.45, B2);
     K.fade($('s2'), t, 7.05, B2);
     K.fade($('h3'), t, 12.45, null);
-    $('illustration').setAttribute('opacity', eo(seg(t, 0.8, 1.4)).toFixed(3));
+    K.fade($('s3'), t, 12.95, null);
+    const illustration = eo(seg(t, 0.8, 1.4)) * (1 - seg(t, 6.0, 6.4) + seg(t, 12.0, 12.4));
+    $('illustration').setAttribute('opacity', illustration.toFixed(3));
     $('fade').setAttribute('opacity', (1 - open + ei(seg(t, 18.25, 19.1))).toFixed(3));
   }
   K.player(DUR, HOLD, render, 'limits');
