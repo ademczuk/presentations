@@ -165,8 +165,9 @@
   // The team. The three bots of the horde's last beat (writer, reviewer, and the scene 1 hero with the lantern,
   // who stands at the top of the rope and is the named merger) plus the gatekeeper; in beat 4 a carrier arrives.
   const bot = () => K.sprite($('team'), { glow: true });
-  const KEEP = { S: K.sprite($('keeper'), { glow: true }), ph: 0.4 };
-  const WRITER = { S: bot(), ph: 1.3 }, REVIEWER = { S: bot(), ph: 2.1 }, BEARER = { S: bot(), ph: 0.0 }, CARRIER = { S: bot(), ph: 2.9 };
+  const KEEP = { S: K.sprite($('keeper'), { glow: true }), ph: 0.4, id: 'local' };
+  const GATE_ANTI = { S: bot(), ph: 0.9, id: 'antigravity' }, GATE_GROK = { S: bot(), ph: 1.8, id: 'grok' };
+  const WRITER = { S: bot(), ph: 1.3, id: 'kimi' }, REVIEWER = { S: bot(), ph: 2.1, id: 'codex' }, BEARER = { S: bot(), ph: 0.0, id: 'claude' }, CARRIER = { S: bot(), ph: 2.9, id: 'local' };
   const W_POS = [0.47, -220], R_POS = [0.47, 220], B_POS = [0.6, 40];
   const ARCH = [0.62, 380], SLOT = [0.62, 495], CAR_FROM = [0.7, 900], CAR_STOP = [0.62, 565];
   const W0 = [0.64, 330], R0 = [0.6, 190];   // the rope pair waits up the slope beside the bearer until beat 2
@@ -209,6 +210,8 @@
   const L_ref = K.label(LB, 'refused', { lift: 70 });
   const L_wr = K.label(LB, 'writes', { lift: 70 });
   const L_rv = K.label(LB, 'reviews', { lift: 70 });
+  const L_kimi = K.label(LB, 'Kimi', { size: 22, h: 44, lift: 58 });
+  const L_codex = K.label(LB, 'Codex', { size: 22, h: 44, lift: 58 });
   const L_mg = K.label(LB, 'merged: the reviewed version', { lift: 96 });
   const L_old = K.label(LB, '67 commits behind', { lift: 110 });
   const L_slot = K.label(LB, "waiting for this build's signed yes", { lift: 150 });
@@ -234,7 +237,7 @@
   function drawBot(B, t, w, ps, op, moving, extra) {
     const q = pose(t, ps, moving, 4, B.ph);
     const o = Object.assign({ t: 0, phase: q.fr, cadence: 0, bob: false }, extra || {});
-    K.drawSprite(B.S, 'climber', w[0], w[1] + q.bob, ps, K.ORANGE, op, o);
+    K.drawCast(B.S, B.id || 'claude', w[0], w[1] + q.bob, ps, op, o);
     return { x: w[0], y: w[1] + q.bob, foot: w[1], ps, z: w[2] };
   }
   // The keeper walks in, dips, raises the mallet, and brings it down; the posts fall from that moment.
@@ -373,6 +376,11 @@
     malletHead.setAttribute('width', fx(kps * 2.8)); malletHead.setAttribute('height', fx(kps * 2.0));
     malletHead.setAttribute('transform', 'translate(' + fx(mx) + ' ' + fx(my) + ') rotate(' + fx(KS.ang + 90) + ')');
     mallet.setAttribute('opacity', open.toFixed(3));
+    const lineOp = open * (1 - eio(seg(t, B1 - 0.25, B1 + 0.25)));
+    const aw = proj(at(0.30, -180)), aps = HERO * K.F / aw[2];
+    const gw = proj(at(0.30, 285)), gps = HERO * K.F / gw[2];
+    drawBot(GATE_ANTI, t, aw, aps, lineOp, t > 0.5 && t < 1.4, { flip: true });
+    drawBot(GATE_GROK, t, gw, gps, lineOp, t > 0.5 && t < 1.4, {});
 
     // ---- the horde ----
     const order = [];
@@ -438,8 +446,9 @@
     const Ww = proj(at(lerp(W0[0], W_POS[0] + wStep, pairIn), lerp(W0[1], W_POS[1] + wStep * 400, pairIn))), wps = HERO * K.F / Ww[2];
     const wMoving = pairWalk || VTIMES.some(t0 => t > t0 - 0.25 && t < t0 + 0.15);
     const Wd = drawBot(WRITER, t, Ww, wps, vIn, wMoving, { rot: -tension * 6 });
-    const Rw = proj(at(lerp(R0[0], R_POS[0], pairIn), lerp(R0[1], R_POS[1], pairIn))), rpsR = HERO * K.F / Rw[2];
-    const Rd = drawBot(REVIEWER, t, Rw, rpsR, vIn, pairWalk, { flip: true });
+    const reviewWalk = eio(seg(t, 25.0, 27.2));
+    const Rw = proj(at(lerp(R0[0], lerp(R_POS[0], CAR_STOP[0], reviewWalk), pairIn), lerp(R0[1], lerp(R_POS[1], CAR_STOP[1] - 110, reviewWalk), pairIn))), rpsR = HERO * K.F / Rw[2];
+    const Rd = drawBot(REVIEWER, t, Rw, rpsR, vIn, pairWalk || (t > 25.0 && t < 27.2), { flip: true });
     const Bw = proj(at(B_POS[0], B_POS[1])), bps = HERO * K.F / Bw[2];
     const lift = eio(seg(t, 16.3, 16.5));
     const dipB = Math.sin(Math.PI * seg(t, 16.25, 16.5)) * 0.08;
@@ -510,6 +519,9 @@
     const r2out = 1 - seg(t, B2 + 0.1, B2 + 0.5);
     labelAt(L_wr, Wd.x, Wd.y - wps * 10.6, Wd.x - L_wr.width / 2 + 34, eo(seg(t, 9.8, 10.1)) * r2out, eo(seg(t, 10.0, 10.4)) * r2out, K.ORANGE);
     labelAt(L_rv, Rd.x, Rd.y - rpsR * 10.6, Rd.x + L_rv.width / 2 - 34, eo(seg(t, 9.9, 10.2)) * r2out, eo(seg(t, 10.1, 10.5)) * r2out, K.ORANGE);
+    const modelNames = 1 - ei(seg(t, 11.35, 11.75));
+    labelAt(L_kimi, Wd.x, Wd.y - wps * 7.3, Wd.x - L_kimi.width / 2 - 110, eo(seg(t, 9.8, 10.05)) * modelNames, eo(seg(t, 9.95, 10.2)) * modelNames, K.CAST.kimi.color);
+    labelAt(L_codex, Rd.x, Rd.y - rpsR * 9.0, Rd.x + L_codex.width / 2 + 150, eo(seg(t, 9.9, 10.15)) * modelNames, eo(seg(t, 10.05, 10.3)) * modelNames, K.CAST.codex.color);
     K.drawLabel(L_mg, Bd.x, Bd.y - bps * 10.6, eo(seg(t, 15.0, 15.3)) * r2out, eo(seg(t, 15.15, 15.5)) * r2out, CREAM);
 
     // ---- beat 3: one stale hill, one pill ----

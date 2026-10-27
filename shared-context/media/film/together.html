@@ -147,11 +147,12 @@
     { id: 'q3', x: -1850, z: 1150, h: 160, r: 300, n: 10, seed: 19, fade: 1 }];
   // the five people: whose hill, their role, when their hill appears and when they walk
   const PEOPLE = [
-    { hill: 'o', role: 'you', show: -1, walk: -1 },
-    { hill: 'w', role: 'sales', show: 1.6, walk: 4.6 },
-    { hill: 'q1', role: 'data', show: 2.0, walk: 5.1 },
-    { hill: 'q2', role: 'product', show: 2.4, walk: 5.6 },
-    { hill: 'q3', role: 'engineering', show: 2.8, walk: 6.1 }];
+    { hill: 'o', role: 'you', show: -1, walk: -1, cast: 'claude' },
+    { hill: 'w', role: 'sales', show: 1.6, walk: 4.6, cast: 'codex' },
+    { hill: 'q1', role: 'data', show: 2.0, walk: 5.1, cast: 'kimi' },
+    { hill: 'q2', role: 'product', show: 2.4, walk: 5.6, cast: 'antigravity' },
+    { hill: 'q3', role: 'engineering', show: 2.8, walk: 6.1, cast: 'grok' },
+    { hill: 'f', role: null, show: 3.2, walk: 6.6, cast: 'local' }];
   const appear = (id, t) => { const P = PEOPLE.find(p => p.hill === id && p.show >= 0); if (!P || id === 'w') return 1; return eio(seg(t, P.show, P.show + 1.6)); };
   const TOPS = {}, TASKS = { o: [-253, 0, -177] };
 
@@ -201,6 +202,14 @@
   // ---------- walkers, one per person ----------
   const BODY = ['0000110000', '0011111100', '0111111110', '0110110110', '0111111110', '1111111111', '0111111110', '0011111100'];
   const LEGS = [['0110000110', '0110000110'], ['0011001100', '0001001000']];
+  const CAST = {
+    claude: { color: '#ff6a1f', body: BODY },
+    codex: { color: '#e9eef6', body: ['0110000110'].concat(BODY.slice(1)) },
+    kimi: { color: '#5b8cff', body: ['0000000110', '0000000011', '0000000011', '0000000110', '0000000000'].concat(BODY.slice(1)) },
+    antigravity: { color: '#ffd23f', body: ['0011111100', '0000000000'].concat(BODY.slice(1)) },
+    grok: { color: '#36d1e0', body: BODY.slice(0, 3).concat(['0100000010'], BODY.slice(4)) },
+    local: { color: '#aab2be', body: ['0000000000'].concat(BODY.slice(1)) }
+  };
   const MAIN = [217, 210, 201], ACC = [255, 106, 31];
   const mix = k => [0, 1, 2].map(i => Math.round(lerp(MAIN[i], ACC[i], k)));
   const ALT_PATH = [[-900, -700], [-760, -610], [-640, -560], [-560, -450], [-470, -380], [-380, -330], [-310, -262], [-292, -205]];
@@ -213,7 +222,8 @@
     }
     P.path = curve(pts, 12);
     P.g = mk('g', {}, $('walkers'));
-    P.pix = []; for (let r = 0; r < 10; r++) for (let q = 0; q < 10; q++) P.pix.push({ r, q, el: mk('rect', {}, P.g) });
+    P.g.setAttribute('fill', CAST[P.cast].color);
+    P.pix = []; for (let r = 0; r < 14; r++) for (let q = 0; q < 10; q++) P.pix.push({ r, q, el: mk('rect', {}, P.g) });
     P.dots = []; for (let s = 0; s < P.path.total; s += 24) P.dots.push({ s, el: mk('circle', { r: 0 }, $('dots')) });
   });
 
@@ -231,7 +241,7 @@
   };
   addLabel('task', 'the task', 86); addLabel('out', 'the goal', 120); addLabel('goal', 'the company objective', 112);
   addLabel('shared', 'the shared goal', 150);
-  PEOPLE.forEach(P => addLabel('r_' + P.hill, P.role, 70));
+  PEOPLE.filter(P => P.role).forEach(P => addLabel('r_' + P.hill, P.role, 70));
   function measure() { for (const k in labels) { const L = labels[k]; if (!L.wr) L.w = Math.round(30 * L.text.textContent.length * 0.55 + 48); try { const n = L.text.getComputedTextLength(); if (n > 0) { L.w = n + 48; L.wr = 1; } } catch (e) {} } if (typeof CHIPS !== 'undefined') CHIPS.forEach(C => { try { const n = C.tx.getComputedTextLength(); if (n > 0) C.w = n + 44; } catch (e) {} }); }
   addEventListener('resize', () => { measure(); try { render(now); } catch (e) {} });
 
@@ -310,10 +320,10 @@
       const wg = along(P.path, sNow); proj(c, wg[0], 0, wg[1], P3);
       if (wv > 0 && P3[2] > 60) {
         P.g.style.display = ''; P.g.setAttribute('opacity', wv.toFixed(3));
-        const ps = 6.5 * F / P3[2] * grow, walking = !isYou && t > P.walk && t < P.walk + 3.2, fr = walking ? Math.floor(t * 4) % 2 : 0, rows = BODY.concat(LEGS[fr]);
+        const ps = 6.5 * F / P3[2] * grow, walking = !isYou && t > P.walk && t < P.walk + 3.2, fr = walking ? Math.floor(t * 4) % 2 : 0, rows = CAST[P.cast].body.concat(LEGS[fr]);
         const bob = fr ? -ps * 0.5 : Math.sin(t * 2.4 + PEOPLE.indexOf(P)) * ps * 0.15, x0 = P3[0] - ps * 5, y0 = P3[1] - ps * rows.length + bob;
         for (const px of P.pix) {
-          if (rows[px.r][px.q] !== '1') { px.el.setAttribute('width', 0); continue; }
+          if (!rows[px.r] || rows[px.r][px.q] !== '1') { px.el.setAttribute('width', 0); continue; }
           px.el.setAttribute('x', fx(x0 + px.q * ps)); px.el.setAttribute('y', fx(y0 + px.r * ps));
           px.el.setAttribute('width', (ps + 0.6).toFixed(2)); px.el.setAttribute('height', (ps + 0.6).toFixed(2));
         }
@@ -363,12 +373,12 @@
     PEOPLE.forEach((P, i) => {
       const el = arcEls[i], u = eio(seg(t, 17.4 + i * 0.32, 18.9 + i * 0.32));
       // the first arc (yours) is Altitude's own arc, already drawn when this film opens; it fades before the team's arcs redraw
-      const own = P.hill === 'o' ? 1 - eio(seg(t, 1.0, 2.2)) : 0;
+      const own = 0;
       const k = Math.max(u, own);
       if (k <= 0) { el.style.display = 'none'; return; }
       el.style.display = ''; let d = ''; const N = 80, end = Math.round(N * (u > 0 ? u : 1));
       for (let s = 0; s <= end; s++) { const q = bez(TOPS[P.hill], TOPS.m, 340, s / N); proj(c, q[0], q[1], q[2], P3); d += (s ? 'L' : 'M') + fx(P3[0]) + ' ' + fx(P3[1]); }
-      el.setAttribute('d', d); el.setAttribute('opacity', (u > 0 ? 1 : own).toFixed(3));
+      el.setAttribute('d', d); el.setAttribute('stroke', CAST[P.cast].color); el.setAttribute('opacity', (u > 0 ? 1 : own).toFixed(3));
     });
 
     // the flag on the summit: up at the start (Altitude's), down while everyone climbs alone, up again at the end
@@ -400,6 +410,7 @@
     place('out', TOPS.o, off, off, 0);
     place('goal', TOPS.m, off, off, 1);
     PEOPLE.forEach(P => {
+      if (!P.role) return;
       const start = P.hill === 'o' ? 3.0 : P.walk + 3.3, v = eo(seg(t, start, start + 0.5));
       place('r_' + P.hill, TOPS[P.hill], v, v, eio(seg(t, start + 0.2, start + 0.8)) * (1 - 0.5 * eio(seg(t, 17.6, 18.6))));
     });
