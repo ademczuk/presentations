@@ -69,7 +69,7 @@
         <path id="slot" fill="#0b0d12" fill-opacity=".55" stroke="#c9ced6" stroke-width="3" stroke-dasharray="9 7"/>
         <g id="flag"><line id="pole" stroke="#f2ece4" stroke-width="4" stroke-linecap="round"/><path id="pennant" fill="#ff6a1f" filter="url(#og)"/></g>
         <g id="team"></g>
-        <path id="rope" fill="none" stroke="#ff6a1f" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round"/>
+        <path id="rope" fill="none" stroke="#f2ece4" stroke-width="4" stroke-dasharray="10 7" stroke-linecap="round"/>
         <g id="ropeFx"></g>
         <g id="gate">
           <path id="gateGlow" fill="#ff6a1f" filter="url(#og)" opacity=".5"/>
@@ -91,7 +91,7 @@
       <g id="cap2" class="cap" text-anchor="middle">
         <text id="k2" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">A ROPE BETWEEN TWO CLIMBERS</text>
         <text id="h2" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One writer. A different reviewer. Every change.</text>
-        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">On that change, a second reviewer caught a new defect every time.</text>
+        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">On one recent change, a second reviewer caught a new defect in every version.</text>
       </g>
       <g id="cap3" class="cap" text-anchor="middle">
         <text id="k3" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">AN INDEX WITH A DATE ON IT</text>
@@ -146,7 +146,7 @@
   // ---------- camera keys ----------
   const K1 = { tx: 150, ty: 115, tz: 400, d: 1250, yaw: -0.86, pitch: 0.28 };
   const K1b = { tx: 160, ty: 110, tz: 400, d: 1160, yaw: -0.9, pitch: 0.28 };
-  const K2 = { tx: 315, ty: 280, tz: 640, d: 760, yaw: -0.1, pitch: 0.36 };
+  const K2 = { tx: 315, ty: 250, tz: 640, d: 1220, yaw: -0.1, pitch: 0.36 };
   const K3 = { tx: -200, ty: 180, tz: 640, d: 1900, yaw: -0.22, pitch: 0.33 };
   const K4 = { tx: 395, ty: 170, tz: 510, d: 1350, yaw: -0.45, pitch: 0.34 };
   const key = (t, v) => Object.assign({ t }, moveKey(v));
@@ -166,6 +166,7 @@
   // who stands at the top of the rope and is the named merger) plus the gatekeeper; in beat 4 a carrier arrives.
   const bot = () => K.sprite($('team'), { glow: true });
   const KEEP = { S: K.sprite($('keeper'), { glow: true }), ph: 0.4, id: 'local' };
+  const keeperEyes = [-1.65, 1.65].map(dx => K.mk('rect', { fill: '#0b0d12' }, $('keeper')));
   const GATE_ANTI = { S: bot(), ph: 0.9, id: 'antigravity' }, GATE_GROK = { S: bot(), ph: 1.8, id: 'grok' };
   const WRITER = { S: bot(), ph: 1.3, id: 'kimi' }, REVIEWER = { S: bot(), ph: 2.1, id: 'codex' }, BEARER = { S: bot(), ph: 0.0, id: 'claude' }, CARRIER = { S: bot(), ph: 2.9, id: 'local' };
   const W_POS = [0.47, -220], R_POS = [0.47, 220], B_POS = [0.6, 40];
@@ -212,10 +213,10 @@
   const L_rv = K.label(LB, 'reviews', { lift: 70 });
   const L_kimi = K.label(LB, 'Kimi', { size: 22, h: 44, lift: 58 });
   const L_codex = K.label(LB, 'Codex', { size: 22, h: 44, lift: 58 });
-  const L_mg = K.label(LB, 'merged: the reviewed version', { lift: 96 });
+  const L_mg = K.label(LB, 'merge only the reviewed version', { lift: 96 });
   const L_old = K.label(LB, '67 commits behind', { lift: 110 });
   const L_slot = K.label(LB, "waiting for this build's signed yes", { lift: 150 });
-  const L_car = K.label(LB, 'live since 27 October, 0 builds carried', { lift: 70, size: 24, h: 46 });
+  const L_car = K.label(LB, 'live since 27 October; 0 builds carried as of that day', { lift: 70, size: 24, h: 46 });
 
   // A pill whose box is slid sideways from its leader, so two pins close together can carry two pills.
   // (Local: K.drawLabel always centers the pill on its pin.)
@@ -367,6 +368,11 @@
     // ---- the gatekeeper and its mallet ----
     const kw = proj(at(KS.s, KS.side)), kps = HERO * K.F / kw[2];
     const k = drawBot(KEEP, t, kw, kps, open, KS.walking, { scaleY: KS.scaleY });
+    keeperEyes.forEach((eye, i) => {
+      const size = kps * 1.1;
+      eye.setAttribute('x', fx(k.x + [-1.65, 1.65][i] * kps - size / 2)); eye.setAttribute('y', fx(k.y - kps * 9.2 - size / 2));
+      eye.setAttribute('width', fx(size)); eye.setAttribute('height', fx(size)); eye.setAttribute('opacity', open.toFixed(3));
+    });
     const hx = k.x + kps * 4.6, hy = k.y - kps * 4.6 * KS.scaleY;
     const len = kps * 6.5, a = KS.ang * Math.PI / 180;
     const mx = hx + Math.cos(a) * len, my = hy + Math.sin(a) * len;
@@ -376,7 +382,7 @@
     malletHead.setAttribute('width', fx(kps * 2.8)); malletHead.setAttribute('height', fx(kps * 2.0));
     malletHead.setAttribute('transform', 'translate(' + fx(mx) + ' ' + fx(my) + ') rotate(' + fx(KS.ang + 90) + ')');
     mallet.setAttribute('opacity', open.toFixed(3));
-    const lineOp = open * (1 - eio(seg(t, B1 - 0.25, B1 + 0.25)));
+    const lineOp = open * (1 - eio(seg(t, B1 - 0.8, B1 - 0.3)));
     const aw = proj(at(0.30, -180)), aps = HERO * K.F / aw[2];
     const gw = proj(at(0.30, 285)), gps = HERO * K.F / gw[2];
     drawBot(GATE_ANTI, t, aw, aps, lineOp, t > 0.5 && t < 1.4, { flip: true });
@@ -464,13 +470,15 @@
     // the rope: writer's hand, reviewer's hand, then up to the merger at the top
     const ropeOn = eo(seg(t, 9.4, 10.0)) * (1 - seg(t, B2 + 0.1, B2 + 0.6)) * vIn;
     const wh = [Wd.x + wps * 5, Wd.y - wps * 4.5], rh = [Rd.x - rpsR * 5, Rd.y - rpsR * 4.5], mh = [Bd.x - bps * 5, Bd.y - bps * 4.5];
-    const sag = lerp(46, 8, tension);
-    const midA = [(wh[0] + rh[0]) / 2, Math.max(wh[1], rh[1]) + sag];
-    const midB = [(rh[0] + mh[0]) / 2 + 20, Math.max(rh[1], mh[1]) + 26];
+    const sag = lerp(28, 5, tension);
+    const ropeLift = Math.max(wps, rpsR) * 5.2;
+    const midA = [(wh[0] + rh[0]) / 2, Math.min(wh[1], rh[1]) - ropeLift - sag];
+    const midB = [(rh[0] + mh[0]) / 2 + 20, Math.min(rh[1], mh[1]) - ropeLift];
     $('rope').setAttribute('d', 'M' + fx(wh[0]) + ' ' + fx(wh[1]) + 'Q' + fx(midA[0]) + ' ' + fx(midA[1]) + ' ' + fx(rh[0]) + ' ' + fx(rh[1]) +
       'Q' + fx(midB[0]) + ' ' + fx(midB[1]) + ' ' + fx(mh[0]) + ' ' + fx(mh[1]));
     $('rope').setAttribute('opacity', ropeOn.toFixed(3));
     $('rope').setAttribute('stroke-width', fx(Math.max(3, wps * 0.4)));
+    $('world').appendChild($('rope')); $('world').appendChild($('ropeFx'));
     const quad = (p0, c, p1, u) => [(1 - u) * (1 - u) * p0[0] + 2 * (1 - u) * u * c[0] + u * u * p1[0], (1 - u) * (1 - u) * p0[1] + 2 * (1 - u) * u * c[1] + u * u * p1[1]];
     // the versions travelling along the rope
     blocks.forEach((el, i) => {
@@ -508,13 +516,15 @@
     check.setAttribute('opacity', (ck * vIn).toFixed(3));
     // the merger plants a pennant once the checked version reaches it
     const pen = eio(seg(t, 14.95, 15.3));
-    const pb = [Bd.x - bps * 7, Bd.foot], ph = bps * 16 * pen;
+    const pb = [Bd.x - bps * 12, Bd.foot], ph = bps * 16 * pen;
+    let flagPin = [Bd.x, Bd.y - bps * 10.6];
     if (pen > 0.01) {
       $('pole').setAttribute('x1', fx(pb[0])); $('pole').setAttribute('x2', fx(pb[0])); $('pole').setAttribute('y1', fx(pb[1])); $('pole').setAttribute('y2', fx(pb[1] - ph));
       $('pole').setAttribute('stroke-width', fx(Math.max(3, bps * 0.45)));
       const fh = bps * 5;
       $('pennant').setAttribute('d', 'M' + fx(pb[0]) + ' ' + fx(pb[1] - ph) + 'l' + fx(fh * 1.3) + ' ' + fx(fh * 0.45) + 'l' + fx(-fh * 1.3) + ' ' + fx(fh * 0.45) + 'z');
       $('flag').style.display = ''; $('flag').setAttribute('opacity', (vIn).toFixed(3));
+      flagPin = [pb[0] + fh * 1.3, pb[1] - ph + fh * 0.45];
     } else $('flag').style.display = 'none';
     const r2out = 1 - seg(t, B2 + 0.1, B2 + 0.5);
     labelAt(L_wr, Wd.x, Wd.y - wps * 10.6, Wd.x - L_wr.width / 2 + 34, eo(seg(t, 9.8, 10.1)) * r2out, eo(seg(t, 10.0, 10.4)) * r2out, K.ORANGE);
@@ -522,7 +532,7 @@
     const modelNames = 1 - ei(seg(t, 11.35, 11.75));
     labelAt(L_kimi, Wd.x, Wd.y - wps * 7.3, Wd.x - L_kimi.width / 2 - 110, eo(seg(t, 9.8, 10.05)) * modelNames, eo(seg(t, 9.95, 10.2)) * modelNames, K.CAST.kimi.color);
     labelAt(L_codex, Rd.x, Rd.y - rpsR * 9.0, Rd.x + L_codex.width / 2 + 150, eo(seg(t, 9.9, 10.15)) * modelNames, eo(seg(t, 10.05, 10.3)) * modelNames, K.CAST.codex.color);
-    K.drawLabel(L_mg, Bd.x, Bd.y - bps * 10.6, eo(seg(t, 15.0, 15.3)) * r2out, eo(seg(t, 15.15, 15.5)) * r2out, CREAM);
+    K.drawLabel(L_mg, flagPin[0], flagPin[1], eo(seg(t, 15.0, 15.3)) * r2out, eo(seg(t, 15.15, 15.5)) * r2out, CREAM);
 
     // ---- beat 3: one stale hill, one pill ----
     const wTop = proj([-950 + 30, 120, 520]);
