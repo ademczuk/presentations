@@ -59,7 +59,7 @@
       <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
       <ellipse id="pool" fill="url(#lampLight)"/>
       <g id="who" filter="url(#og)"></g>
-      <rect id="lamp" fill="#ffe7a3" filter="url(#og)"/>
+      <g id="lantern" filter="url(#og)"><path id="lampHandle" fill="none" stroke="#c9b27a" stroke-width="2"/><rect id="lampCap" fill="#c9b27a"/><rect id="lamp" fill="#ffe7a3"/></g>
       <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
         <text id="h1" x="960" y="150">You have context with your AI.</text>
         <text id="h2" x="960" y="246" fill="#3ddc84">Does your team share it?</text>
@@ -108,7 +108,11 @@
     const lx = P[0] + ps * 6.4, ly = P[1] - ps * 7.2;
     $('lamp').setAttribute('x', K.fx(lx - ps * 0.9)); $('lamp').setAttribute('y', K.fx(ly - ps * 1.4));
     $('lamp').setAttribute('width', K.fx(ps * 1.8)); $('lamp').setAttribute('height', K.fx(ps * 2.2));
-    $('lamp').setAttribute('opacity', (appear * (0.35 + 0.65 * on)).toFixed(3));
+    $('lamp').setAttribute('opacity', (0.35 + 0.65 * on).toFixed(3));
+    $('lantern').setAttribute('opacity', appear.toFixed(3));
+    $('lampCap').setAttribute('x', K.fx(lx - ps * 1.2)); $('lampCap').setAttribute('y', K.fx(ly - ps * 2.1));
+    $('lampCap').setAttribute('width', K.fx(ps * 2.4)); $('lampCap').setAttribute('height', K.fx(ps * 0.7));
+    $('lampHandle').setAttribute('d', 'M' + K.fx(lx - ps * 0.8) + ' ' + K.fx(ly - ps * 2.1) + 'Q' + K.fx(lx) + ' ' + K.fx(ly - ps * 3.6) + ' ' + K.fx(lx + ps * 0.8) + ' ' + K.fx(ly - ps * 2.1));
     $('pool').setAttribute('cx', K.fx(lx)); $('pool').setAttribute('cy', K.fx(P[1] - ps * 2));
     $('pool').setAttribute('rx', K.fx(ps * 58 * (0.55 + 0.45 * on))); $('pool').setAttribute('ry', K.fx(ps * 26 * (0.55 + 0.45 * on)));
     $('pool').setAttribute('opacity', (on * flick).toFixed(3));

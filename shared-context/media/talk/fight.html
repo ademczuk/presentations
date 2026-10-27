@@ -68,7 +68,7 @@
       <g id="cap2" class="cap" text-anchor="middle">
         <text class="sans kicker" x="960" y="92" font-size="26" fill="#3ddc84">A ROPE BETWEEN TWO CLIMBERS</text>
         <text class="serif" x="960" y="168" font-size="58" fill="#f2ece4">One writer, a different reviewer, for every change.</text>
-        <text class="serif" x="960" y="240" font-size="58" fill="#f2ece4">On the change with seven versions, that is what caught all seven.</text>
+        <text class="serif" x="960" y="240" font-size="58" fill="#f2ece4">On that change, the reviewer caught a new defect in every version.</text>
         <text class="serif" x="960" y="312" font-size="46" fill="#c9ced6">One named merger, pinned to the exact version that was reviewed.</text>
       </g>
       <g id="cap3" class="cap" text-anchor="middle">
@@ -190,7 +190,6 @@
 
     let tally = '';
     if (t >= 2.6 && t < B1 + 0.3) tally = 'that message, re-tested: refused ' + Math.min(8, Math.max(1, Math.round(8 * K.eo(K.seg(t, 2.6, 6.0))))) + ' of 8';
-    else if (t >= B1 + 2.0 && t < B2 + 0.3) tally = 'caught ' + Math.max(1, Math.round(7 * K.eo(K.seg(t, B1 + 2.0, B1 + 5.5)))) + ' of 7';
     $('tally1').textContent = tally;
     $('tally').setAttribute('opacity', (tally ? 1 : 0) * open);
 
