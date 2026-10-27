@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dawn</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dawn: the whole team and a person stand by an orange pennant on the summit as three tips appear">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        .cap text, .tipText { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1080">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset=".20" stop-color="#111722"/>
+          <stop offset=".29" stop-color="#0d1119"/>
+          <stop offset=".36" stop-color="#0b0d12"/>
+          <stop offset=".47" stop-color="#0b0d12"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </linearGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+        <radialGradient id="poolGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffe7a3" stop-opacity=".42"/>
+          <stop offset=".38" stop-color="#ffd36b" stop-opacity=".16"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="skyMask"></g>
+      <g id="poolLayer"></g>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="flag"><line id="pole" stroke="#f2ece4" stroke-width="5" stroke-linecap="round"/><path id="pennant" fill="#ff6a1f" stroke="#0b0d12" stroke-width="2" filter="url(#og)"/></g>
+      <g id="actors"></g>
+      <g id="lampLayer" filter="url(#og)"></g>
+      <g id="labels"></g>
+      <g id="cap1" class="cap" text-anchor="middle">
+        <text id="h1" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">Back on the summit.</text>
+      </g>
+      <g id="tips" class="serif" fill="#f2ece4">
+        <g id="tip0">
+          <circle cx="480" cy="98" r="31" fill="#ff6a1f" stroke="#0b0d12" stroke-width="3"/>
+          <text class="sans" x="480" y="109" text-anchor="middle" font-size="30" fill="#0b0d12">1</text>
+          <text class="tipText" x="550" y="120" font-size="58">Share the goal, not just the task.</text>
+        </g>
+        <g id="tip1">
+          <circle cx="480" cy="188" r="31" fill="#ff6a1f" stroke="#0b0d12" stroke-width="3"/>
+          <text class="sans" x="480" y="199" text-anchor="middle" font-size="30" fill="#0b0d12">2</text>
+          <text class="tipText" x="550" y="210" font-size="58">Store a decision once.</text>
+        </g>
+        <g id="tip2">
+          <circle cx="480" cy="278" r="31" fill="#ff6a1f" stroke="#0b0d12" stroke-width="3"/>
+          <text class="sans" x="480" y="289" text-anchor="middle" font-size="30" fill="#0b0d12">3</text>
+          <text class="tipText" x="550" y="300" font-size="58">Ask the person who decides.</text>
+        </g>
+      </g>
+      <g id="cap5" class="cap" text-anchor="middle">
+        <text id="h5" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">Shared context is the frontier.</text>
+        <text id="s5" class="sans" style="font-weight:600" x="960" y="208" font-size="40" fill="#d9d2c9">You have context with your AI. Does your team share it?</text>
+      </g>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="26" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 26.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$, seg = K.seg, eo = K.eo, ei = K.ei, eio = K.eio;
+  // beats: 0-6 night to dawn | 6-11 tip one | 11-16 tip two | 16-21 tip three | 21-26 closing question
+  const DUR = 26, HOLD = 26;
+  const KEYS = [
+    { t: 0, tx: 170, ty: 340, tz: 800, d: 3375, yaw: -0.10, pitch: 0.53 },
+    { t: 26, tx: 170, ty: 340, tz: 800, d: 3375, yaw: -0.10, pitch: 0.53 }
+  ];
+  const TIP_AT = [6, 11, 16];
+
+  K.SPRITES.person = {
+    body: [
+      '0001111000', '0001111000', '0000110000', '0011111100',
+      '0011111100', '0011111100', '0011111100', '0011111100',
+      '0011111100', '0001111000', '0001111000', '0001111000'
+    ],
+    legs: [
+      ['0001101100', '0001101100'],
+      ['0001101100', '0001101100']
+    ]
+  };
+
+  const stars = K.stars($('stars'), 170, 41, 580);
+  const mask = K.skyMask($('skyMask'));
+  const T = K.terrain($('terrain'));
+  const ridge = K.mk('path', { fill: 'none' }, $('terrain'));
+  const ridgeEcho = K.mk('path', { fill: 'none' }, $('terrain'));
+  const summit = T.summit.m;
+  const lantern = K.lantern($('lampLayer'));
+  lantern.body.setAttribute('stroke', '#6b421f');
+  lantern.body.setAttribute('stroke-width', '1.5');
+  lantern.cap.setAttribute('stroke', '#6b421f');
+  lantern.cap.setAttribute('stroke-width', '1.5');
+  $('poolLayer').appendChild(lantern.pool);
+  lantern.pool.setAttribute('fill', 'url(#poolGrad)');
+
+  const offsets = {
+    person: -300, codex: -200, kimi: -100, antigravity: 0,
+    grok: 100, local: 200, claude: 300
+  };
+  const actors = K.CAST_ORDER.map(id => ({ id, S: K.sprite($('actors'), { glow: true, outline: true }) }));
+  actors.push({ id: 'person', S: K.sprite($('actors'), { glow: true, outline: true }) });
+  actors.forEach((a, i) => {
+    a.dx = offsets[a.id];
+    a.phase = i * 0.83;
+  });
+
+  const stops = Array.from(document.querySelectorAll('#sky stop'));
+  const nightSky = ['#1a2232', '#111722', '#0d1119', '#0b0d12', '#0b0d12', '#0b0d12'];
+  const dawnSky = ['#101b34', '#1c3252', '#e6783e', '#ffe0a0', '#1c3252', '#0b1020'];
+  const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const nightRgb = nightSky.map(rgb), dawnRgb = dawnSky.map(rgb);
+  const mixed = (a, b, p) => a.map((v, i) => Math.round(K.lerp(v, b[i], p)));
+  const color = a => 'rgb(' + a.join(',') + ')';
+  const nightGround = [105, 120, 150], dawnGround = [72, 86, 110], dawnHill = [160, 138, 116];
+  const P = [0, 0, 0];
+
+  function render(t) {
+    const c = K.keyCamera(KEYS, t);
+    const dawn = eio(seg(t, 1.0, 5.0));
+    stops.forEach((stop, i) => stop.setAttribute('stop-color', color(mixed(nightRgb[i], dawnRgb[i], dawn))));
+    K.drawStars(stars, t, 1 - eio(seg(t, 1.0, 4.8)));
+    K.drawSkyMask(mask, T, c, null, 'url(#sky)');
+    const ground = mixed(nightGround, dawnGround, dawn), hill = mixed(nightGround, dawnHill, dawn);
+    K.drawTerrain(T, c, 1, L => {
+      const tone = L.hill ? hill : ground;
+      return [tone[0], tone[1], tone[2], L.hill === 'm' ? 1 : L.hill ? 0.55 : 0.65];
+    }, { nearFade: true });
+
+    K.proj(c, summit[0], summit[1], summit[2], P);
+    const summitX = P[0], summitY = P[1], ps = 16 * K.F / P[2] * 1.35;
+    ridge.setAttribute('d', 'M' + K.fx(summitX - 340) + ' ' + K.fx(summitY + 4) +
+      'Q' + K.fx(summitX - 160) + ' ' + K.fx(summitY - 2) + ' ' + K.fx(summitX) + ' ' + K.fx(summitY + 2) +
+      'T' + K.fx(summitX + 450) + ' ' + K.fx(summitY + 4));
+    ridge.setAttribute('stroke', color(hill));
+    ridge.setAttribute('stroke-width', '3');
+    ridge.setAttribute('stroke-opacity', '.8');
+    ridgeEcho.setAttribute('d', 'M' + K.fx(summitX - 330) + ' ' + K.fx(summitY + 16) +
+      'Q' + K.fx(summitX - 150) + ' ' + K.fx(summitY + 10) + ' ' + K.fx(summitX) + ' ' + K.fx(summitY + 14) +
+      'T' + K.fx(summitX + 440) + ' ' + K.fx(summitY + 16));
+    ridgeEcho.setAttribute('stroke', color(hill));
+    ridgeEcho.setAttribute('stroke-width', '2');
+    ridgeEcho.setAttribute('stroke-opacity', '.38');
+    const flagX = summitX + 410, flagH = ps * 15;
+    $('pole').setAttribute('x1', K.fx(flagX));
+    $('pole').setAttribute('x2', K.fx(flagX));
+    $('pole').setAttribute('y1', K.fx(summitY + 4));
+    $('pole').setAttribute('y2', K.fx(summitY - flagH));
+    $('pennant').setAttribute('d', 'M' + K.fx(flagX) + ' ' + K.fx(summitY - flagH) +
+      'l' + K.fx(flagH * 0.68) + ' ' + K.fx(flagH * 0.2) +
+      'l' + K.fx(-flagH * 0.68) + ' ' + K.fx(flagH * 0.2) + 'Z');
+
+    const order = [];
+    let claude = null;
+    actors.forEach(a => {
+      const x = summitX + a.dx, y = summitY + Math.sin(t * 1.7 + a.phase) * ps * 0.16;
+      if (a.id === 'person') K.drawSprite(a.S, 'person', x, y, ps, '#f2ece4', 1, 0);
+      else K.drawCast(a.S, a.id, x, y, ps, 1, 0);
+      if (a.id === 'claude') claude = { x, y, ps, g: a.S.g };
+      order.push({ g: a.S.g, z: P[2] });
+    });
+    K.depthSort(order);
+    $('actors').appendChild(claude.g);
+
+    const lampOn = K.lerp(0.85, 0.72, dawn);
+    const handX = claude.x + claude.ps * 6, handY = claude.y - claude.ps * 2.85;
+    K.drawLantern(lantern, handX, handY, claude.ps * 1.12, lampOn, t);
+    lantern.pool.setAttribute('cx', K.fx(handX));
+    lantern.pool.setAttribute('cy', K.fx(summitY + ps * 2));
+    lantern.pool.setAttribute('rx', K.fx(claude.ps * 32));
+    lantern.pool.setAttribute('ry', K.fx(claude.ps * 10));
+
+    K.fade($('h1'), t, 0.6, 6.0);
+    const tipOut = ei(seg(t, 21.0, 22.0));
+    for (let i = 0; i < 3; i++) {
+      const enter = eo(seg(t, TIP_AT[i] + 0.5, TIP_AT[i] + 1.5));
+      const dim = i < 2 ? 1 - 0.38 * eo(seg(t, TIP_AT[i + 1], TIP_AT[i + 1] + 0.8)) : 1;
+      const el = $('tip' + i), opacity = enter * dim * (1 - tipOut);
+      el.setAttribute('opacity', opacity.toFixed(3));
+      el.setAttribute('transform', 'translate(0 ' + K.fx((1 - enter) * 20 - tipOut * 12) + ')');
+    }
+    K.fade($('h5'), t, 22.0, null);
+    K.fade($('s5'), t, 23.0, null);
+    $('fade').setAttribute('opacity', (1 - eo(seg(t, 0, 1.2))).toFixed(3));
+  }
+
+  K.player(DUR, HOLD, render, 'dawn');
+})();
+</script>
+</body>
+</html>

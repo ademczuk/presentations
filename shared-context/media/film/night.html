@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Night: an orange Claude figure walks onto a contour-map mountain and lights a lantern; three teammates stand in the dark beyond its light">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        #h1, #h2 { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <!-- The sky in user space (it reproduces a 50% / 30% / 75% bounding-box gradient over the full frame), so the
+             mountain sky mask can fill with the very same gradient and stay invisible against it. -->
+        <radialGradient id="sky" gradientUnits="userSpaceOnUse" cx=".5" cy=".3" r=".75" gradientTransform="matrix(1920 0 0 1080 0 0)">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+        <radialGradient id="poolGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffe7a3" stop-opacity=".62"/>
+          <stop offset=".38" stop-color="#ffd36b" stop-opacity=".26"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff3cf" stop-opacity=".95"/>
+          <stop offset=".3" stop-color="#ffd36b" stop-opacity=".45"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+        <g id="warmDefs"></g>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="skyMask"></g>
+      <g id="poolLayer"></g>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="actors"></g>
+      <g id="lampLayer" filter="url(#og)"><circle id="lampHalo" fill="url(#haloGrad)"/></g>
+      <g class="serif" text-anchor="middle" fill="#f2ece4">
+        <text id="h1" x="960" y="142" font-size="68">You have context with your AI.</text>
+        <text id="h2" x="960" y="226" font-size="68" fill="#ff6a1f">Does your team share it?</text>
+      </g>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="13" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 13.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$;
+  // One deck range: ?deck&from=0&to=11.4.  The crane lands at 4.4 and the slow push settles at 10.4,
+  // a full second before the hold, so the held frame never shows a camera in motion.
+  const DUR = 13, HOLD = 11.4;
+  const KEYS = [
+    { t: 0.0, tx: 40, ty: 120, tz: 330, d: 3000, yaw: 0.08, pitch: 1.05 },     // the map from above
+    { t: 4.4, tx: -240, ty: 225, tz: -110, d: 1550, yaw: -0.02, pitch: 0.30 }, // craned down to the hero, at Altitude's task point
+    { t: 10.4, tx: -240, ty: 225, tz: -110, d: 1400, yaw: -0.02, pitch: 0.30 }]; // a slow push in, then still
+
+  // ---- timing of the beat ----
+  const WALK0 = 2.2, WALK1 = 3.6;          // the walk in
+  const LIFT0 = 3.95, LIFT1 = 4.25;        // the lantern comes up
+  const POP = 4.85;                        // three dim flickers before it, then the lamp catches
+  const H1 = 5.4, H2 = 7.4, TEAM = 7.6;    // captions; the team appears as the question lands
+
+  const BLUE = [118, 132, 160], WARM = [255, 211, 107];
+  const mixc = (a, b, k) => [0, 1, 2].map(i => Math.round(K.lerp(a[i], b[i], k)));
+  const rgb = a => 'rgb(' + a.join(',') + ')';
+
+  const stars = K.stars($('stars'), 150, 41, 240);
+  const mask = K.skyMask($('skyMask'));
+  const T = K.terrain($('terrain'));
+
+  // The outcome hill's rings, lowest first.  The hero stands at Altitude's task point at the hill's foot,
+  // so the light climbs: ring 1, ring 0, then 2, 3, 4, 5, and stops.  Six rings, no more.
+  const mRings = T.lines.filter(L => L.hill === 'o').sort((a, b) => a.q - b.q);   // the outcome hill behind the task
+  const HERO_RING = 0.75, LIT = 6;
+  const lit = mRings.map((L, i) => ({ L, i, rank: Math.abs(i - HERO_RING) }))
+    .sort((a, b) => a.rank - b.rank).slice(0, LIT).map((o, n) => Object.assign(o, { n }));
+  // Each lit ring is stroked with its own radial gradient centered on the lantern, warm near it and moonlit
+  // far from it, so the light also stops in space: the far side of the hill stays cold.
+  lit.forEach(o => {
+    const g = K.mk('radialGradient', { id: 'warm' + o.n, gradientUnits: 'userSpaceOnUse' }, $('warmDefs'));
+    o.grad = g;
+    o.stops = [0, 0.45, 1].map(off => K.mk('stop', { offset: off }, g));
+  });
+
+  // ---- the cast ----
+  const hero = K.sprite($('actors'), { glow: true });
+  const lantern = K.lantern($('lampLayer'));
+  $('poolLayer').appendChild(lantern.pool);   // the light pool sits under the contours, the lamp over the hero
+  lantern.pool.setAttribute('fill', 'url(#poolGrad)');   // a little stronger than the kit's, so the pool reads
+  const HERO_PS = 11.5;                         // world pixel size: about 90 to 100 px tall at the hold
+  // The team: five dim members on other slopes, beyond the reach of the light. Seeds drawn once here.
+  const rr = K.rng(1118);
+  const TEAM_AT = [
+    [300, 420, 'codex'], [-800, 470, 'kimi'], [1050, 900, 'grok'],
+    [-1170, 820, 'antigravity'], [760, 160, 'local']
+  ].map(([x, z, id], i) => ({
+    x, z, id, y: K.groundY(x, z), S: K.sprite($('actors'), {}), phase: rr() * 6.3, delay: i * 0.35 }));
+
+  const P = [0, 0, 0], H = [0, 0, 0];
+
+  // Three dim flickers, each a quick rise and fall to a low glow, then the catch.
+  function lampOn(t) {
+    const blip = (a, peak) => peak * (K.eo(K.seg(t, a, a + 0.06)) - K.eo(K.seg(t, a + 0.08, a + 0.22)));
+    const pre = blip(4.28, 0.30) + blip(4.48, 0.42) + blip(4.65, 0.55);
+    return Math.max(pre, K.eo(K.seg(t, POP, POP + 0.12)));
+  }
+  // The pool overshoots to 1.15x as the lamp catches, then settles to 1.
+  function poolScale(t) {
+    const up = K.eo(K.seg(t, POP, POP + 0.16)), back = K.eio(K.seg(t, POP + 0.16, POP + 0.75));
+    return K.lerp(0.55, 1.15, up) - 0.15 * back;
+  }
+
+  function render(t) {
+    const c = K.keyCamera(KEYS, t);
+
+    // Stars live only in the sky: none on the map while we look down on it, revealed as the crane drops.
+    K.proj(c, c.C[0] + 1e5 * Math.sin(c.yaw), 0, c.C[2] + 1e5 * Math.cos(c.yaw), H);
+    const horizon = H[1], skyA = K.eo(K.seg(t, 0.4, 2.4));
+    K.drawStars(stars, t, skyA);
+    for (const s of stars) s.el.setAttribute('opacity', (+s.el.getAttribute('opacity') * K.seg(horizon - s.y, 0, 70)).toFixed(3));
+    K.drawSkyMask(mask, T, c, null, 'url(#sky)');
+    $('skyMask').setAttribute('opacity', K.eo(K.seg(t, 2.6, 3.8)).toFixed(3));
+
+    // ---- the hero walks in, settles, and lifts the lantern ----
+    const wp = K.seg(t, WALK0, WALK1), walking = t > WALK0 && t < WALK1;
+    const ease = wp * wp * (3 - 2 * wp) * 0.35 + wp * 0.65;
+    // From the flat ground onto the foot of the mountain (the PLAN's 210 to 330, started a little further out
+    // so the walk covers more than one body width on screen).
+    const FX = K.lerp(-413, -253, ease), FZ = K.lerp(-257, -177, ease), FY = K.groundY(FX, FZ);   // onto Altitude's task point
+    K.proj(c, FX, FY, FZ, P);
+    const hx = P[0], hy = P[1], hz = P[2], ps = Math.max(4.5, HERO_PS * K.F / hz);
+    const cad = walking ? 4 : 0, frame = walking ? Math.floor(t * cad) % 2 : 0;
+    const bob = frame ? -ps * 0.5 : Math.sin(t * 2.4) * ps * 0.15;
+    // Settle: a squash as the feet stop, then back up with a touch of stretch.
+    const sq = K.seg(t, WALK1, WALK1 + 0.14), un = K.seg(t, WALK1 + 0.14, WALK1 + 0.42);
+    const scaleY = 1 - 0.08 * K.eo(sq) + 0.08 * K.eo(un) + 0.025 * Math.sin(Math.PI * un);
+    const appear = K.eo(K.seg(t, 1.7, 2.3));
+    K.drawSprite(hero, 'climber', hx, hy, ps, K.CLAUDE, appear, { t, cadence: cad, bob: true, scaleY });
+
+    // The lantern hangs from the right end of the arm row (row 5 of 10), riding the same bob and squash
+    // the kit applied to the sprite.  It comes up a little as the hero gets ready to light it.
+    const lift = K.eio(K.seg(t, LIFT0, LIFT1));
+    const handX = hx + ps * 6.0, armY = hy + bob - (hy + bob - (hy - ps * 4.5 + bob)) * scaleY;
+    const handY = armY + ps * 1.65 - lift * ps * 0.9;
+    const on = lampOn(t);
+    K.drawLantern(lantern, handX, handY, ps, on, t);
+    lantern.g.setAttribute('opacity', appear.toFixed(3));
+    // A small bright halo on the lamp body itself, so it reads as the light source.
+    $('lampHalo').setAttribute('cx', K.fx(handX + Math.sin(1.5 * Math.sin(t * 2.1) * Math.PI / 180) * ps * 1.2));
+    $('lampHalo').setAttribute('cy', K.fx(handY + ps * 0.9));
+    $('lampHalo').setAttribute('r', K.fx(ps * (2.0 + 2.4 * on)));
+    $('lampHalo').setAttribute('opacity', (0.85 * on * appear).toFixed(3));
+    // A tighter pool than the kit's default so the edge of the light reads, centered on the ground at the
+    // hero's feet, with the overshoot the kit's clamped `on` cannot express.
+    const pS = poolScale(t), poolX = hx + ps * 2, poolY = hy - ps * 0.6;
+    const flick = t > POP + 0.8 ? 0.94 + 0.06 * Math.sin(t * 7.3) * Math.sin(t * 3.1) : 1;
+    lantern.pool.setAttribute('cx', K.fx(poolX)); lantern.pool.setAttribute('cy', K.fx(poolY));
+    lantern.pool.setAttribute('rx', K.fx(ps * 34 * pS)); lantern.pool.setAttribute('ry', K.fx(ps * 12.5 * pS));
+    lantern.pool.setAttribute('opacity', (on * appear * flick * 0.95).toFixed(3));
+
+    // ---- the terrain: moonlit, the near field faded so the mountain carries the frame ----
+    const land = K.eo(K.seg(t, 0.3, 2.4));
+    // The small foreground hill 'o' is dimmed a touch so the main mountain, where the light is, leads.
+    K.drawTerrain(T, c, land, L => [BLUE[0], BLUE[1], BLUE[2], L.hill === 'o' ? 0.72 : 1], { nearFade: true });
+    // The lit rings warm one by one, outward from the hero, toward the lamp's gold, with glow.
+    const R = ps * 52 * pS;
+    for (const o of lit) {
+      const k = K.eio(K.seg(t, POP + 0.05 + o.n * 0.11, POP + 0.55 + o.n * 0.11)) * (1 - 0.1 * o.n);
+      const el = o.L.el, base = +el.getAttribute('stroke-opacity');
+      if (k <= 0.002) { el.removeAttribute('filter'); continue; }
+      const op = K.lerp(base, 0.95, k);
+      o.grad.setAttribute('cx', K.fx(poolX)); o.grad.setAttribute('cy', K.fx(poolY));
+      o.grad.setAttribute('r', K.fx(R)); o.grad.setAttribute('gradientTransform',
+        'translate(' + K.fx(poolX) + ' ' + K.fx(poolY) + ') scale(1 0.42) translate(' + K.fx(-poolX) + ' ' + K.fx(-poolY) + ')');
+      o.stops[0].setAttribute('stop-color', rgb(mixc(BLUE, WARM, k))); o.stops[0].setAttribute('stop-opacity', 1);
+      o.stops[1].setAttribute('stop-color', rgb(mixc(BLUE, WARM, k * 0.75))); o.stops[1].setAttribute('stop-opacity', 1);
+      o.stops[2].setAttribute('stop-color', rgb(BLUE)); o.stops[2].setAttribute('stop-opacity', (base / op).toFixed(3));
+      el.setAttribute('stroke', 'url(#warm' + o.n + ')');
+      el.setAttribute('stroke-opacity', op.toFixed(3));
+      el.setAttribute('stroke-width', K.lerp(2.0, 2.8, k).toFixed(2));
+      if (k > 0.02) el.setAttribute('filter', 'url(#og)'); else el.removeAttribute('filter');
+    }
+
+    // ---- the team, in the dark ----
+    const order = [{ g: hero.g, z: hz }];
+    TEAM_AT.forEach(m => {
+      K.proj(c, m.x, m.y, m.z, P);
+      const a = 0.24 * K.eo(K.seg(t, TEAM + m.delay, TEAM + m.delay + 0.9));
+      K.drawCast(m.S, m.id, P[0], P[1], Math.max(4.5, HERO_PS * K.F / P[2]), a, { t: t + m.phase, cadence: 0, bob: true });
+      order.push({ g: m.S.g, z: P[2] });
+    });
+    K.depthSort(order);
+
+    K.fade($('h1'), t, H1, null);
+    K.fade($('h2'), t, H2, null);
+    // From black at the start; to black only after the deck's hold.
+    $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 1.4)) + K.ei(K.seg(t, 11.8, 12.9))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'night');
+})();
+</script>
+</body>
+</html>
