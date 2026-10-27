@@ -104,7 +104,7 @@
     return y;
   };
 
-  // ---------- pixel sprites (altitude.html's walker, recoloured, plus the monsters) ----------
+  // ---------- pixel sprites (altitude.html's walker, recolored, plus the monsters) ----------
   K.SPRITES = {
     climber: { body: ['0000110000', '0011111100', '0111111110', '0110110110', '0111111110', '1111111111', '0111111110', '0011111100'],
                legs: [['0110000110', '0110000110'], ['0011001100', '0001001000']] },
@@ -153,7 +153,7 @@
     el.setAttribute('transform', 'translate(0 ' + K.fx((1 - i) * (rise == null ? 24 : rise) - o * 16) + ')');
   };
 
-  // ---------- the player (altitude.html's, unchanged in behaviour) ----------
+  // ---------- the player (altitude.html's, unchanged in behavior) ----------
   K.player = function (DUR, holdDefault, render, name) {
     const $ = K.$, QS = new URLSearchParams(location.search), FROM = +(QS.get('from') || 0);
     const DECK = document.documentElement.classList.contains('deck'), HOLD = QS.has('to') ? +QS.get('to') : holdDefault;

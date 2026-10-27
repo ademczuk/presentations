@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#3ddc84; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Night: a lone green figure with a lamp at the foot of a contour-map mountain under the stars">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        #h1, #h2 { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <radialGradient id="sky" cx="50%" cy="30%" r="75%">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <radialGradient id="lampLight" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffe7a3" stop-opacity=".7"/>
+          <stop offset=".45" stop-color="#ffd36b" stop-opacity=".22"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <ellipse id="pool" fill="url(#lampLight)"/>
+      <g id="who" filter="url(#og)"></g>
+      <rect id="lamp" fill="#ffe7a3" filter="url(#og)"/>
+      <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
+        <text id="h1" x="960" y="150">You have context with your AI.</text>
+        <text id="h2" x="960" y="246" fill="#3ddc84">Does your team share it?</text>
+      </g>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="13" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 13.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$;
+  const DUR = 13, HOLD = 11.4;
+  const VIEW = { tx: 300, ty: 170, tz: 560, d: 2250, yaw: -0.28, pitch: 0.27, dolly: 12, drift: 0.003 };
+  const stars = K.stars($('stars'), 170, 41, 560);
+  const T = K.terrain($('terrain'));
+  const who = K.sprite($('who'));
+  // The figure stands at the foot of the main mountain, on the side that faces the camera.
+  const FX = 330, FZ = 360, FY = K.groundY(FX, FZ);
+  const P = [0, 0, 0];
+
+  function render(t) {
+    const c = K.camera(VIEW, t);
+    const sky = K.eo(K.seg(t, 0.2, 2.6));
+    K.drawStars(stars, t, sky);
+    const land = K.eo(K.seg(t, 0.8, 3.4));
+    K.drawTerrain(T, c, land, L => {
+      // Moonlit blue-grey; the lines near the figure take a little of the lamp's warmth once it is lit.
+      const lit = K.seg(t, 3.0, 4.4);
+      if (L.hill === 'o' || (L.hill === 'm' && L.q < 0.12)) return [Math.round(K.lerp(118, 170, lit)), Math.round(K.lerp(132, 150, lit)), Math.round(K.lerp(160, 120, lit)), 1];
+      return [118, 132, 160, 1];
+    });
+    K.proj(c, FX, FY, FZ, P);
+    const ps = 9.5 * K.F / P[2];
+    const appear = K.eo(K.seg(t, 2.2, 3.2));
+    const fr = t > 2.2 && t < 3.6 ? Math.floor(t * 4) % 2 : 0;
+    K.drawSprite(who, 'climber', P[0], P[1], ps, K.GREEN, appear, fr);
+    // The lamp: held up at the figure's right hand, then lit.
+    const on = K.eo(K.seg(t, 3.0, 4.2)), flick = 0.92 + 0.08 * Math.sin(t * 9.0) * Math.sin(t * 3.7);
+    const lx = P[0] + ps * 6.4, ly = P[1] - ps * 7.2;
+    $('lamp').setAttribute('x', K.fx(lx - ps * 0.9)); $('lamp').setAttribute('y', K.fx(ly - ps * 1.4));
+    $('lamp').setAttribute('width', K.fx(ps * 1.8)); $('lamp').setAttribute('height', K.fx(ps * 2.2));
+    $('lamp').setAttribute('opacity', (appear * (0.35 + 0.65 * on)).toFixed(3));
+    $('pool').setAttribute('cx', K.fx(lx)); $('pool').setAttribute('cy', K.fx(P[1] - ps * 2));
+    $('pool').setAttribute('rx', K.fx(ps * 58 * (0.55 + 0.45 * on))); $('pool').setAttribute('ry', K.fx(ps * 26 * (0.55 + 0.45 * on)));
+    $('pool').setAttribute('opacity', (on * flick).toFixed(3));
+    K.fade($('h1'), t, 4.8, null);
+    K.fade($('h2'), t, 7.4, null);
+    // From black at the start; to black only after the deck's hold.
+    $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 1.4)) + K.ei(K.seg(t, 11.8, 12.9))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'night');
+})();
+</script>
+</body>
+</html>
