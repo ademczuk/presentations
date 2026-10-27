@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limits</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Limits: the rope team keeps monsters outside its lantern light, checks the freshness of its map, and waits for a person to open a gate">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        .cap text, #illustration { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <radialGradient id="sky" gradientUnits="userSpaceOnUse" cx=".5" cy=".3" r=".75" gradientTransform="matrix(1920 0 0 1080 0 0)">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+        <radialGradient id="poolGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#ffe7a3" stop-opacity=".62"/>
+          <stop offset=".38" stop-color="#ffd36b" stop-opacity=".26"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#fff3cf" stop-opacity=".95"/>
+          <stop offset=".3" stop-color="#ffd36b" stop-opacity=".45"/>
+          <stop offset="1" stop-color="#ffd36b" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="skyMask"></g>
+      <g id="poolLayer"></g>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="actors">
+        <g id="mapSign">
+          <line id="mapPost" x1="0" y1="0" x2="0" y2="-102" stroke="#c9b27a" stroke-width="9" stroke-linecap="round"/>
+          <rect x="-66" y="-154" width="132" height="66" rx="5" fill="#252321" stroke="#c9b27a" stroke-width="4"/>
+          <path d="M-55 -129 C-35 -150 -14 -104 8 -130 S42 -144 55 -124 M-55 -110 C-31 -133 -13 -91 13 -113 S42 -126 55 -106" fill="none" stroke="#8d949e" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="20" cy="-126" r="6" fill="#ff6a1f"/>
+        </g>
+        <g id="gate" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path id="gateGlow" stroke="#ff6a1f" stroke-width="13" filter="url(#og)" opacity=".5"/>
+          <path id="gatePosts" stroke="#f2ece4" stroke-width="8"/>
+          <line id="gateBarGlow" stroke="#ff6a1f" stroke-width="15" filter="url(#og)" opacity=".55"/>
+          <line id="gateBar" stroke="#f2ece4" stroke-width="9"/>
+        </g>
+        <g id="team"></g>
+        <g id="personLayer"></g>
+        <g id="monsters"></g>
+      </g>
+      <g id="lampLayer" filter="url(#og)"><circle id="lampHalo" fill="url(#haloGrad)"/></g>
+      <g id="labels"></g>
+      <g class="cap" text-anchor="middle">
+        <text id="h1" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">The horde never fully goes away.</text>
+        <text id="s1" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">Some always wait at the edge of the light.</text>
+        <text id="h2" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">Check how fresh the map is.</text>
+        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">One index was 67 commits behind the code it described.</text>
+        <text id="h3" class="serif" x="960" y="142" font-size="68" fill="#f2ece4">People still decide.</text>
+      </g>
+      <text id="illustration" class="sans" style="font-weight:600" x="42" y="1032" font-size="24" fill="#8d949e">illustration</text>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="19.2" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 19.2 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$, seg = K.seg, lerp = K.lerp, eo = K.eo, ei = K.ei, eio = K.eio, fx = K.fx;
+  // beats: 0-6 the fringe remains | 6-12 the map is stale | 12-18 a person opens the gate.
+  // Deck ranges: 0-6, 6-12, 12-18. Every moving part settles before each endpoint.
+  const DUR = 19.2, HOLD = 18, B1 = 6, B2 = 12;
+  const HERO = 11, MON = 8.8;
+
+  // Fight's slope placement and final camera keep the task point, outcome hill, and summit in the same view.
+  const FOOT = [160, 330], TOPP = [470, 840];
+  const TASK = [-253, -177], PIV_S = 0.47, HO = K.HILLS.find(H => H.id === 'o');
+  const PIV = [lerp(FOOT[0], TOPP[0], PIV_S), lerp(FOOT[1], TOPP[1], PIV_S)];
+  const ROT = Math.atan2(HO.x - TASK[0], HO.z - TASK[1]) - Math.atan2(TOPP[0] - FOOT[0], TOPP[1] - FOOT[1]);
+  const CR = Math.cos(ROT), SR = Math.sin(ROT);
+  const place = (x, z) => { const vx = x - PIV[0], vz = z - PIV[1]; return [TASK[0] + vx * CR + vz * SR, TASK[1] - vx * SR + vz * CR]; };
+  const at = (s, side) => { const q = place(lerp(FOOT[0], TOPP[0], s) + side, lerp(FOOT[1], TOPP[1], s) - side * 0.35); return [q[0], K.groundY(q[0], q[1]), q[1]]; };
+  const moveKey = v => { const q = place(v.tx, v.tz); return Object.assign({}, v, { tx: q[0], tz: q[1], ty: v.ty - K.groundY(v.tx, v.tz) + K.groundY(q[0], q[1]), yaw: v.yaw + ROT }); };
+  const K4 = { tx: 395, ty: 170, tz: 510, d: 1350, yaw: -0.45, pitch: 0.34 };
+  const finalKey = moveKey(K4);
+  const KEYS = [Object.assign({ t: 0 }, finalKey), Object.assign({ t: HOLD }, finalKey)];
+  const P = [0, 0, 0];
+  let cam = K.keyCamera(KEYS, 0);
+  const proj = w => { K.proj(cam, w[0], w[1], w[2], P); return [P[0], P[1], P[2]]; };
+  const above = (w, h) => proj([w[0], w[1] + h, w[2]]);
+
+  K.SPRITES.person = {
+    body: ['00011000', '00111100', '00111100', '00011000', '00111100', '01111110', '01111110', '00111100', '00111100', '00111100', '00011000'],
+    legs: [['00100100', '00100100', '01100110'], ['00100100', '00011000', '01100110']]
+  };
+
+  const stars = K.stars($('stars'), 150, 41, 520);
+  const mask = K.skyMask($('skyMask'));
+  const T = K.terrain($('terrain'));
+  const lantern = K.lantern($('lampLayer'));
+  $('poolLayer').appendChild(lantern.pool);
+  lantern.pool.setAttribute('fill', 'url(#poolGrad)');
+
+  const TEAM_AT = {
+    claude: [0.47, -40], codex: [0.44, -190], kimi: [0.43, 130],
+    antigravity: [0.55, -240], grok: [0.55, 200], local: [0.36, 20]
+  };
+  const TEAM = K.CAST_ORDER.map((id, i) => {
+    const w = TEAM_AT[id];
+    return { id, s: w[0], side: w[1], S: K.sprite($('team'), { glow: true }), L: K.label($('labels'), K.CAST[id].name, { lift: 84, size: 26, h: 50 }), t0: 0.9 + i * 0.68 };
+  });
+  const CLAUDE = TEAM[0];
+  const person = K.sprite($('personLayer'), { glow: true });
+  const L_old = K.label($('labels'), '67 commits behind', { lift: 76, size: 28, h: 54 });
+
+  const rr = K.rng(9009);
+  const MON_AT = [
+    ['shambler', K.GREEN, 0.02, -520], ['mutant', K.RED, -0.16, -540],
+    ['zmutant', K.PURPLE, -0.26, 40], ['shambler', K.GREEN, -0.10, 360],
+    ['mutant', K.RED, 0.06, 580], ['zmutant', K.PURPLE, -0.34, 620]
+  ];
+  const MONSTERS = MON_AT.map((m, i) => ({
+    kind: m[0], color: m[1], s: m[2], side: m[3], phase: rr() * 2,
+    t0: 0.8 + rr() * 0.8, t1: 4.1 + rr() * 0.7, dir: i % 2 ? -1 : 1,
+    S: K.sprite($('monsters'), { outline: true })
+  }));
+
+  function render(t) {
+    cam = K.keyCamera(KEYS, t);
+    const open = eo(seg(t, 0, 0.9));
+    K.drawStars(stars, 0, open);
+    K.drawSkyMask(mask, T, cam, ['m', 'w', 'o', 'f'], 'url(#sky)');
+    $('skyMask').setAttribute('opacity', open.toFixed(3));
+    K.drawTerrain(T, cam, open, L => L.hill === 'o' ? [137, 140, 151, 1] : [118, 132, 160, 1], { nearFade: true });
+
+    const dim = eio(seg(t, 6.2, 7.4));
+    const mapIn = eo(seg(t, 6.25, 7.0));
+    const mapOut = seg(t, 12.2, 12.8);
+    const gateIn = eo(seg(t, 12.2, 12.9));
+    const gateOpen = eio(seg(t, 14.9, 16.7));
+    const order = [];
+
+    // Each defender is named once, then the label leaves. No name pills remain at a hold.
+    let claudeDraw = null;
+    TEAM.forEach(m => {
+      const w = proj(at(m.s, m.side)), ps = HERO * K.F / w[2];
+      K.drawCast(m.S, m.id, w[0], w[1], ps, open, { phase: 0, flip: m.side > 40 });
+      order.push({ g: m.S.g, z: w[2] });
+      const out = seg(t, m.t0 + 0.62, m.t0 + 0.88);
+      K.drawLabel(m.L, w[0], w[1] - ps * 10.5, eio(seg(t, m.t0, m.t0 + 0.22)) * (1 - out), eo(seg(t, m.t0 + 0.12, m.t0 + 0.36)) * (1 - out), K.CAST[m.id].color);
+      if (m === CLAUDE) claudeDraw = { x: w[0], y: w[1], ps, z: w[2] };
+    });
+
+    // Claude carries the only lantern. Its pool dims during the stale-map beat and then stays still.
+    const hx = claudeDraw.x + claudeDraw.ps * 5.6, hy = claudeDraw.y - claudeDraw.ps * 4.4;
+    K.drawLantern(lantern, hx, hy, claudeDraw.ps, 1, 0);
+    lantern.g.setAttribute('opacity', open.toFixed(3));
+    $('lampHalo').setAttribute('cx', fx(hx));
+    $('lampHalo').setAttribute('cy', fx(hy + claudeDraw.ps * 1.2));
+    $('lampHalo').setAttribute('r', fx(claudeDraw.ps * 4.4));
+    $('lampHalo').setAttribute('opacity', (0.72 * open * (1 - 0.18 * dim)).toFixed(3));
+    lantern.pool.setAttribute('cx', fx(claudeDraw.x + claudeDraw.ps * 2));
+    lantern.pool.setAttribute('cy', fx(claudeDraw.y - claudeDraw.ps * 0.5));
+    lantern.pool.setAttribute('rx', fx(claudeDraw.ps * 56 * (1 - 0.07 * dim)));
+    lantern.pool.setAttribute('ry', fx(claudeDraw.ps * 18 * (1 - 0.07 * dim)));
+    lantern.pool.setAttribute('opacity', (open * 0.95 * (1 - 0.3 * dim)).toFixed(3));
+
+    // The map is a small sign beside the team, with the measured staleness in the kit's label style.
+    const mp = proj(at(0.54, -345)), mw = [mp[0] - 120, mp[1] - 10, mp[2]];
+    const ms = Math.max(0.7, Math.min(1.2, 1050 / mw[2]));
+    $('mapSign').setAttribute('transform', 'translate(' + fx(mw[0]) + ' ' + fx(mw[1]) + ') scale(' + ms.toFixed(3) + ')');
+    $('mapSign').setAttribute('opacity', (mapIn * (1 - 0.35 * mapOut)).toFixed(3));
+    order.push({ g: $('mapSign'), z: mw[2] });
+    K.drawLabel(L_old, mw[0], mw[1] - 154 * ms, eio(seg(t, 6.55, 6.95)) * (1 - mapOut), eo(seg(t, 6.85, 7.3)) * (1 - mapOut), K.GREY);
+
+    // The person waits beyond the gate. Two small bobs finish before the gate swings upward.
+    const nod = Math.sin(Math.PI * seg(t, 13.55, 14.05)) + Math.sin(Math.PI * seg(t, 14.15, 14.65));
+    const pw = proj(at(0.67, 205)), pps = HERO * K.F / pw[2];
+    K.drawSprite(person, 'person', pw[0], pw[1] + nod * pps * 0.55, pps, '#f2ece4', gateIn, { phase: 0, flip: true });
+    order.push({ g: person.g, z: pw[2] });
+
+    const gl = at(0.64, -145), gr = at(0.64, 145);
+    const glb = proj(gl), grb = proj(gr), glt = above(gl, 145), grt = above(gr, 145);
+    const posts = 'M' + fx(glb[0]) + ' ' + fx(glb[1]) + 'L' + fx(glt[0]) + ' ' + fx(glt[1]) + 'M' + fx(grb[0]) + ' ' + fx(grb[1]) + 'L' + fx(grt[0]) + ' ' + fx(grt[1]);
+    $('gatePosts').setAttribute('d', posts);
+    $('gateGlow').setAttribute('d', posts);
+    const ba = above(gl, 76), bb = above(gr, 76);
+    const dx = bb[0] - ba[0], dy = bb[1] - ba[1], ang = -Math.PI * 0.5 * gateOpen;
+    const bx = ba[0] + dx * Math.cos(ang) - dy * Math.sin(ang), by = ba[1] + dx * Math.sin(ang) + dy * Math.cos(ang);
+    for (const el of [$('gateBar'), $('gateBarGlow')]) {
+      el.setAttribute('x1', fx(ba[0])); el.setAttribute('y1', fx(ba[1]));
+      el.setAttribute('x2', fx(bx)); el.setAttribute('y2', fx(by));
+    }
+    $('gate').setAttribute('opacity', gateIn.toFixed(3));
+    order.push({ g: $('gate'), z: (glb[2] + grb[2]) / 2 });
+
+    // The fringe wanders within each beat and returns to rest before every hold. Nobody is destroyed.
+    const bt = t < B1 ? t : t < B2 ? t - B1 : t - B2;
+    MONSTERS.forEach(m => {
+      const walk = seg(bt, m.t0, m.t1), moving = bt > m.t0 && bt < m.t1;
+      const sway = Math.sin(Math.PI * walk);
+      const w = proj(at(m.s + 0.018 * sway * m.dir, m.side + 82 * sway * m.dir));
+      const ps = MON * K.F / w[2], fr = moving ? Math.floor(bt * 3.2 + m.phase) % 2 : 0;
+      K.drawSprite(m.S, m.kind, w[0], w[1], ps, m.color, open * 0.88, { phase: fr, flip: m.dir < 0, outline: true });
+      order.push({ g: m.S.g, z: w[2] });
+    });
+    K.depthSort(order);
+
+    K.fade($('h1'), t, 0.45, B1);
+    K.fade($('s1'), t, 1.05, B1);
+    K.fade($('h2'), t, 6.45, B2);
+    K.fade($('s2'), t, 7.05, B2);
+    K.fade($('h3'), t, 12.45, null);
+    $('illustration').setAttribute('opacity', eo(seg(t, 0.8, 1.4)).toFixed(3));
+    $('fade').setAttribute('opacity', (1 - open + ei(seg(t, 18.25, 19.1))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'limits');
+})();
+</script>
+</body>
+</html>
