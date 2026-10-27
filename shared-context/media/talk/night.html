@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="fonts.css">
 <script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
 <style>
-  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#3ddc84; }
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
   @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
   * { box-sizing:border-box }
   html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
@@ -32,7 +32,7 @@
 <body>
 <main>
   <div class="frame">
-    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Night: a lone green figure with a lamp at the foot of a contour-map mountain under the stars">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Night: a lone orange Claude figure with a lantern at the foot of a contour-map mountain under the stars">
       <style>
         .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
         .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
@@ -62,7 +62,7 @@
       <g id="lantern" filter="url(#og)"><path id="lampHandle" fill="none" stroke="#c9b27a" stroke-width="2"/><rect id="lampCap" fill="#c9b27a"/><rect id="lamp" fill="#ffe7a3"/></g>
       <g class="serif" text-anchor="middle" font-size="76" fill="#f2ece4">
         <text id="h1" x="960" y="150">You have context with your AI.</text>
-        <text id="h2" x="960" y="246" fill="#3ddc84">Does your team share it?</text>
+        <text id="h2" x="960" y="246" fill="#ff6a1f">Does your team share it?</text>
       </g>
       <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
     </svg>
@@ -102,7 +102,7 @@
     const ps = 9.5 * K.F / P[2];
     const appear = K.eo(K.seg(t, 2.2, 3.2));
     const fr = t > 2.2 && t < 3.6 ? Math.floor(t * 4) % 2 : 0;
-    K.drawSprite(who, 'climber', P[0], P[1], ps, K.GREEN, appear, fr);
+    K.drawSprite(who, 'climber', P[0], P[1], ps, K.ORANGE, appear, fr);
     // The lamp: held up at the figure's right hand, then lit.
     const on = K.eo(K.seg(t, 3.0, 4.2)), flick = 0.92 + 0.08 * Math.sin(t * 9.0) * Math.sin(t * 3.7);
     const lx = P[0] + ps * 6.4, ly = P[1] - ps * 7.2;

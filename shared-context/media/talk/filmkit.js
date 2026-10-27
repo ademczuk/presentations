@@ -14,7 +14,12 @@
   K.rng = function (s) { let a = s >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
   K.mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
   K.$ = id => document.getElementById(id);
+  // Cast colors (Andrew, 27 Oct): the Claude bot keeps Altitude's original orange; zombie threads are green,
+  // mutant processes red, and the zombie mutants of the horde purple.
+  K.ORANGE = '#ff6a1f';
   K.GREEN = '#3ddc84';
+  K.RED = '#ff4b4b';
+  K.PURPLE = '#a56bff';
   K.GREY = '#8d949e';
 
   // ---------- the camera (altitude.html's projection, one fixed view per film plus a slow drift) ----------
@@ -111,21 +116,30 @@
     blob: { body: ['0001111000', '0111111110', '1111111111', '1101111011', '1111111111', '1111111111', '0111111110', '0011001100'],
             legs: [['0100000010', '0000000000'], ['0010000100', '0000000000']] },
     zombie: { body: ['0001111000', '0011111100', '0011001100', '0011111100', '1111111111', '1001111001', '0001111000', '0001111000'],
-              legs: [['0011001100', '0110000110'], ['0001111000', '0011001100']] }
+              legs: [['0011001100', '0110000110'], ['0001111000', '0011001100']] },
+    // 12-wide monsters designed for the 27 Oct rework (Kimi K3, checked against the brief): the zombie thread
+    // shambles with arms out, the mutant buds a second head, the zombie mutant has a jagged crown and three legs.
+    shambler: { body: ['000111100000', '001111111000', '001001011000', '011111111100', '111111111111', '011111111110', '001111111000', '001111110000', '000111100000', '000111100000'],
+             legs: [['001100011000', '011000001100'], ['000110001100', '001100000110']] },
+    mutant: { body: ['000110011000', '001111111100', '011101101110', '011111111110', '001111111100', '001111111100', '011111111110', '011111111110', '001111111100', '000111111000'],
+             legs: [['001100011000', '001100011000'], ['000110011000', '000110001100']] },
+    zmutant: { body: ['001011010000', '011111111000', '011011011100', '111111111110', '011111111111', '001111111110', '011111111100', '001111111000', '000111110000', '000111100000'],
+             legs: [['001100110000', '011001101100'], ['000110110000', '001101100110']] }
   };
   K.sprite = function (parent) {
     const g = K.mk('g', {}, parent), px = [];
-    for (let r = 0; r < 10; r++) for (let q = 0; q < 10; q++) px.push({ r, q, el: K.mk('rect', {}, g) });
+    // 12 wide by 13 tall covers every sprite in K.SPRITES (body up to 11 rows plus 2 leg rows).
+    for (let r = 0; r < 13; r++) for (let q = 0; q < 12; q++) px.push({ r, q, el: K.mk('rect', {}, g) });
     return { g, px };
   };
   // Draw sprite S of kind `kind` with its feet at screen (x, y), pixel size ps, walk frame fr.
   K.drawSprite = function (S, kind, x, y, ps, fill, opacity, fr) {
     if (opacity <= 0.002 || ps <= 0.05) { S.g.style.display = 'none'; return; }
     S.g.style.display = ''; S.g.setAttribute('fill', fill); S.g.setAttribute('opacity', opacity.toFixed(3));
-    const def = K.SPRITES[kind], rows = def.body.concat(def.legs[fr ? 1 : 0]);
-    const x0 = x - ps * 5, y0 = y - ps * rows.length;
+    const def = K.SPRITES[kind], rows = def.body.concat(def.legs[fr ? 1 : 0]), wd = rows[0].length;
+    const x0 = x - ps * wd / 2, y0 = y - ps * rows.length;
     for (const p of S.px) {
-      if (rows[p.r][p.q] !== '1') { p.el.setAttribute('width', 0); continue; }
+      if (p.r >= rows.length || p.q >= wd || rows[p.r][p.q] !== '1') { p.el.setAttribute('width', 0); continue; }
       p.el.setAttribute('x', K.fx(x0 + p.q * ps)); p.el.setAttribute('y', K.fx(y0 + p.r * ps));
       p.el.setAttribute('width', (ps + 0.6).toFixed(2)); p.el.setAttribute('height', (ps + 0.6).toFixed(2));
     }
