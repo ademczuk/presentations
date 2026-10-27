@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The team</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#ff6a1f; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The team: six AI models as pixel figures, Claude, Codex, Kimi, Antigravity, Grok and local models, joined by one dotted line; facing them, the three kinds of monster">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        #h1, #s1 { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+      </style>
+      <defs>
+        <radialGradient id="sky" gradientUnits="userSpaceOnUse" cx=".5" cy=".3" r=".75" gradientTransform="matrix(1920 0 0 1080 0 0)">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="halo" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <line x1="120" y1="760" x2="1800" y2="760" stroke="#263044" stroke-width="2"/>
+      <path id="rope" fill="none" stroke="#f2ece4" stroke-width="3" stroke-dasharray="4 14" stroke-linecap="round" opacity=".7"/>
+      <g id="actors"></g>
+      <g id="labels"></g>
+      <g class="serif" text-anchor="middle" fill="#f2ece4">
+        <text id="h1" x="960" y="160" font-size="68">One team, many models.</text>
+      </g>
+      <text id="s1" class="sans" x="960" y="232" text-anchor="middle" font-size="34" fill="#a6a098" style="font-weight:600">Different models, one shared channel.</text>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 10.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$;
+  // beats: 0-5.2 the team walks in, one model at a time, and the rope joins them | 5.2-8.6 the monsters arrive | hold 8.6
+  const DUR = 10, HOLD = 8.6;
+  const GROUND = 760, PS = 10, SPACING = 165, X0 = 190;
+  const stars = K.stars($('stars'), 140, 53, 520);
+  const team = K.CAST_ORDER.map((id, i) => ({
+    id, i, x: X0 + i * SPACING, at: 0.5 + i * 0.45,
+    S: K.sprite($('actors'), { glow: true }), L: K.label($('labels'), K.CAST[id].name, { lift: 46, size: 28, h: 52 }) }));
+  const ROPE = 3.6, ALERT = 5.2;
+  const MON = [['shambler', K.GREEN, 'zombie threads'], ['mutant', K.RED, 'mutant processes'], ['zmutant', K.PURPLE, 'the horde']]
+    .map(([kind, color, name], i) => ({ kind, color, i, x: 1260 + i * 230, at: ALERT + i * 0.4,
+      S: K.sprite($('actors'), {}), L: K.label($('labels'), name, { lift: 40, size: 26, h: 50 }) }));
+  const ropeD = 'M' + team.map(m => (m.x) + ' ' + (GROUND - PS * 6)).join(' L');
+  $('rope').setAttribute('d', ropeD);
+  const ropeLen = (team.length - 1) * SPACING;
+  $('rope').setAttribute('stroke-dasharray', '4 14');
+
+  function render(t) {
+    K.drawStars(stars, t, 0.8);
+    team.forEach(m => {
+      const k = K.eo(K.seg(t, m.at, m.at + 0.9));
+      const x = m.x - (1 - k) * 220, walking = k > 0 && k < 1;
+      K.drawCast(m.S, m.id, x, GROUND, PS, k, { t, cadence: walking ? 6 : 0, phase: 0, bob: true });
+      K.drawLabel(m.L, x, GROUND - PS * 13 - (m.i % 2) * 64, K.seg(t, m.at + 0.5, m.at + 1.0), K.seg(t, m.at + 0.5, m.at + 1.0), K.CAST[m.id].color);
+    });
+    const r = K.eio(K.seg(t, ROPE, ROPE + 1.2));
+    $('rope').setAttribute('stroke-dashoffset', '0');
+    $('rope').setAttribute('clip-path', '');
+    $('rope').style.opacity = (0.7 * K.seg(t, ROPE, ROPE + 0.3)).toFixed(3);
+    $('rope').setAttribute('d', r > 0 ? 'M' + team[0].x + ' ' + (GROUND - PS * 6) + ' L' + K.fx(team[0].x + ropeLen * r) + ' ' + (GROUND - PS * 6) : 'M0 0');
+    MON.forEach(m => {
+      const k = K.eo(K.seg(t, m.at, m.at + 1.0));
+      K.drawSprite(m.S, m.kind, m.x + (1 - k) * 260, GROUND, PS * 0.9, m.color, k, { t, cadence: k < 1 ? 5 : 1.2, phase: 0.3, bob: true, flip: true });
+      K.drawLabel(m.L, m.x + (1 - k) * 260, GROUND - PS * 12 - (m.i % 2) * 64, K.seg(t, m.at + 0.5, m.at + 1.0), K.seg(t, m.at + 0.5, m.at + 1.0), m.color);
+    });
+    K.fade($('h1'), t, 0.4, null);
+    K.fade($('s1'), t, ROPE + 0.4, null);
+    $('fade').setAttribute('opacity', (1 - K.eo(K.seg(t, 0, 0.6)) + K.ei(K.seg(t, 9.2, 9.9))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'cast');
+})();
+</script>
+</body>
+</html>

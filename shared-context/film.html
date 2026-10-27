@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared Context, the film</title>
+<meta name="description" content="A talk told as one animated night film: a team of different AI models climbs one mountain, holds off zombie threads, mutant processes and the horde, and finds that the map they share is a graph in the stars.">
+<link rel="stylesheet" href="media/film/fonts.css">
+<style>
+  :root { --ground:#06070a; --ink:#f2ece4; --muted:#a6a098; --line:#263044; --accent:#ff6a1f; color-scheme:dark; }
+  * { box-sizing:border-box }
+  html, body { margin:0; height:100%; background:var(--ground); color:var(--ink); font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; overflow:hidden }
+  #stage { position:absolute; left:50%; top:50%; width:min(100vw, 177.78vh); height:min(100vh, 56.25vw); transform:translate(-50%, -50%); background:#0b0d12; overflow:hidden }
+  #stage iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:#0b0d12; pointer-events:none; visibility:hidden }
+  #stage iframe.on { visibility:visible }
+  .card { position:absolute; inset:0; display:none; container-type:size }
+  .card.on { display:block }
+  /* the cover and the live page are drawn in the films' own type, sized to the stage */
+  .cover { background:radial-gradient(circle at 50% 30%, #1a2232 0, #0b0d12 75%) }
+  .cover h1 { position:absolute; left:0; right:0; top:22%; margin:0; text-align:center; font:700 9cqh/1.05 'Source Serif 4', Georgia, serif }
+  .cover .q { position:absolute; left:0; right:0; top:39%; text-align:center; font:600 3.4cqh/1.3 Manrope, Arial, sans-serif; color:var(--muted) }
+  .cover .q b { color:var(--accent); font-weight:700 }
+  .cover svg { position:absolute; left:50%; top:52%; width:52cqw; height:16cqh; transform:translateX(-50%) }
+  .cover .by { position:absolute; left:0; right:0; bottom:13%; text-align:center; font:700 3.2cqh/1.2 Manrope, Arial, sans-serif }
+  .cover .ev { position:absolute; left:0; right:0; bottom:8.5%; text-align:center; font:600 2.4cqh/1.2 Manrope, Arial, sans-serif; color:var(--muted) }
+  .live { background:#0b0d12; display:none; place-content:center; text-align:center }
+  .live.on { display:grid }
+  .live h1 { margin:0; font:700 7.5cqh/1.1 'Source Serif 4', Georgia, serif; display:flex; align-items:center; gap:2.4cqh; justify-content:center }
+  .live p { margin:3cqh 0 0; font:600 3.2cqh/1.4 Manrope, Arial, sans-serif; color:var(--muted) }
+  .dot { width:3.2cqh; height:3.2cqh; border-radius:50%; background:#ff4b4b; box-shadow:0 0 0 0 rgba(255,75,75,.6); animation:pulse 1.6s ease-out infinite }
+  @keyframes pulse { to { box-shadow:0 0 0 3cqh rgba(255,75,75,0) } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation:none } }
+  #hud { position:fixed; right:14px; bottom:10px; font:600 12px/1 Manrope, Arial, sans-serif; color:#6f7685; letter-spacing:.06em; opacity:.0; transition:opacity .4s; pointer-events:none }
+  body:hover #hud, #hud.show { opacity:1 }
+  #notes { position:fixed; left:0; right:0; bottom:0; padding:16px 22px 18px; background:rgba(8,10,14,.92); border-top:1px solid var(--line); font:600 17px/1.5 Manrope, Arial, sans-serif; color:#d9d2c9; display:none; max-height:40vh; overflow:auto }
+  #notes.on { display:block }
+  #notes .nm { color:var(--accent); font-weight:700; margin-right:10px }
+  #help { position:fixed; inset:0; display:none; place-content:center; background:rgba(6,7,10,.86); z-index:5 }
+  #help.on { display:grid }
+  #help div { background:#131824; border:1px solid var(--line); border-radius:10px; padding:24px 28px; font:600 15px/1.9 Manrope, Arial, sans-serif; color:var(--ink); max-width:min(560px, calc(100vw - 32px)) }
+  #help kbd { font:700 13px Manrope, Arial, sans-serif; border:1px solid var(--line); border-radius:6px; padding:2px 8px; margin-right:8px; background:#0b0d12 }
+  #blank { position:fixed; inset:0; background:#000; display:none; z-index:4 }
+  #blank.on { display:block }
+  .skip { position:absolute; left:-9999px }
+  .skip:focus { left:16px; top:16px; z-index:9; background:#131824; color:var(--ink); padding:8px 12px; border-radius:8px }
+</style>
+</head>
+<body>
+<a class="skip" href="#help" onclick="Film.help(true);return false">Keyboard controls</a>
+<div id="stage" aria-live="polite">
+  <iframe id="bufA" title="scene" tabindex="-1"></iframe>
+  <iframe id="bufB" title="scene" tabindex="-1"></iframe>
+  <section class="card cover" id="card-cover" aria-label="Title">
+    <h1>Shared Context</h1>
+    <div class="q">You have context with your AI. <b>Does your team share it?</b></div>
+    <svg id="coverCast" viewBox="0 0 960 180" aria-label="The team: Claude, Codex, Kimi, Antigravity, Grok and local models"></svg>
+    <div class="by">Andrew Demczuk</div>
+    <div class="ev">Agentic AI in Practice, AI Factory Austria, 18 November 2026</div>
+  </section>
+  <section class="card live" id="card-live" aria-label="Live">
+    <div><h1><span class="dot"></span>Our company graph, live</h1><p>The repositories we index, with meeting notes and decisions alongside.</p></div>
+  </section>
+</div>
+<div id="hud"></div>
+<div id="notes"></div>
+<div id="blank"></div>
+<div id="help" role="dialog" aria-label="Keyboard controls"><div>
+  <kbd>Right</kbd><kbd>Space</kbd> finish the beat, then next<br>
+  <kbd>Left</kbd> previous beat<br>
+  <kbd>Home</kbd><kbd>End</kbd> first or last<br>
+  <kbd>F</kbd> full screen &nbsp; <kbd>N</kbd> speaker notes &nbsp; <kbd>B</kbd> black screen<br>
+  <kbd>?</kbd> this help. Click the right or left half of the screen to move on or back.<br>
+  Each scene is also a page of its own in <code>media/film/</code>, with play and scrub controls.
+</div></div>
+<script src="media/film/filmkit.js"></script>
+<script>
+(function () {
+  'use strict';
+  var F = 'media/film/';
+  // One entry per press-to-press beat. from/to are the scene's own seconds (its ?deck&from=&to= range).
+  var PAGES = [
+    { name: 'Shared Context', card: 'cover', notes: 'Open on the question. Then right arrow into the night.' },
+    { name: '1 Night', src: 'night.html', notes: 'One climber, one lamp, at the task point. The others wait in the dark beyond its light, and they are not all the same: different models.' },
+    { name: '2 The task', src: 'altitude.html', to: 11.6, notes: 'Felix Rieseberg&#39;s idea, drawn as altitude. A task is often just your best guess.' },
+    { name: '2 The goal', src: 'altitude.html', from: 11.6, to: 14.1, notes: 'Ask for the goal, and let it find the path.' },
+    { name: '2 The company objective', src: 'altitude.html', from: 14.1, notes: 'Better still, the company objective.' },
+    { name: 'The team', src: 'cast.html', notes: 'Now we know what this work is for. Can the agents actually deliver it? This is the team: Claude, Codex, Kimi, Antigravity, Grok and local models, on one shared channel. And this is what comes up the mountain after them.' },
+    { name: '3 Mutant processes', src: 'horde.html', from: 0, to: 9, notes: 'One run started 384 helpers; 341 died on a shared limit before finishing. The design and critic phases never ran.' },
+    { name: '3 Zombie threads', src: 'horde.html', from: 9, to: 18.5, notes: 'A tool said stopped. It kept running, and two copies were writing the same file.' },
+    { name: '3 Built twice', src: 'horde.html', from: 18.5, to: 25, notes: 'Two agents built the same fix, 25 minutes apart; each had searched, in the wrong place.' },
+    { name: '3 Every version', src: 'horde.html', from: 25, to: 32, notes: 'One change, and a second reviewer found a real defect in every version. Say the count on the day.' },
+    { name: '4 A gate', src: 'fight.html', from: 0, to: 8, notes: 'Tools that refuse, not warn. A gate on the send path: the message is refused, not flagged.' },
+    { name: '4 A rope', src: 'fight.html', from: 8, to: 16, notes: 'One writer, a different reviewer, and they are different models. One named merger, pinned to the reviewed version.' },
+    { name: '4 A lamp', src: 'fight.html', from: 16, to: 24, notes: 'A map that says how old it is. One index was 67 commits behind the code it described.' },
+    { name: '4 Waiting for a yes', src: 'fight.html', from: 24, to: 32, notes: 'A carrier that will not pass a build on without the reviewer&#39;s signed yes for that exact build. Live since 27 October, nothing carried yet.' },
+    { name: '5 Together', src: 'together.html', notes: 'Checks like these make each step dependable. The team still needs one shared picture of where it is going. Everyone works from their own map; different work, one goal; then what each one learns travels to the others.' },
+    { name: '6 Look up', src: 'stars.html', notes: 'Pan up from the summit. The stars connect: the map we share is a graph of decisions, code, people and questions.' },
+    { name: '7 A decision, recorded once', src: 'sky.html', from: 0, to: 9, notes: 'Illustration: a decision saved once; later a colleague&#39;s Claude finds it instead of asking again.' },
+    { name: '7 A code question', src: 'sky.html', from: 9, to: 19, notes: 'Measured: one real project&#39;s code graph, 7,133 nodes, 15,589 edges, 37 repositories, a snapshot from 11 Oct 2026.' },
+    { name: '7 The person who decides', src: 'sky.html', from: 19, notes: 'Illustration: a question routed to the person who decides, past the people who do not.' },
+    { name: '8 Without a map', src: 'evidence.html', from: 0, to: 5, notes: 'Without a graph the agent searches, reads file after file and fills its context.' },
+    { name: '8 With a graph', src: 'evidence.html', from: 5, to: 10, notes: 'The structure was already there: each definition a node, each reference an edge.' },
+    { name: '8 Atlassian', src: 'evidence.html', from: 10, to: 16, notes: 'Their internal benchmark. Say so.' },
+    { name: '8 Codebase-Memory', src: 'evidence.html', from: 16, to: 22, notes: 'The honest one: far fewer tokens, slightly lower answer quality than an agent that reads the files.' },
+    { name: '8 GraphRAG', src: 'evidence.html', from: 22, to: 28, notes: 'Questions about a whole corpus.' },
+    { name: '8 Honcho', src: 'evidence.html', from: 28, notes: 'Their own figure. Four sources, four different methods.' },
+    { name: '9 The horde never goes away', src: 'limits.html', from: 0, to: 6, notes: 'Honest limits. Some always wait at the edge of the light.' },
+    { name: '9 How fresh is the map', src: 'limits.html', from: 6, to: 12, notes: 'Check how fresh the map is before you trust it.' },
+    { name: '9 People still decide', src: 'limits.html', from: 12, notes: 'Agents run the routine; people own the decisions.' },
+    { name: '10 Live', card: 'live', notes: 'Tick demo-safe FIRST, then switch to the live tab. Come back and press right.' },
+    { name: '11 Dawn', src: 'dawn.html', from: 0, to: 6, notes: 'Back on the summit, at dawn.' },
+    { name: '11 Tip 1', src: 'dawn.html', from: 6, to: 11, notes: 'Share the goal, not just the task.' },
+    { name: '11 Tip 2', src: 'dawn.html', from: 11, to: 16, notes: 'Store a decision once.' },
+    { name: '11 Tip 3', src: 'dawn.html', from: 16, to: 21, notes: 'Ask the person who decides.' },
+    { name: '11 The frontier', src: 'dawn.html', from: 21, notes: 'Shared context is the frontier. Thank you.' }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var bufs = [$('bufA'), $('bufB')], show = 0, idx = -1, started = 0, settled = true, timer = 0;
+  function url(p, wait) {
+    var q = ['deck'];
+    if (wait) q.push('wait');
+    if (p.from != null) q.push('from=' + p.from);
+    if (p.to != null) q.push('to=' + p.to);
+    return F + p.src + '?' + q.join('&');
+  }
+  function send(fr, msg) { try { fr.contentWindow.postMessage(msg, '*'); } catch (e) {} }
+  function filmLength(fr, p) {
+    var d = 0; try { d = +fr.contentWindow.DURATION || 0; } catch (e) {}
+    if (p.to != null) d = p.to;
+    return Math.max(0.5, d - (p.from || 0));
+  }
+  function load(fr, p, then) {
+    var want = url(p, true);
+    if (fr.dataset.want === want && fr.dataset.ready === '1') { then(); return; }
+    fr.dataset.want = want; fr.dataset.ready = '0';
+    fr.onload = function () { fr.dataset.ready = '1'; then(); };
+    fr.src = want;
+  }
+  function preload(i) {
+    var p = PAGES[i]; if (!p || !p.src) return;
+    var fr = bufs[1 - show];
+    load(fr, p, function () {});
+  }
+  function cards(name) {
+    document.querySelectorAll('.card').forEach(function (c) { c.classList.toggle('on', c.id === 'card-' + name); });
+  }
+  function hud() {
+    var p = PAGES[idx];
+    $('hud').textContent = (idx + 1) + ' / ' + PAGES.length + '   ' + p.name;
+    $('notes').innerHTML = '<span class="nm">' + p.name + '</span>' + p.notes;
+    if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  function go(i, atEnd) {
+    i = Math.max(0, Math.min(PAGES.length - 1, i));
+    if (i === idx) return;
+    idx = i; var p = PAGES[i]; clearTimeout(timer); hud();
+    if (p.card) {
+      bufs.forEach(function (b) { b.classList.remove('on'); });
+      cards(p.card); settled = true; preload(i + 1); return;
+    }
+    // the film for this beat: use the buffer that already holds it (preloaded), else the hidden one
+    var want = url(p, true), use = bufs[1 - show].dataset.want === want ? 1 - show : (bufs[show].dataset.want === want ? show : 1 - show);
+    var fr = bufs[use];
+    load(fr, p, function () {
+      if (idx !== i) return;
+      cards(''); fr.classList.add('on'); bufs[1 - use].classList.remove('on'); show = use;
+      if (atEnd) { send(fr, 'end'); settled = true; }
+      else {
+        send(fr, 'play'); settled = false; started = performance.now();
+        timer = setTimeout(function () { settled = true; }, filmLength(fr, p) * 1000 + 150);
+      }
+      preload(i + 1);
+    });
+  }
+  function next() {
+    var p = PAGES[idx];
+    if (p && p.src && !settled) { clearTimeout(timer); send(bufs[show], 'end'); settled = true; return; }
+    go(idx + 1);
+  }
+  function prev() { go(idx - 1, true); }
+  function help(on) { $('help').classList.toggle('on', on == null ? !$('help').classList.contains('on') : on); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key;
+    if ($('help').classList.contains('on') && k !== '?' ) { help(false); if (k === 'Escape') return; }
+    if (k === 'ArrowRight' || k === ' ' || k === 'PageDown' || k === 'Enter') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }
+    else if (k === 'Home') { e.preventDefault(); go(0, true); }
+    else if (k === 'End') { e.preventDefault(); go(PAGES.length - 1, true); }
+    else if (k === 'f' || k === 'F') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(function () {}); }
+    else if (k === 'n' || k === 'N') { $('notes').classList.toggle('on'); }
+    else if (k === 'b' || k === 'B' || k === '.') { $('blank').classList.toggle('on'); }
+    else if (k === '?') { help(); }
+  });
+  $('stage').addEventListener('click', function (e) {
+    var r = $('stage').getBoundingClientRect();
+    if (e.clientX - r.left > r.width / 2) next(); else prev();
+  });
+  // keep keyboard focus here, not inside a film
+  window.addEventListener('blur', function () { setTimeout(function () { try { window.focus(); } catch (e) {} }, 0); });
+
+  // the cover's cast, drawn with the films' own sprites
+  (function () {
+    var K = window.FilmKit; if (!K) return;
+    var g = $('coverCast');
+    K.CAST_ORDER.forEach(function (id, i) {
+      var S = K.sprite(g, {});
+      K.drawCast(S, id, 80 + i * 160, 150, 9, 1, { t: 0 });
+    });
+  })();
+
+  window.Film = { go: function (n) { go(n - 1); }, next: next, prev: prev, help: help, pages: PAGES };
+  var start = parseInt((location.hash || '').slice(1), 10);
+  go(start > 0 ? start - 1 : 0, start > 1);
+  setTimeout(function () { $('hud').classList.add('show'); setTimeout(function () { $('hud').classList.remove('show'); }, 2500); }, 300);
+})();
+</script>
+</body>
+</html>
