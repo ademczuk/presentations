@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fight</title>
+<link rel="stylesheet" href="fonts.css">
+<script>if (/[?&]deck/.test(location.search)) document.documentElement.classList.add('deck');</script>
+<style>
+  :root { color-scheme: light dark; --page:#e9e6e1; --panel:#f6f4f1; --ink:#1d1b19; --muted:#6b665f; --line:#cfcac3; --accent:#3ddc84; }
+  @media (prefers-color-scheme: dark) { :root { --page:#141312; --panel:#1d1b19; --ink:#eeeae4; --muted:#9a948c; --line:#34312e; } }
+  * { box-sizing:border-box }
+  html, body { margin:0; background:var(--page); color:var(--ink); font-family:Manrope, system-ui, sans-serif }
+  main { max-width:1280px; margin:0 auto; padding:24px 20px 32px }
+  .frame { border-radius:10px; overflow:hidden; background:#0b0d12; box-shadow:0 10px 30px rgba(0,0,0,.25) }
+  #film { display:block; width:100%; height:auto; aspect-ratio:16/9 }
+  .bar { display:flex; align-items:center; gap:14px; margin-top:14px; padding:10px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px }
+  button { font:inherit; font-weight:600; font-size:14px; color:var(--ink); background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px 14px; cursor:pointer }
+  button:hover { border-color:var(--muted) }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+  #play { min-width:76px }
+  input[type=range] { flex:1; accent-color:var(--accent); min-width:80px }
+  #time { font-variant-numeric:tabular-nums; font-size:14px; color:var(--muted); min-width:92px; text-align:right }
+  html.deck, html.deck body { background:#0b0d12; overflow:hidden }
+  html.deck main { max-width:none; padding:0 }
+  html.deck .bar { display:none }
+  html.deck .frame { border-radius:0; box-shadow:none; background:#0b0d12 }
+  html.deck #film { width:100vw; height:100vh; aspect-ratio:auto }
+  @media (max-width:640px) { .bar { flex-wrap:wrap } input[type=range] { order:3; flex-basis:100% } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <svg id="film" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Fight: the green figures hold the slope with tools that refuse, a gate, a rope between a writer and a reviewer, a lamp that shows how fresh the map is, and the horde thins">
+      <style>
+        .serif { font-family:'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight:700 }
+        .sans { font-family:Manrope, 'Helvetica Neue', Arial, sans-serif; font-weight:700 }
+        .cap text, .tag { paint-order:stroke;stroke:#0b0d12;stroke-width:12px;stroke-linejoin:round }
+        .kicker { letter-spacing:6px }
+      </style>
+      <defs>
+        <radialGradient id="sky" cx="50%" cy="30%" r="75%">
+          <stop offset="0" stop-color="#1a2232"/>
+          <stop offset="1" stop-color="#0b0d12"/>
+        </radialGradient>
+        <filter id="og" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="1920" height="1080" fill="#0b0d12"/>
+      <rect width="1920" height="1080" fill="url(#sky)"/>
+      <g id="stars"></g>
+      <g id="terrain" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="monsters"></g>
+      <g id="gate" fill="none" stroke="#3ddc84" stroke-width="7" stroke-linecap="round" filter="url(#og)">
+        <path id="gatePath"/>
+      </g>
+      <path id="rope" fill="none" stroke="#3ddc84" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round" filter="url(#og)"/>
+      <g id="team" filter="url(#og)"></g>
+      <g id="tags" class="sans" font-size="26" text-anchor="middle"></g>
+      <g id="cap1" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="92" font-size="26" fill="#3ddc84">A GATE THAT REFUSES</text>
+        <text class="serif" x="960" y="168" font-size="58" fill="#f2ece4">A gate on the send path: the message is refused, not flagged.</text>
+        <text class="serif" x="960" y="240" font-size="58" fill="#f2ece4">Built after a refusal was printed and the post went out anyway.</text>
+      </g>
+      <g id="cap2" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="92" font-size="26" fill="#3ddc84">A ROPE BETWEEN TWO CLIMBERS</text>
+        <text class="serif" x="960" y="168" font-size="58" fill="#f2ece4">One writer, a different reviewer, for every change.</text>
+        <text class="serif" x="960" y="240" font-size="58" fill="#f2ece4">On the change with seven versions, that is what caught all seven.</text>
+        <text class="serif" x="960" y="312" font-size="46" fill="#c9ced6">One named merger, pinned to the exact version that was reviewed.</text>
+      </g>
+      <g id="cap3" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="92" font-size="26" fill="#3ddc84">A LAMP THAT SHOWS WHAT IS FRESH</text>
+        <text class="serif" x="960" y="168" font-size="58" fill="#f2ece4">A map that says how old it is.</text>
+        <text class="serif" x="960" y="240" font-size="58" fill="#f2ece4">One index was 67 commits behind the code it described.</text>
+      </g>
+      <g id="cap4" class="cap" text-anchor="middle">
+        <text class="sans kicker" x="960" y="92" font-size="26" fill="#3ddc84">TOOLS THAT REFUSE, NOT WARN</text>
+        <text class="serif" x="960" y="168" font-size="54" fill="#f2ece4">A carrier that won't pass a build on until it holds</text>
+        <text class="serif" x="960" y="236" font-size="54" fill="#f2ece4">the reviewer's signed yes for that exact build.</text>
+        <text class="serif" x="960" y="300" font-size="40" fill="#c9ced6">Live since 27 October. It hasn't carried a build yet.</text>
+      </g>
+      <g id="tally" class="sans" font-size="34" fill="#c9ced6" text-anchor="end">
+        <text id="tally1" x="1840" y="1000"></text>
+      </g>
+      <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
+    </svg>
+  </div>
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="33" step="0.01" value="0" aria-label="Playback position">
+    <span id="time">0.0 / 33.0 s</span>
+    <button id="save" type="button">Save frame as SVG</button>
+  </div>
+</main>
+<script src="filmkit.js"></script>
+<script>
+(function () {
+  const K = FilmKit, $ = K.$;
+  // Four beats. The deck stops on each: ?from=0&to=8, ?from=8&to=16, ?from=16&to=24, ?from=24&to=32.
+  const DUR = 33, HOLD = 32, B1 = 8, B2 = 16, B3 = 24, B4 = 32;
+  const VIEW = { tx: 330, ty: 170, tz: 600, d: 2350, yaw: -0.28, pitch: 0.27, dolly: 5, drift: 0.002 };
+  const stars = K.stars($('stars'), 150, 41, 520);
+  const T = K.terrain($('terrain'));
+  const FOOT = [160, 330], TOP = [470, 840];
+  const at = (s, side) => { const x = K.lerp(FOOT[0], TOP[0], s) + side, z = K.lerp(FOOT[1], TOP[1], s) - side * 0.35; return [x, K.groundY(x, z), z]; };
+  const P = [0, 0, 0];
+  const place = (c, w) => { K.proj(c, w[0], w[1], w[2], P); return [P[0], P[1], P[2]]; };
+  const r = K.rng(91);
+  const GATE_S = 0.2;
+
+  // The horde from scene 3, still coming. The gate stops them below GATE_S; in beat 4 they thin out.
+  const HORDE = [];
+  for (let i = 0; i < 30; i++) HORDE.push({ s0: -0.12 + r() * 0.2, side: (r() - 0.5) * 1000, sp: 0.02 + r() * 0.02, kind: i % 3 ? 'blob' : 'zombie',
+                                            leaves: B3 + 0.6 + r() * 6.5, S: K.sprite($('monsters')) });
+  // The team: a gatekeeper, a writer and a reviewer on one rope, and a lamp bearer up the slope.
+  const TEAM = [{ s: GATE_S + 0.07, side: 0 }, { s: 0.5, side: -170 }, { s: 0.5, side: 160 }, { s: 0.66, side: 10 }]
+    .map(m => Object.assign(m, { S: K.sprite($('team')) }));
+  const tagW = K.mk('text', { class: 'tag', fill: '#3ddc84' }, $('tags'));
+  const tagR = K.mk('text', { class: 'tag', fill: '#3ddc84' }, $('tags'));
+  const tagNo = K.mk('text', { class: 'tag', fill: '#ff8a7a' }, $('tags'));
+  const tagOld = K.mk('text', { class: 'tag', fill: '#8d949e' }, $('tags'));
+  const tagNew = K.mk('text', { class: 'tag', fill: '#3ddc84' }, $('tags'));
+
+  function render(t) {
+    const c = K.camera(VIEW, t);
+    const open = K.eo(K.seg(t, 0, 1.0));
+    K.drawStars(stars, t, open);
+    // Beat 3: the lamp shows what is fresh. The main mountain is lit green; the far hill to the left stays grey.
+    const lamp = K.eo(K.seg(t, B2 + 0.4, B2 + 2.2));
+    K.drawTerrain(T, c, open, L => {
+      if (L.hill === 'm') return [Math.round(K.lerp(118, 61, lamp)), Math.round(K.lerp(132, 220, lamp)), Math.round(K.lerp(160, 132, lamp)), 1 + 0.15 * lamp];
+      if (L.hill === 'w') return [118, 120, 126, 1 - 0.45 * lamp];
+      return [118, 132, 160, 1];
+    });
+    const walk = Math.floor(t * 4) % 2;
+
+    // ---- the gate ----
+    const gUp = K.eo(K.seg(t, 0.8, 2.2));
+    const gl = place(c, at(GATE_S, -300)), gr = place(c, at(GATE_S, 300));
+    const post = 52 * K.F / gl[2], postR = 52 * K.F / gr[2];
+    const lift = 1 - gUp;
+    $('gatePath').setAttribute('d', 'M' + K.fx(gl[0]) + ' ' + K.fx(gl[1]) + 'L' + K.fx(gl[0]) + ' ' + K.fx(gl[1] - post * gUp) +
+      'M' + K.fx(gr[0]) + ' ' + K.fx(gr[1]) + 'L' + K.fx(gr[0]) + ' ' + K.fx(gr[1] - postR * gUp) +
+      'M' + K.fx(gl[0]) + ' ' + K.fx(gl[1] - post * 0.75 * gUp) + 'L' + K.fx(gr[0]) + ' ' + K.fx(gr[1] - postR * 0.75 * gUp - lift * 40));
+    $('gate').setAttribute('opacity', (gUp * open).toFixed(3));
+
+    // ---- the horde: held below the gate, then thinning ----
+    let held = 0;
+    HORDE.forEach(h => {
+      const want = h.s0 + h.sp * t;
+      const limit = GATE_S - 0.03 - 0.02 * Math.abs(Math.sin(h.side));
+      let s = want, knock = 0;
+      if (gUp > 0.5 && want > limit) { s = limit - 0.02 * Math.abs(Math.sin(t * 3 + h.side)); knock = 1; held++; }
+      const gone = K.seg(t, h.leaves, h.leaves + 0.8);
+      const w = place(c, at(s, h.side));
+      K.drawSprite(h.S, h.kind, w[0], w[1] + gone * 30, 7.5 * K.F / w[2], knock && Math.sin(t * 9 + h.side) > 0.6 ? '#b3b8c0' : K.GREY,
+                   open * (1 - gone), walk);
+    });
+    tagNo.textContent = 'refused';
+    tagNo.setAttribute('x', K.fx((gl[0] + gr[0]) / 2)); tagNo.setAttribute('y', K.fx((gl[1] + gr[1]) / 2 - post * 1.15));
+    tagNo.setAttribute('opacity', (K.eo(K.seg(t, 2.6, 3.0)) * (0.65 + 0.35 * Math.sin(t * 5)) * (1 - K.seg(t, B1, B1 + 0.5))).toFixed(3));
+
+    // ---- the team ----
+    const pos = TEAM.map((m, i) => {
+      const vis = i === 0 ? open : i < 3 ? K.eo(K.seg(t, B1 + 0.2 + i * 0.3, B1 + 1.0 + i * 0.3)) : K.eo(K.seg(t, B2 + 0.1, B2 + 0.9));
+      const w = place(c, at(m.s, m.side));
+      const ps = 8.5 * K.F / w[2];
+      K.drawSprite(m.S, 'climber', w[0], w[1], ps, K.GREEN, vis, walk);
+      return { w, ps, vis };
+    });
+    // The rope between the writer and the reviewer.
+    const a = pos[1], b = pos[2], rv = Math.min(a.vis, b.vis);
+    const ax = a.w[0] + a.ps * 4, ay = a.w[1] - a.ps * 8, bx = b.w[0] - b.ps * 4, by = b.w[1] - b.ps * 8;
+    $('rope').setAttribute('d', 'M' + K.fx(ax) + ' ' + K.fx(ay) + 'Q' + K.fx((ax + bx) / 2) + ' ' + K.fx(Math.max(ay, by) + 34) + ' ' + K.fx(bx) + ' ' + K.fx(by));
+    $('rope').setAttribute('opacity', rv.toFixed(3));
+    $('rope').setAttribute('stroke-dashoffset', K.fx(-t * 30));
+    tagW.textContent = 'writes'; tagW.setAttribute('x', K.fx(a.w[0])); tagW.setAttribute('y', K.fx(a.w[1] + 38));
+    tagR.textContent = 'reviews'; tagR.setAttribute('x', K.fx(b.w[0])); tagR.setAttribute('y', K.fx(b.w[1] + 38));
+    const tagsOn = rv * K.eo(K.seg(t, B1 + 1.6, B1 + 2.2));
+    tagW.setAttribute('opacity', tagsOn.toFixed(3)); tagR.setAttribute('opacity', tagsOn.toFixed(3));
+    // The lamp's labels: fresh on the lit mountain, behind on the grey hill.
+    const far = place(c, [-950, 140, 520]), near = place(c, at(0.72, 60));
+    tagOld.textContent = '67 commits behind'; tagOld.setAttribute('x', K.fx(far[0])); tagOld.setAttribute('y', K.fx(far[1] - 40));
+    tagNew.textContent = 'current'; tagNew.setAttribute('x', K.fx(near[0])); tagNew.setAttribute('y', K.fx(near[1] - 70));
+    const lampTags = K.eo(K.seg(t, B2 + 2.0, B2 + 2.6)) * (1 - K.seg(t, B3, B3 + 0.5));
+    tagOld.setAttribute('opacity', lampTags.toFixed(3)); tagNew.setAttribute('opacity', lampTags.toFixed(3));
+
+    let tally = '';
+    if (t >= 2.6 && t < B1 + 0.3) tally = 'that message, re-tested: refused ' + Math.min(8, Math.max(1, Math.round(8 * K.eo(K.seg(t, 2.6, 6.0))))) + ' of 8';
+    else if (t >= B1 + 2.0 && t < B2 + 0.3) tally = 'caught ' + Math.max(1, Math.round(7 * K.eo(K.seg(t, B1 + 2.0, B1 + 5.5)))) + ' of 7';
+    $('tally1').textContent = tally;
+    $('tally').setAttribute('opacity', (tally ? 1 : 0) * open);
+
+    K.fade($('cap1'), t, 1.4, B1);
+    K.fade($('cap2'), t, B1 + 0.6, B2);
+    K.fade($('cap3'), t, B2 + 0.6, B3);
+    K.fade($('cap4'), t, B3 + 0.6, null);
+    $('fade').setAttribute('opacity', (1 - open + K.ei(K.seg(t, B4 + 0.2, B4 + 0.9))).toFixed(3));
+  }
+  K.player(DUR, HOLD, render, 'fight');
+})();
+</script>
+</body>
+</html>
