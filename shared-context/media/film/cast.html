@@ -85,7 +85,7 @@
     S: K.sprite($('actors'), { glow: true }), L: K.label($('labels'), K.CAST[id].name, { lift: 46, size: 28, h: 52 }) }));
   const ROPE = 3.6, ALERT = 5.2;
   // Claude carries the lantern here too, as in every other scene; its pool stays soft on this flat stage.
-  const lamp = K.lantern($('lampLayer'));
+  const lamp = K.lantern($('lampLayer'), { glow: true });
   $('poolLayer').appendChild(lamp.pool);
   const MON = [['shambler', K.GREEN, 'zombie threads'], ['mutant', K.RED, 'mutant processes'], ['zmutant', K.PURPLE, 'the horde']]
     .map(([kind, color, name], i) => ({ kind, color, i, x: 1215 + i * 268, at: ALERT + i * 0.4, lift: 0,

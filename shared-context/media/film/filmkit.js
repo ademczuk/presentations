@@ -289,7 +289,8 @@
   };
 
   // ---------- the hanging lantern and its light pool ----------
-  K.lantern = function (parent) {
+  // opts.glow: a soft light halo around the lantern body (night.html builds its own, so the default stays off).
+  K.lantern = function (parent, opts) {
     const svg = parent.ownerSVGElement || parent, defs = svg.querySelector('defs') || svg.insertBefore(K.mk('defs', {}, null), svg.firstChild);
     const id = 'filmkit-lantern-light';
     if (!svg.querySelector('#' + id)) {
@@ -299,10 +300,21 @@
       K.mk('stop', { offset: '1', 'stop-color': '#ffd36b', 'stop-opacity': '0' }, grad);
     }
     const pool = K.mk('ellipse', { fill: 'url(#' + id + ')' }, parent);
+    let halo = null;
+    if (opts && opts.glow) {
+      const hid = 'filmkit-lantern-halo';
+      if (!svg.querySelector('#' + hid)) {
+        const hg = K.mk('radialGradient', { id: hid, cx: '50%', cy: '50%', r: '50%' }, defs);
+        K.mk('stop', { offset: '0', 'stop-color': '#fff1c4', 'stop-opacity': '.9' }, hg);
+        K.mk('stop', { offset: '.35', 'stop-color': '#ffd36b', 'stop-opacity': '.38' }, hg);
+        K.mk('stop', { offset: '1', 'stop-color': '#ffd36b', 'stop-opacity': '0' }, hg);
+      }
+      halo = K.mk('circle', { fill: 'url(#' + hid + ')' }, parent);
+    }
     const g = K.mk('g', {}, parent);
     const handle = K.mk('path', { fill: 'none', stroke: '#c9b27a', 'stroke-width': 2 }, g);
     const cap = K.mk('rect', { fill: '#c9b27a' }, g), body = K.mk('rect', { fill: '#ffe7a3' }, g);
-    return { g, pool, handle, cap, body };
+    return { g, pool, halo, handle, cap, body };
   };
   K.drawLantern = function (L, handX, handY, ps, on, t) {
     on = K.clamp01(on); ps = Math.max(4.5, ps);
@@ -316,6 +328,10 @@
     L.pool.setAttribute('cx', K.fx(lx)); L.pool.setAttribute('cy', K.fx(handY - ps * 1.2));
     L.pool.setAttribute('rx', K.fx(ps * 58 * (.55 + .45 * on))); L.pool.setAttribute('ry', K.fx(ps * 26 * (.55 + .45 * on)));
     L.pool.setAttribute('opacity', on.toFixed(3));
+    if (L.halo) {
+      L.halo.setAttribute('cx', K.fx(lx)); L.halo.setAttribute('cy', K.fx(ly - ps * .3));
+      L.halo.setAttribute('r', K.fx(ps * (3.2 + 1.8 * on))); L.halo.setAttribute('opacity', (on * (.85 + .15 * Math.sin(t * 3.1))).toFixed(3));
+    }
   };
 
   // ---------- a projected, dotted route through world-space points ----------
