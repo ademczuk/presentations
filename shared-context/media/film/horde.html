@@ -78,8 +78,8 @@
       </g>
       <g id="capC2" class="cap" text-anchor="middle">
         <text class="sans kicker" x="960" y="76" font-size="26" fill="#a56bff">THE HORDE</text>
-        <text id="h3line" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One change. A real defect in ten versions in a row.</text>
-        <text class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">Our own reviewers had approved two of them.</text>
+        <text id="h3line" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One change. A real defect in ten of eleven versions.</text>
+        <text id="h3sub" class="sans" x="960" y="200" font-size="40" fill="#c9ced6" style="font-weight:600">Our own reviewers had approved three of them.</text>
       </g>
       <rect id="fade" width="1920" height="1080" fill="#0b0d12"/>
     </svg>
@@ -102,10 +102,12 @@
   //   ?deck&from=25&to=32    C2 the horde, defects
   // Every frame is a pure function of t. All seeds are drawn once here, at init.
   const DUR = 33, HOLD = 32;
-  // H3, re-counted 29 Oct from the review record: ten heads in a row, each with a real finding fixed in the next
-  // head; the eleventh drew none and the change merged. The line says so instead of "every version".
-  const H3_VERSIONS = 10; // re-check against the incident ledger on the day
-  $('h3line').textContent = 'One change. A real defect in ' + ['', '', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][H3_VERSIONS] + ' versions in a row.';
+  // H3, re-counted 29 Oct from the PR's review record (comments and receipts): of the eleven heads reviewed on
+  // 27 Oct 10:13 to 14:53 Vienna, ten drew a real finding, each fixed in the next head; one (22c39c3a) came back
+  // clean and its gap was caught on the next. Our own reviewers had approved three of the ten. Re-check on the day.
+  const H3 = { found: 10, of: 11, approved: 3 }, W = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  $('h3line').textContent = 'One change. A real defect in ' + W[H3.found] + ' of ' + W[H3.of] + ' versions.';
+  $('h3sub').textContent = 'Our own reviewers had approved ' + W[H3.approved] + ' of them.';
   const P = [0, 0, 0];
   const r = K.rng(77);
 
