@@ -91,7 +91,7 @@
       <g id="cap2" class="cap" text-anchor="middle">
         <text id="k2" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">A ROPE BETWEEN TWO CLIMBERS</text>
         <text id="h2" class="serif" x="960" y="142" font-size="66" fill="#f2ece4">One writer. A different reviewer. Every change.</text>
-        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">On one recent change, a second reviewer caught a new defect in every version.</text>
+        <text id="s2" class="sans" style="font-weight:600" x="960" y="198" font-size="40" fill="#c9ced6">On one change, a second reviewer caught a new defect in ten versions in a row.</text>
       </g>
       <g id="cap3" class="cap" text-anchor="middle">
         <text id="k3" class="sans kicker" x="960" y="80" font-size="26" fill="#ff6a1f">AN INDEX WITH A DATE ON IT</text>
@@ -159,7 +159,7 @@
   const T = K.terrain($('terrain'));
   const HM = K.HILLS.find(H => H.id === 'm');
   T.lines.forEach(L => { if (L.hill === 'm') L.ring = Math.round((L.q - 0.05) / 0.935 * (HM.n - 1)); });
-  const lantern = K.lantern($('lamp'));
+  const lantern = K.lantern($('lamp'), { glow: true });
   const r = K.rng(4401);
 
   // The team. The three bots of the horde's last beat (writer, reviewer, and the scene 1 hero with the lantern,
@@ -466,6 +466,7 @@
     const lh = [lerp(sideH[0], overH[0], lampUp), lerp(sideH[1], overH[1], lampUp) + Math.sin(Math.PI * seg(t, 16.25, 16.5)) * bps * 1.4];
     K.drawLantern(lantern, lh[0], lh[1], bps * (1 + 0.5 * lampUp), lampOn, t);
     lantern.g.setAttribute('opacity', vIn.toFixed(3)); lantern.pool.setAttribute('opacity', (lampOn * vIn * (0.55 + 0.45 * lampUp)).toFixed(3));
+    lantern.halo.setAttribute('opacity', (lampOn * vIn * (0.6 + 0.4 * lampUp)).toFixed(3));
 
     // the rope: writer's hand, reviewer's hand, then up to the merger at the top
     const ropeOn = eo(seg(t, 9.4, 10.0)) * (1 - seg(t, B2 + 0.1, B2 + 0.6)) * vIn;
