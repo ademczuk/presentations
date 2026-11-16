@@ -18,11 +18,13 @@
   /* the cover and the live page are drawn in the films' own type, sized to the stage */
   .cover { background:radial-gradient(circle at 50% 30%, #1a2232 0, #0b0d12 75%) }
   .cover h1 { position:absolute; left:0; right:0; top:22%; margin:0; text-align:center; font:700 9cqh/1.05 'Source Serif 4', Georgia, serif }
-  .cover .q { position:absolute; left:0; right:0; top:39%; text-align:center; font:600 3.4cqh/1.3 Manrope, Arial, sans-serif; color:var(--muted) }
+  .cover .q { position:absolute; left:0; right:0; top:41.5%; text-align:center; font:600 3.4cqh/1.3 Manrope, Arial, sans-serif; color:var(--muted) }
   .cover .q b { color:var(--accent); font-weight:700 }
   .cover svg { position:absolute; left:50%; top:52%; width:52cqw; height:16cqh; transform:translateX(-50%) }
   .cover .by { position:absolute; left:0; right:0; bottom:13%; text-align:center; font:700 3.2cqh/1.2 Manrope, Arial, sans-serif }
   .cover .ev { position:absolute; left:0; right:0; bottom:8.5%; text-align:center; font:600 2.4cqh/1.2 Manrope, Arial, sans-serif; color:var(--muted) }
+  .cover .sub { position:absolute; left:0; right:0; top:32.5%; text-align:center; font:600 2.6cqh/1.2 Manrope, Arial, sans-serif; color:#c9ced6 }
+  .cover .cr { position:absolute; left:0; right:0; bottom:4.5%; text-align:center; font:600 1.7cqh/1.2 Manrope, Arial, sans-serif; color:var(--muted); opacity:.7 }
   .live { background:#0b0d12; display:none; place-content:center; text-align:center }
   .live.on { display:grid }
   .live h1 { margin:0; font:700 7.5cqh/1.1 'Source Serif 4', Georgia, serif; display:flex; align-items:center; gap:2.4cqh; justify-content:center }
@@ -56,10 +58,12 @@
   <iframe id="bufB" title="scene" tabindex="-1"></iframe>
   <section class="card cover" id="card-cover" aria-label="Title">
     <h1>Shared Context</h1>
+    <div class="sub">Building Out the Frontier of AI: Networking Intelligence</div>
     <div class="q">You have context with your AI. <b>Does your team share it?</b></div>
     <svg id="coverCast" viewBox="0 0 960 180" aria-label="The team: Claude, Codex, Kimi, Antigravity, Grok and local models"></svg>
     <div class="by">Andrew Demczuk</div>
     <div class="ev">Agentic AI in Practice, AI Factory Austria, 18 November 2026</div>
+    <div class="cr">The altitude scenes are after an idea by Felix Rieseberg.</div>
   </section>
   <div id="qr"><img src="media/film/qr-film.svg" alt="QR code for this film">this film</div>
   <section class="card live" id="card-live" aria-label="Live">
@@ -84,12 +88,21 @@
   var F = 'media/film/';
   // One entry per press-to-press beat. from/to are the scene's own seconds (its ?deck&from=&to= range).
   var PAGES = [
+    { name: 'Opening: Shared Context', deck: { file: 'slides-embed.html', start: 0, end: 1 }, notes: 'From the 22 Oct deck: title, then About me. Right arrow steps.' },
+    { name: 'A question', deck: { file: 'slides-embed.html', start: 3, end: 3 }, notes: 'You have context with an LLM. Right arrow: But do you have SHARED context?' },
+    { name: 'The problem today', deck: { file: 'slides-embed.html', start: 5, end: 5 }, notes: 'Copy-paste between windows; every agent re-reads the same files; two agents fix the same bug; nobody knows who is waiting on whom. One bullet per right arrow.' },
     { name: 'Shared Context', card: 'cover', notes: 'Open on the question. Then right arrow into the night.' },
     { name: '1 Night', src: 'night.html', notes: 'One climber, one lamp, at the task point. The others wait in the dark beyond its light, and they are not all the same: different models.' },
-    { name: '2 The task', src: 'altitude.html', to: 11.6, notes: 'After an idea by Felix Rieseberg, drawn as altitude. A task is often just your best guess.' },
+    { name: '2 The task', src: 'altitude.html', from: 2.8, to: 11.6, notes: 'Altitude, after an idea by Felix Rieseberg (credited on the cover). The film starts straight in the climb, no title card. A task is often just your best guess.' },
     { name: '2 The goal', src: 'altitude.html', from: 11.6, to: 14.1, notes: 'Ask for the goal, and let it find the path.' },
     { name: '2 The company objective', src: 'altitude.html', from: 14.1, notes: 'Better still, the company objective.' },
     { name: 'The team', src: 'cast.html', notes: 'Now we know what this work is for. Can the agents actually deliver it? This is the team: Claude, Codex, Kimi, Antigravity, Grok and local models, on one shared channel. And this is what comes up the mountain after them.' },
+    { name: 'MeshyChat', deck: { start: 3, end: 3 }, notes: 'The shared channel is called MeshyChat. The map: the fleet, signed messages, delivery, the graph, owed and decisions, and its first 30 days (as of 21 Oct 2026). Each right arrow flies to the next island; the film moves on after the overview. Link on the closing page once it is public.' },
+    { name: 'MeshyChat at work', deck: { file: 'meshychat-video.html', start: 0, end: 0 }, notes: 'Full screen: the MeshyChat mission-control view rotating through its panels. Let it run; right arrow hides the caption, next right arrow moves on.' },
+    { name: 'Five open-source techniques', deck: { file: 'slides-embed.html', start: 11, end: 11 }, notes: 'Credits for the looks we re-implemented: showtime, remocn, SeeCode, ff-tracking, explainroo. One row per right arrow.' },
+    { name: 'One message, step by step', deck: { file: 'slides-embed.html', start: 13, end: 13 }, notes: 'Example data. One signed message from one agent to another through the server and the postbox.' },
+    { name: 'A message sequence, after SeeCode', deck: { file: 'slides-embed.html', start: 14, end: 14 }, notes: 'Example data. Four vendors, one conversation. Technique credit on the slide.' },
+    { name: 'Fleet tracking, after ff-tracking', deck: { file: 'slides-embed.html', start: 15, end: 15 }, notes: 'Illustration, not a measurement: a tracker sweeps one desk for live agent sessions. Technique credit on the slide.' },
     { name: '3 Mutant processes', src: 'horde.html', from: 0, to: 9, notes: 'One run started 384 helpers; 341 died on a shared limit before finishing. The design and critic phases never ran.' },
     { name: '3 Zombie threads', src: 'horde.html', from: 9, to: 18.5, notes: 'A tool said stopped. It kept running, and two copies were writing the same file.' },
     { name: '3 Built twice', src: 'horde.html', from: 18.5, to: 25, notes: 'Two agents built the same fix, 25 minutes apart; each had searched, in the wrong place.' },
@@ -97,33 +110,30 @@
     { name: '4 A gate', src: 'fight.html', from: 0, to: 8, notes: 'Tools that refuse, not warn. A gate on the send path: the message is refused, not flagged.' },
     { name: '4 A rope', src: 'fight.html', from: 8, to: 16, notes: 'One writer, a different reviewer: in the film, two different models. One named merger, and the merge pinned to the exact version that was reviewed.' },
     { name: '4 A lamp', src: 'fight.html', from: 16, to: 24, notes: 'A map that says how old it is. One index was 67 commits behind the code it described.' },
-    { name: '4 Waiting for a yes', src: 'fight.html', from: 24, to: 32, notes: 'A carrier that will not pass a build on without the reviewer&#39;s signed yes for that exact build. Live since 27 October; 0 builds carried as of that day. Re-count on the day.' },
+    { name: '4 Waiting for a yes', src: 'fight.html', from: 24, to: 32, notes: 'A carrier that will not pass a build on without the reviewer&#39;s signed yes for that exact build. Live since 27 October; 0 builds carried, re-counted Mon 16 Nov (empty outbox, no build state). Re-count on the day.' },
+    { name: 'Agents do the work. Humans hold the gates.', deck: { file: 'slides-embed.html', start: 10, end: 10 }, notes: 'The motion clip plays, then the line lands.' },
+    { name: 'Four pull requests to main', deck: { file: 'slides-embed.html', start: 19, end: 19 }, notes: 'From the 22 Oct deck: review by a different agent, the gate, the merge. Steps per right arrow.' },
+    { name: 'The machine caught its own flake', deck: { file: 'slides-embed.html', start: 20, end: 20 }, notes: '7,543 tests, about 1 h 40 min; run 1 one flaky failure, run 2 passed.' },
     { name: '5 Together', src: 'together.html', notes: 'Checks like these make each step dependable. The team still needs one shared picture of where it is going. Everyone works from their own map; different work, one goal; then what each one learns travels to the others.' },
-    { name: '6 Look up', src: 'stars.html', notes: 'Pan up from the summit. The stars connect: the map we share is a graph of decisions, code, people and questions.' },
-    { name: '7 A decision, recorded once', src: 'sky.html', from: 0, to: 9, notes: 'Illustration: a decision saved once; later a colleague&#39;s Claude finds it instead of asking again.' },
-    { name: '7 The code graph', src: 'sky.html', from: 9, to: 19, notes: 'Measured: one real project&#39;s code graph, 7,133 nodes, 15,589 edges, 37 repositories, a snapshot from 11 Oct 2026.' },
-    { name: '7 The person who decides', src: 'sky.html', from: 19, notes: 'Illustration: a question routed to the person who decides, past the people who do not.' },
-    { name: '8 Without a map', src: 'evidence.html', from: 0, to: 5, notes: 'Without a graph the agent searches, reads file after file and fills its context.' },
-    { name: '8 With a graph', src: 'evidence.html', from: 5, to: 10, notes: 'The structure was already there: each definition a node, each reference an edge.' },
-    { name: '8 Atlassian', src: 'evidence.html', from: 10, to: 16, notes: 'Their internal benchmark. Say so.' },
-    { name: '8 Codebase-Memory', src: 'evidence.html', from: 16, to: 22, notes: 'The honest one: about 10x fewer tokens, and answer quality 83% against 92% for an agent that reads the files.' },
-    { name: '8 GraphRAG', src: 'evidence.html', from: 22, to: 28, notes: 'Questions about a whole corpus.' },
-    { name: '8 Honcho', src: 'evidence.html', from: 28, to: 32, notes: 'Their own figure.' },
-    { name: '8 Measured elsewhere', src: 'evidence.html', from: 32, notes: 'Four sources, four different methods. The links are at the bottom of the frame.' },
+    { name: '6 Look up', src: 'stars.html', from: 0, to: 5.5, notes: 'Pan up from the summit to the stars. Look up. (Cut before the old constellation; the next beat is the better graph.)' },
+    { name: '7 Measured elsewhere', deck: { start: 14, end: 14 }, notes: 'From the stars into the graph: the camera flies from the star field into four clusters, one per source. Atlassian 44% more accurate and 48% fewer tokens (their internal benchmark); Codebase-Memory about 10x fewer tokens and 2.1x fewer tool calls, answer quality 83% against 92% (the honest trade-off); Microsoft GraphRAG about 2 to 3% of the tokens; Honcho 60 to 90% token savings (their own figure). One right arrow per source.' },
     { name: '9 The horde never goes away', src: 'limits.html', from: 0, to: 6, notes: 'Honest limits. Some always wait at the edge of the light.' },
     { name: '9 How fresh is the map', src: 'limits.html', from: 6, to: 12, notes: 'Check how fresh the map is before you trust it.' },
     { name: '9 People still decide', src: 'limits.html', from: 12, notes: 'Agents run the routine; people own the decisions.' },
-    { name: '10 Live', card: 'live', notes: 'Tick demo-safe FIRST, then switch to the live tab. Come back and press right.' },
-    { name: '11 Dawn', src: 'dawn.html', from: 0, to: 6, notes: 'Back on the summit, at dawn.' },
-    { name: '11 Tip 1', src: 'dawn.html', from: 6, to: 11, notes: 'Share the goal, not just the task.' },
-    { name: '11 Tip 2', src: 'dawn.html', from: 11, to: 16, notes: 'Store a decision once.' },
-    { name: '11 Tip 3', src: 'dawn.html', from: 16, to: 21, notes: 'Ask the person who decides.' },
-    { name: '11 The frontier', src: 'dawn.html', from: 21, notes: 'Shared context is the frontier. Thank you.' }
+    { name: '10 Dawn', src: 'dawn.html', from: 0, to: 6, notes: 'Back on the summit, at dawn.' },
+    { name: 'The whole firm in one graph', deck: { start: 13, end: 13 }, notes: 'After Lexifina, a controlled test on a test firm&#39;s records.' },
+    { name: 'How the team shares what it knows', deck: { start: 10, end: 10 }, notes: 'Shared memory: meetings and code today; chat and business data next.' },
+    { name: 'Where is processOrder used?', deck: { start: 11, end: 11 }, notes: 'Without a map the agent reads 60 files; with a graph it follows the edges.' },
+    { name: 'The code graph', deck: { start: 5, end: 5 }, notes: 'The fly-in plays first. 7,133 nodes, 15,589 edges, 37 repositories, a snapshot from 11 Oct 2026.' },
+    { name: 'Our company graph, live', deck: { start: 15, end: 15 }, notes: 'The live demo. Tick demo-safe FIRST, then switch to the live graph tab. Come back and press right.' },
+    { name: 'Three tips', deck: { start: 17, end: 17 }, notes: 'Three tips for working with agents, one per right arrow.' },
+    { name: 'Shared context is the frontier', deck: { start: 16, end: 16 }, interactive: true, notes: 'Left: QR for the playable; middle: the playable itself (needs the venue internet); right: QR for github.com/ademczuk/MeshyChat. Do not show the MeshyChat QR before joey confirms the repo is public.' },
   ];
 
   var $ = function (id) { return document.getElementById(id); };
-  var bufs = [$('bufA'), $('bufB')], show = 0, idx = -1, started = 0, settled = true, timer = 0;
+  var bufs = [$('bufA'), $('bufB')], show = 0, idx = -1, started = 0, settled = true, timer = 0, fadeTimer = 0, lastSrc = null, DISSOLVE = 700;
   function url(p, wait) {
+    if (p.deck) return (p.deck.file || 'talk-embed.html') + '?start=' + p.deck.start + '&end=' + p.deck.end + (p.deck.pre ? '&pre=' + p.deck.pre : '');
     var q = ['deck'];
     if (wait) q.push('wait');
     if (p.from != null) q.push('from=' + p.from);
@@ -143,8 +153,9 @@
     fr.onload = function () { fr.dataset.ready = '1'; then(); };
     fr.src = want;
   }
+  function key(p) { return p.src || (p.deck ? (p.deck.file || 'talk') + ':' + p.deck.start : ''); }
   function preload(i) {
-    var p = PAGES[i]; if (!p || !p.src) return;
+    var p = PAGES[i]; if (!p || !(p.src || p.deck)) return;
     var fr = bufs[1 - show];
     load(fr, p, function () {});
   }
@@ -153,7 +164,7 @@
   }
   function hud() {
     var p = PAGES[idx];
-    $('qr').classList.toggle('on', idx === PAGES.length - 1);
+    $('qr').classList.toggle('on', idx === PAGES.length - 1 && !PAGES[idx].deck);
     $('hud').textContent = (idx + 1) + ' / ' + PAGES.length + '   ' + p.name;
     $('notes').innerHTML = '<span class="nm">' + p.name + '</span>' + p.notes;
     if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
@@ -168,24 +179,55 @@
     }
     // the film for this beat: use the buffer that already holds it (preloaded), else the hidden one
     var want = url(p, true), use = bufs[1 - show].dataset.want === want ? 1 - show : (bufs[show].dataset.want === want ? show : 1 - show);
-    var fr = bufs[use];
+    var fr = bufs[use], prevSrc = lastSrc; lastSrc = key(p);
     load(fr, p, function () {
       if (idx !== i) return;
-      cards(''); fr.classList.add('on'); bufs[1 - use].classList.remove('on'); show = use;
-      if (atEnd) { send(fr, 'end'); settled = true; }
+      cards('');
+      var old = bufs[1 - use];
+      // a new scene dissolves over the last frame of the one before, instead of cutting to its dark first frame;
+      // beats inside one scene keep their hard (frame-exact) cut. The next preload waits until the old buffer is hidden.
+      var dissolve = !atEnd && prevSrc && prevSrc !== key(p) && old.classList.contains('on');
+      clearTimeout(fadeTimer); old.style.transition = ''; old.style.opacity = '';
+      if (dissolve) {
+        fr.style.transition = 'none'; fr.style.opacity = '0'; fr.style.zIndex = '2'; old.style.zIndex = '1';
+        fr.classList.add('on'); void fr.offsetWidth;
+        fr.style.transition = 'opacity ' + DISSOLVE + 'ms ease'; fr.style.opacity = '1';
+        fadeTimer = setTimeout(function () {
+          if (bufs[show] === fr) old.classList.remove('on');
+          fr.style.transition = ''; fr.style.zIndex = ''; old.style.zIndex = '';
+          if (idx === i) preload(i + 1);
+        }, DISSOLVE + 50);
+      } else {
+        fr.style.transition = ''; fr.style.opacity = ''; fr.style.zIndex = '';
+        fr.classList.add('on'); old.classList.remove('on');
+      }
+      show = use;
+      bufs[0].style.pointerEvents = ''; bufs[1].style.pointerEvents = '';
+      if (p.interactive) fr.style.pointerEvents = 'auto';
+      // a deck beat was usually preloaded while hidden: restart its entry animation now that it is on screen
+      if (p.deck) { try { var D = fr.contentWindow.Deck; if (D && D.replay) D.replay(); } catch (e) {} }
+      if (p.deck) { settled = true; }
+      else if (atEnd) { send(fr, 'end'); settled = true; }
       else {
         send(fr, 'play'); settled = false; started = performance.now();
         timer = setTimeout(function () { settled = true; }, filmLength(fr, p) * 1000 + 150);
       }
-      preload(i + 1);
+      if (!dissolve) preload(i + 1);
     });
   }
   function next() {
     var p = PAGES[idx];
+    // a talk-deck beat steps through the deck's own builds and pages first; the film moves on when the deck has nothing left
+    if (p && p.deck) { try { if (bufs[show].contentWindow.Deck.next()) return; } catch (e) {} go(idx + 1); return; }
     if (p && p.src && !settled) { clearTimeout(timer); send(bufs[show], 'end'); settled = true; return; }
     go(idx + 1);
   }
-  function prev() { go(idx - 1, true); }
+  function prev() {
+    var p = PAGES[idx];
+    // inside a deck beat, step back through its builds first; leave the beat only at its first step
+    if (p && p.deck) { try { if (bufs[show].contentWindow.Deck.prev()) return; } catch (e) {} }
+    go(idx - 1, true);
+  }
   function help(on) { $('help').classList.toggle('on', on == null ? !$('help').classList.contains('on') : on); }
 
   document.addEventListener('keydown', function (e) {

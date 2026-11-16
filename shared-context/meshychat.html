@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeshyChat</title>
+<style>
+  :root { --bg:#0e0d0c; --ink:#f2ece4; --muted:#a6a098; --accent:#ff7a3d }
+  html,body { margin:0; min-height:100%; background:var(--bg); color:var(--ink); font:500 18px/1.5 Manrope, Arial, sans-serif }
+  main { max-width:560px; margin:0 auto; padding:56px 20px }
+  h1 { font:700 40px/1.1 'Source Serif 4', Georgia, serif; margin:0 0 12px }
+  p { color:var(--muted); margin:0 0 18px }
+  a { color:var(--accent) }
+  .wait { color:var(--muted) }
+</style>
+</head>
+<body>
+<main>
+  <h1>MeshyChat</h1>
+  <p id="msg" class="wait">Checking the repository...</p>
+  <p><a id="repo" href="https://github.com/ademczuk/MeshyChat">github.com/ademczuk/MeshyChat</a></p>
+</main>
+<script>
+/* One QR code that works before and after the repository goes public.
+   Redirect ONLY on a verified public answer (HTTP 200 with private:false).
+   Private (404), rate limit, offline or anything else: stay here and show the note plus the plain link. */
+(function () {
+  var REPO = 'https://github.com/ademczuk/MeshyChat', API = window.__API || 'https://api.github.com/repos/ademczuk/MeshyChat';
+  var msg = document.getElementById('msg');
+  function hold(text) { msg.className = ''; msg.textContent = text; }
+  var settled = false, timer = setTimeout(function () { if (!settled) { settled = true; hold('Could not check right now. The link below opens the repository once it is public.'); } }, 5000);
+  fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } })
+    .then(function (r) { return r.status === 200 ? r.json().then(function (j) { return { s: 200, j: j }; }) : { s: r.status }; })
+    .then(function (x) {
+      if (settled) return; settled = true; clearTimeout(timer);
+      if (x.s === 200 && x.j && x.j.private === false) { location.replace(window.__REPO || REPO); return; }
+      if (x.s === 404) { hold('The public MeshyChat repository is not open yet. Keep this link: once it is open, it takes you straight there.'); return; }
+      hold('Could not check right now. The link below opens the repository once it is public.');
+    })
+    .catch(function () { if (!settled) { settled = true; clearTimeout(timer); hold('Could not check right now. The link below opens the repository once it is public.'); } });
+})();
+</script>
+</body>
+</html>
