@@ -116,11 +116,7 @@
     { name: 'The machine caught its own flake', deck: { file: 'slides-embed.html', start: 20, end: 20 }, notes: '7,543 tests, about 1 h 40 min; run 1 one flaky failure, run 2 passed.' },
     { name: '5 Together', src: 'together.html', notes: 'Checks like these make each step dependable. The team still needs one shared picture of where it is going. Everyone works from their own map; different work, one goal; then what each one learns travels to the others.' },
     { name: '6 Look up', src: 'stars.html', from: 0, to: 5.5, notes: 'Pan up from the summit to the stars. Look up. (Cut before the old constellation; the next beat is the better graph.)' },
-    { name: '7 Measured elsewhere', deck: { start: 14, end: 14 }, notes: 'From the stars into the graph: the camera flies from the star field into four clusters, one per source. Atlassian 44% more accurate and 48% fewer tokens (their internal benchmark); Codebase-Memory about 10x fewer tokens and 2.1x fewer tool calls, answer quality 83% against 92% (the honest trade-off); Microsoft GraphRAG about 2 to 3% of the tokens; Honcho 60 to 90% token savings (their own figure). One right arrow per source.' },
-    { name: '9 The horde never goes away', src: 'limits.html', from: 0, to: 6, notes: 'Honest limits. Some always wait at the edge of the light.' },
-    { name: '9 How fresh is the map', src: 'limits.html', from: 6, to: 12, notes: 'Check how fresh the map is before you trust it.' },
-    { name: '9 People still decide', src: 'limits.html', from: 12, notes: 'Agents run the routine; people own the decisions.' },
-    { name: '10 Dawn', src: 'dawn.html', from: 0, to: 6, notes: 'Back on the summit, at dawn.' },
+    { name: '7 Measured elsewhere', deck: { start: 14, end: 14 }, dissolve: 1400, notes: 'From the stars into the graph: the camera flies from the star field into four clusters, one per source. Atlassian 44% more accurate and 48% fewer tokens (their internal benchmark); Codebase-Memory about 10x fewer tokens and 2.1x fewer tool calls, answer quality 83% against 92% (the honest trade-off); Microsoft GraphRAG about 2 to 3% of the tokens; Honcho 60 to 90% token savings (their own figure). One right arrow per source.' },
     { name: 'The whole firm in one graph', deck: { start: 13, end: 13 }, notes: 'After Lexifina, a controlled test on a test firm&#39;s records.' },
     { name: 'How the team shares what it knows', deck: { start: 10, end: 10 }, notes: 'Shared memory: meetings and code today; chat and business data next.' },
     { name: 'Where is processOrder used?', deck: { start: 11, end: 11 }, notes: 'Without a map the agent reads 60 files; with a graph it follows the edges.' },
@@ -191,12 +187,12 @@
       if (dissolve) {
         fr.style.transition = 'none'; fr.style.opacity = '0'; fr.style.zIndex = '2'; old.style.zIndex = '1';
         fr.classList.add('on'); void fr.offsetWidth;
-        fr.style.transition = 'opacity ' + DISSOLVE + 'ms ease'; fr.style.opacity = '1';
+        var fade = p.dissolve || DISSOLVE; fr.style.transition = 'opacity ' + fade + 'ms ease'; fr.style.opacity = '1';
         fadeTimer = setTimeout(function () {
           if (bufs[show] === fr) old.classList.remove('on');
           fr.style.transition = ''; fr.style.zIndex = ''; old.style.zIndex = '';
           if (idx === i) preload(i + 1);
-        }, DISSOLVE + 50);
+        }, fade + 50);
       } else {
         fr.style.transition = ''; fr.style.opacity = ''; fr.style.zIndex = '';
         fr.classList.add('on'); old.classList.remove('on');

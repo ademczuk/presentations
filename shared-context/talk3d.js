@@ -68,7 +68,7 @@
       S.raf = 0;
       if (!S.host || !S.host.isConnected) return;
       var since = RM ? 999 : (now - S.since0) / 1000, total = (now - S.t0) / 1000;
-      var c = S.ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = BG; c.fillRect(0, 0, S.canvas.width, S.canvas.height);
+      var c = S.ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = opts.bg || BG; c.fillRect(0, 0, S.canvas.width, S.canvas.height);
       c.setTransform(S.k * S.dpr, 0, 0, S.k * S.dpr, S.ox * S.dpr, S.oy * S.dpr);
       opts.draw(c, S.step, since, total, S);
       if (active()) S.raf = requestAnimationFrame(frame);
@@ -335,6 +335,8 @@
 
   // ---------------------------------------------------------------- Measured elsewhere: a flight between four clusters
   var evid = (function () {
+    // in the film's embed this beat follows the star field: start on its navy, words after the camera moves
+    var FILM = /talk-embed[.]html$/.test(location.pathname);
     var SRC = [
       { who: 'Atlassian, Teamwork Graph', when: 'July 2026, agents with and without graph context', c: [-950, 120, -250],
         big: [{ v: 44, s: '%' }, ' more accurate, ', { v: 48, s: '%' }, ' fewer tokens'], cav: 'Their internal benchmark.' },
@@ -403,6 +405,7 @@
     }
     var raf = 0;
     function onStep(ov, i, back) {
+      if (FILM && i === 0 && !back && !RM) { ov.style.transition = 'none'; ov.style.opacity = '0'; void ov.offsetWidth; ov.style.transition = 'opacity .9s ease 1.1s'; ov.style.opacity = '1'; }
       ov.querySelectorAll('.card').forEach(function (e) { e.classList.toggle('on', +e.dataset.at === i); });
       cancelAnimationFrame(raf);
       var card = ov.querySelector('.card[data-at="' + i + '"]'), cnts = card.querySelectorAll('.cnt'), t0 = performance.now() + (back || RM ? -99999 : 1000);
@@ -413,7 +416,7 @@
       }
       raf = requestAnimationFrame(tick);
     }
-    return scene({ steps: 4, draw: draw, overlay: overlay, onStep: onStep });
+    return scene({ steps: 4, draw: draw, overlay: overlay, onStep: onStep, bg: FILM ? '#0b0d12' : null });
   })();
 
   if (window.Talk) { window.Talk.whyGraph = why; window.Talk.lexifina = lexi; window.Talk.evidence = evid; }
